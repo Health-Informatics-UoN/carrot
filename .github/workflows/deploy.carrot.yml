@@ -69,10 +69,15 @@ jobs:
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
         working-directory: website
 
+      - name: Copy built files to carrot
+        run: |
+          rm -rf carrot-2/*
+          cp -r website/out carrot-2/
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: website/out
+          path: carrot-2
   deploy:
     environment:
       name: github-pages
