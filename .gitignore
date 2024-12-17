@@ -38,3 +38,4 @@ jspm_packages
 .next
 .env
 .DS_Store
+website/out/
