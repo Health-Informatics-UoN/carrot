@@ -5,7 +5,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  basePath: "/website",
+  distDir: "out",
   output: "export",
 };
 
