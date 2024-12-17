@@ -3,7 +3,7 @@ import BoxReveal from "@/components/ui/box-reveal";
 
 const features = [
   {
-    name: "CO-CONNECTt",
+    name: "CO-CONNECT",
     description:
       "CO-CONNECT developed Carrot to streamline COVID-19 data access and integration across the UK, aiding researchers in developing therapies and treatments.",
     background: (
