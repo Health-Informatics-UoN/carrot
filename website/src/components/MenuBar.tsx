@@ -13,7 +13,7 @@ export const MenuBar = () => {
           <div className="text-2xl flex items-center font-semibold">
             <img
               className="mx-3 w-[25px]"
-              src="/carrot-logo.png"
+              src="/carrot/carrot-logo.png"
               alt="carrot-logo"
             />
             Carrot

@@ -41,7 +41,7 @@ export function Sidebar({ userName }: { userName?: string }) {
                   <div className="text-2xl flex items-center font-semibold">
                     <img
                       className="mx-3 w-[25px]"
-                      src="/carrot-logo.png"
+                      src="/carrot/carrot-logo.png"
                       alt="carrot-logo"
                     />
                     Carrot
@@ -116,7 +116,7 @@ export function Sidebar({ userName }: { userName?: string }) {
           <div className="text-2xl flex items-center font-semibold">
             <img
               className="mx-3 w-[25px]"
-              src="/carrot-logo.png"
+              src="/carrot/carrot-logo.png"
               alt="carrot-logo"
             />
             Carrot

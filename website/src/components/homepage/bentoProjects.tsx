@@ -7,7 +7,11 @@ const features = [
     description:
       "CO-CONNECT developed Carrot to streamline COVID-19 data access and integration across the UK, aiding researchers in developing therapies and treatments.",
     background: (
-      <img className="w-[150px]" src="/logos/coconnect1.png" alt="CO-CONNECT" />
+      <img
+        className="w-[150px]"
+        src="/carrot/logos/coconnect1.png"
+        alt="CO-CONNECT"
+      />
     ),
     href: "https://fed-a.org/co-connect-home/",
     cta: "Find out more",
@@ -20,7 +24,7 @@ const features = [
     background: (
       <img
         className="opacity-80 p-5 w-[300px]"
-        src="/logos/alleviate.jpeg"
+        src="/carrot/logos/alleviate.jpeg"
         alt="ALLEVIATE"
       />
     ),
@@ -35,7 +39,7 @@ const features = [
     background: (
       <img
         className="opacity-80 p-5 dark:bg-white"
-        src="/logos/nbrc.png"
+        src="/carrot/logos/nbrc.png"
         alt="NOTTINGHAM BRC"
       />
     ),
@@ -48,7 +52,11 @@ const features = [
     description:
       "The BY-COVID project uses Carrot to enable open data sharing on SARS-CoV-2 and other infectious diseases, boosting research and public health efforts across Europe.",
     background: (
-      <img className="w-[300px]" src="/logos/bycovid.png" alt="BY-COVID" />
+      <img
+        className="w-[300px]"
+        src="/carrot/logos/bycovid.png"
+        alt="BY-COVID"
+      />
     ),
     href: "https://by-covid.org/about",
     cta: "Find out more",
@@ -61,7 +69,7 @@ const features = [
     background: (
       <img
         className="p-2 w-[200px]"
-        src="/logos/sde.png"
+        src="/carrot/logos/sde.png"
         alt="East Midlands SDE"
       />
     ),

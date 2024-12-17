@@ -55,7 +55,7 @@ export function AnimatedBeamMapping({ className }: { className?: string }) {
           <Circle ref={div6Ref}>
             <img
               className="mx-3 w-[32px]"
-              src="/carrot-logo.png"
+              src="/carrot/carrot-logo.png"
               alt="carrot-logo"
             />
           </Circle>

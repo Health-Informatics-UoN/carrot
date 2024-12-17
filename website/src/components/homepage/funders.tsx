@@ -25,7 +25,7 @@ export default function Funders() {
           <div>
             {" "}
             <Image
-              src="/logos/nhs-e.jpg"
+              src="/carrot/logos/nhs-e.jpg"
               alt="Logo UoN"
               height={200}
               width={200}
@@ -34,7 +34,7 @@ export default function Funders() {
           </div>
           <div>
             <Image
-              src="/logos/nihr.jpg"
+              src="/carrot/logos/nihr.jpg"
               alt="Logo CCN"
               height={400}
               width={400}
@@ -43,7 +43,7 @@ export default function Funders() {
           </div>
           <div>
             <Image
-              src="/logos/UKRI.png"
+              src="/carrot/logos/UKRI.png"
               alt="Logo UKRI"
               height={400}
               width={400}
@@ -53,7 +53,7 @@ export default function Funders() {
           </div>
           <div>
             <Image
-              src="/logos/horizon.jpg"
+              src="/carrot/logos/horizon.jpg"
               alt="Logo ALVE"
               height={200}
               width={200}
