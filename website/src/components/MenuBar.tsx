@@ -16,7 +16,7 @@ export const MenuBar = () => {
               src="/carrot/carrot-logo.png"
               alt="carrot-logo"
             />
-            Carrot 2
+            Carrot
           </div>
         </Link>
 
