@@ -6,12 +6,13 @@ on:
 
     # paths:
     #   - "website/**"
-  env:
-    ENABLE_FEATURES: ${{ vars.ENABLE_FEATURES }}
-    ENABLE_PROJECTS: ${{ vars.ENABLE_PROJECTS }}
-    ENABLE_FUNDERS: ${{ vars.ENABLE_FUNDERS }}
-    DEPLOY_LINK: ${{ vars.DEPLOY_LINK }}
-    LOGIN_LINK: ${{ vars.LOGIN_LINK }}
+env:
+  ENABLE_FEATURES: ${{ vars.ENABLE_FEATURES }}
+  ENABLE_PROJECTS: ${{ vars.ENABLE_PROJECTS }}
+  ENABLE_FUNDERS: ${{ vars.ENABLE_FUNDERS }}
+  DEPLOY_LINK: ${{ vars.DEPLOY_LINK }}
+  LOGIN_LINK: ${{ vars.LOGIN_LINK }}
+
 permissions:
   contents: read
   pages: write
