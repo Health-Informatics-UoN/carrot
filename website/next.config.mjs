@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+import nextra from "nextra";
 
 const nextConfig = {
   reactStrictMode: true,
@@ -11,4 +12,9 @@ const nextConfig = {
   assetPrefix: "/carrot",
 };
 
-export default nextConfig;
+const withNextra = nextra({
+  theme: "nextra-theme-docs",
+  themeConfig: "./theme.config.tsx",
+});
+
+export default withNextra(nextConfig);

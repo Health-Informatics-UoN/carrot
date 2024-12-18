@@ -1,0 +1,356 @@
+import { Callout, Tabs, Table, Td, Th, Tr, Code } from "nextra/components";
+import { Mandatory } from "../../components/Mandatory";
+
+# Configuration
+
+Relay can be configured using environment variables, or any approach supported by [ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/)
+
+Your desired approach may differ depending on the environment you're configuring, e.g.:
+
+<Tabs items={['Compose Container Stack', 'Local Development']}>
+  <Tabs.Tab>
+    If you're running Relay as part of a composed stack of containers, we recommend setting environment variables in the `compose.yml`.
+    
+    For example:
+
+    ```yaml filename="compose.yml"
+    services:
+      # ...
+
+      relay:
+        # ...
+
+        environment:
+          ConnectionStrings__Default: Server=db_host;Port=5432;Database=hutch-relay;User Id=postgres;Password=postgres
+          RelayTaskQueue__ConnectionString: amqp://user:password@rabbitmq:5672
+
+          UpstreamTaskApi__BaseUrl: https://my-task-api.com
+          UpstreamTaskApi__CollectionId: dd52026b-5a61-4c89-b733-04ba141b3f31
+          UpstreamTaskApi__Username: user
+          UpstreamTaskApi__Password: password
+
+        # ...
+    ```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+    In development, you should use [.NET User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets), and run Relay with `DOTNET_Environment` set to `Development`.
+
+    <Callout emoji="💡">
+      Running from an IDE will set the environment to `Development` for you, and
+      provide a way to edit User Secrets.
+    </Callout>
+
+    ```json filename="secrets.json"
+    {
+      "ConnectionStrings": {
+        "Default": "Server=localhost;Port=5432;Database=hutch-relay;User Id=postgres;Password=postgres"
+      },
+      "RelayTaskQueue": {
+        "ConnectionString": "amqp://user:password@localhost:5672"
+      },
+      "UpstreamTaskApi": {
+        "BaseUrl": "https://my-task-api.com",
+        "CollectionId": "dd52026b-5a61-4c89-b733-04ba141b3f31",
+        "Username": "user",
+        "Password": "password"
+      }
+    }
+    ```
+
+  </Tabs.Tab>
+</Tabs>
+
+## Upstream Task API [#upstream-task-api]
+
+**Configuration Section: `UptreamTaskApi`**
+
+<Table>
+  <thead>
+    <Tr>
+      <Th>Key</Th>
+      <Th>Description</Th>
+    </Tr>
+  </thead>
+  <tbody>
+    <Tr>
+      <Td>
+        <Mandatory>`BaseUrl`</Mandatory>
+      </Td>
+      <Td>
+        The Base URL for an Upstream Task API that Relay should fetch jobs from.
+        This only needs to include scheme (e.g. `https://`), host
+        (`my-task-api.com`) and optionally port `8080`
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>
+        <Mandatory>`CollectionId`</Mandatory>
+      </Td>
+      <Td>An ID (provided from the Upstream API) for this Task API consumer</Td>
+    </Tr>
+    <Tr>
+      <Td>
+        <Mandatory>`Username`</Mandatory>
+      </Td>
+      <Td>A valid username for accessing the Task API</Td>
+    </Tr>
+    <Tr>
+      <Td>
+        <Mandatory>`Password`</Mandatory>
+      </Td>
+      <Td>A valid password for the Task API user configured above</Td>
+    </Tr>
+    <Tr>
+      <Td>`PollingFrequency`</Td>
+      <Td>
+        Interval in milliseconds between polling requests to the Upstream Task
+        API.
+
+        Defaults to `5000` (5 seconds).
+      </Td>
+    </Tr>
+
+  </tbody>
+</Table>
+
+Examples:
+
+<Tabs items={['Environment', 'Compose', 'JSON']}>
+  <Tabs.Tab>
+    ```bash filename=".env" copy
+    UpstreamTaskApi__BaseUrl="https://my-task-api.com"
+    UpstreamTaskApi__CollectionId="dd52026b-5a61-4c89-b733-04ba141b3f31"
+    UpstreamTaskApi__Username=user
+    UpstreamTaskApi__Password=password
+    UpstreamTaskApi__PollingFrequency=5000
+    ```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```yaml filename="compose.yml" copy
+    environment:
+      UpstreamTaskApi__BaseUrl: https://my-task-api.com
+      UpstreamTaskApi__CollectionId: dd52026b-5a61-4c89-b733-04ba141b3f31
+      UpstreamTaskApi__Username: user
+      UpstreamTaskApi__Password: password
+      UpstreamTaskApi__PollingFrequency: 5000
+    ```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```json filename="secrets.json" copy
+    {
+      "UpstreamTaskApi": {
+        "BaseUrl": "https://my-task-api.com",
+        "CollectionId": "dd52026b-5a61-4c89-b733-04ba141b3f31",
+        "Username": "user",
+        "Password": "password"
+        "PollingFrequency": 5000
+      }
+    }
+    ```
+
+  </Tabs.Tab>
+</Tabs>
+
+## Database Connections [#database]
+
+**Configuration Section: `ConnectionStrings`**
+
+<Table>
+  <thead>
+    <Tr>
+      <Th>Key</Th>
+      <Th>Description</Th>
+    </Tr>
+  </thead>
+  <tbody>
+    <Tr>
+      <Td>
+        <Mandatory>`Default`</Mandatory>
+      </Td>
+      <Td>
+        An ODBC/ADO.NET style connection string for a PostgreSQL 16 Server, and
+        a database name for Relay to store working state in.
+      </Td>
+    </Tr>
+  </tbody>
+</Table>
+
+**Configuration Section: `Database`**
+
+<Table>
+  <thead>
+    <Tr>
+      <Th>Key</Th>
+      <Th>Description</Th>
+    </Tr>
+  </thead>
+  <tbody>
+    <Tr>
+      <Td>`ApplyMigrationsOnStartup`</Td>
+      <Td>
+        Should Relay automatically apply outstanding database migrations at
+        startup? `true` / `false`.
+        
+        Defaults to `false`.
+      </Td>
+    </Tr>
+  </tbody>
+</Table>
+
+Examples:
+
+<Tabs items={['Environment', 'Compose', 'JSON']}>
+  <Tabs.Tab>
+    ```bash filename=".env" copy
+    ConnectionStrings__Default="Server=localhost;Port=5432;Database=hutch-relay;User Id=postgres;Password=postgres"
+    Database__ApplyMigrationsOnStartup=true
+    ```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```yaml filename="compose.yml" copy
+    environment:
+      ConnectionStrings__Default: "Server=localhost;Port=5432;Database=hutch-relay;User Id=postgres;Password=postgres"
+      Database__ApplyMigrationsOnStartup: true
+    ```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```json filename="secrets.json" copy
+    {
+      "ConnectionStrings": {
+        "Default": "Server=localhost;Port=5432;Database=hutch-relay;User Id=postgres;Password=postgres"
+      },
+      "Database": {
+        "ApplyMigrationsOnStartup": true
+      }
+    }
+    ```
+
+  </Tabs.Tab>
+</Tabs>
+
+## RelayTask Queue
+
+**Configuration Section: `RelayTaskQueue`**
+
+<Table>
+  <thead>
+    <Tr>
+      <Th>Key</Th>
+      <Th>Description</Th>
+    </Tr>
+  </thead>
+  <tbody>
+    <Tr>
+      <Td>
+        <Mandatory>`ConnectionString`</Mandatory>
+      </Td>
+      <Td>A connection URL for an AMQP Server</Td>
+    </Tr>
+  </tbody>
+</Table>
+
+Examples:
+
+<Tabs items={['Environment', 'Compose', 'JSON']}>
+  <Tabs.Tab>
+    ```bash filename=".env" copy
+    RelayTaskQueue__ConnectionString="amqp://user:password@localhost:5672"
+    ```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```yaml filename="compose.yml" copy
+    environment:
+      RelayTaskQueue__ConnectionString: "amqp://user:password@localhost:5672"
+    ```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```json filename="secrets.json" copy
+    {
+      "RelayTaskQueue": {
+        "ConnectionString": "amqp://user:password@localhost:5672"
+      },
+    }
+    ```
+
+  </Tabs.Tab>
+</Tabs>
+
+## Results Obfuscation
+
+**Configuration Section: `Obfuscation`**
+
+<Table>
+  <thead>
+    <Tr>
+      <Th>Key</Th>
+      <Th>Description</Th>
+    </Tr>
+  </thead>
+  <tbody>
+    <Tr>
+      <Td>`LowNumberSuppressionThreshold`</Td>
+      <Td>
+        A positive number will set the threshold below which Relay will suppress
+        and return `0`.
+        
+        Defaults to `0` (effectively off).
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`RoundingTarget`</Td>
+      <Td>
+        The target nearest number to round up to, e.g. `10` will round both
+        `171` and `179` to `180`.
+        
+        Defaults to `0` (effectively off).
+      </Td>
+    </Tr>
+  </tbody>
+</Table>
+
+Examples:
+
+<Tabs items={['Environment', 'Compose', 'JSON']}>
+  <Tabs.Tab>
+    ```bash filename=".env" copy
+    Obfuscation__LowNumberSuppressionThreshold=50
+    Obfuscation__RoundingTarget=5
+    ```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```yaml filename="compose.yml" copy
+    environment:
+      Obfuscation__LowNumberSuppressionThreshold: 50
+      Obfuscation__RoundingTarget: 5
+    ```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```json filename="secrets.json" copy
+    {
+      "Obfuscation": {
+        "LowNumberSuppressionThreshold": 50,
+        "RoundingTarget": 5
+      }
+    }
+    ```
+
+  </Tabs.Tab>
+</Tabs>
+
+## ASP.NET Core
+
+Since Relay is an ASP.NET Core application, there are some capabilities of that framework that can be configured in the standard way.
+
+Examples of this include [logging levels](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/logging/#configure-logging)
+and [hosting configuration](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel/endpoints) (e.g. bind addresses, TLS...).
+
+Please refer to the [ASP.NET Core documentation](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/) on these topics.

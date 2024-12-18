@@ -1,0 +1,21 @@
+# Carrot docs
+
+Jobs coming from the HDR Gateway are put into a queue in Relay. [Bunny](/bunny) polls Relay for jobs, and POSTs the results when the job is completed.
+
+## Getting started
+
+Hutch tools are designed to be deployed together as a stack.
+
+### Prerequisites
+
+Docker
+
+### Deployment
+
+To build the stack, run
+
+```bash
+docker compose up
+```
+
+This will build the component images and compose your stack.
