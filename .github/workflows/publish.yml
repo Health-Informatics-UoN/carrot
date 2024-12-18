@@ -4,8 +4,8 @@ on:
     branches:
       - main
 
-    # paths:
-    #   - "website/**"
+    paths:
+      - "website/**"
 
 permissions:
   contents: read

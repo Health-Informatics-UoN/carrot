@@ -24,7 +24,7 @@ export default function CallToAction() {
                 <Github className="mr-2 size-4" /> GitHub Discussions
               </Button>
             </a>
-            {deployLink && (
+            {deployLink != "" && (
               <a href={deployLink} target="_blank">
                 <Button className="lg:text-lg dark:hover:bg-gray-100 hover:bg-gray-100 text-md hover:border-orange-900 dark:hover:border-orange-900 text-orange-600 dark:text-orange-600 bg-white dark:bg-white border border-orange-600">
                   <Rocket className="mr-2 size-4" /> Deploy your own Carrot
