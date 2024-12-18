@@ -33,19 +33,6 @@ jobs:
         with:
           static_site_generator: next
 
-      - name: test env. var
-        run: |
-          echo "repository variable : $ENABLE_FEATURES"
-          echo "organization variable : $ENABLE_PROJECTS"
-          echo "overridden variable : $ENABLE_FUNDERS"
-          echo "variable from shell environment : $DEPLOY_LINK"
-        env:
-          ENABLE_FEATURES: ${{ vars.ENABLE_FEATURES }}
-          ENABLE_PROJECTS: ${{ vars.ENABLE_PROJECTS }}
-          ENABLE_FUNDERS: ${{ vars.ENABLE_FUNDERS }}
-          DEPLOY_LINK: ${{ vars.DEPLOY_LINK }}
-          LOGIN_LINK: ${{ vars.LOGIN_LINK }}
-
       - name: Build with Next.js 🏗️
         run: npx next build
         working-directory: website
