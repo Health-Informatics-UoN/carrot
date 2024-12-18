@@ -4,9 +4,14 @@ on:
     branches:
       - main
 
-    paths:
-      - "website/**"
-
+    # paths:
+    #   - "website/**"
+  env:
+    ENABLE_FEATURES: ${{ vars.ENABLE_FEATURES }}
+    ENABLE_PROJECTS: ${{ vars.ENABLE_PROJECTS }}
+    ENABLE_FUNDERS: ${{ vars.ENABLE_FUNDERS }}
+    DEPLOY_LINK: ${{ vars.DEPLOY_LINK }}
+    LOGIN_LINK: ${{ vars.LOGIN_LINK }}
 permissions:
   contents: read
   pages: write
@@ -46,17 +51,13 @@ jobs:
           LOGIN_LINK: ${{ vars.LOGIN_LINK }}
 
       - name: test env. var 2
-        run: |
-          echo "repository variable : $ENABLE_FEATURES"
-          echo "organization variable : $ENABLE_PROJECTS"
-          echo "overridden variable : $ENABLE_FUNDERS"
-          echo "variable from shell environment : $DEPLOY_LINK"
-        env:
-          ENABLE_FEATURES: ${{ env.ENABLE_FEATURES }}
-          ENABLE_PROJECTS: ${{ env.ENABLE_PROJECTS }}
-          ENABLE_FUNDERS: ${{ env.ENABLE_FUNDERS }}
-          DEPLOY_LINK: ${{ env.DEPLOY_LINK }}
-          LOGIN_LINK: ${{ env.LOGIN_LINK }}
+        run: env
+        # env:
+        #   ENABLE_FEATURES: ${{ env.ENABLE_FEATURES }}
+        #   ENABLE_PROJECTS: ${{ env.ENABLE_PROJECTS }}
+        #   ENABLE_FUNDERS: ${{ env.ENABLE_FUNDERS }}
+        #   DEPLOY_LINK: ${{ env.DEPLOY_LINK }}
+        #   LOGIN_LINK: ${{ env.LOGIN_LINK }}
 
       - name: Build with Next.js 🏗️
         run: npx next build
