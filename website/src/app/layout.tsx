@@ -34,10 +34,10 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/icons/favicon.ico",
-    apple: "/icons/apple-touch-icon.png",
+    icon: "/carrot/icons/favicon.ico",
+    apple: "/carrot/icons/apple-touch-icon.png",
   },
-  manifest: "/manifest.json",
+  manifest: "/carrot/manifest.json",
 };
 
 export default async function RootLayout({
