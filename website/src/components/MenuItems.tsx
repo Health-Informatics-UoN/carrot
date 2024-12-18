@@ -51,7 +51,7 @@ export const sidebarItems: SidebarItems = {
     },
     {
       label: "Login",
-      href: "/accounts/login/",
+      href: `${process.env.LOGIN_LINK}`,
       icon: LogIn,
     },
   ],
