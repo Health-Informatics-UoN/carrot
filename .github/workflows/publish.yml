@@ -35,6 +35,12 @@ jobs:
       - name: Build with Next.js 🏗️
         run: npx next build
         working-directory: website
+        env:
+          ENABLE_FEATURES: ${{ vars.ENABLE_FEATURES }}
+          ENABLE_PROJECTS: ${{ vars.ENABLE_PROJECTS }}
+          ENABLE_FUNDERS: ${{ vars.ENABLE_FUNDERS }}
+          DEPLOY_LINK: ${{ vars.DEPLOY_LINK }}
+          LOGIN_LINK: ${{ vars.LOGIN_LINK }}
 
       - name: Upload artifact 📡
         uses: actions/upload-pages-artifact@v3
