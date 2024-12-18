@@ -6,12 +6,6 @@ on:
 
     # paths:
     #   - "website/**"
-env:
-  ENABLE_FEATURES: ${{ env.ENABLE_FEATURES }}
-  ENABLE_PROJECTS: ${{ env.ENABLE_PROJECTS }}
-  ENABLE_FUNDERS: ${{ env.ENABLE_FUNDERS }}
-  DEPLOY_LINK: ${{ env.DEPLOY_LINK }}
-  LOGIN_LINK: ${{ env.LOGIN_LINK }}
 
 permissions:
   contents: read
@@ -23,6 +17,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  environment: github-pages
   build:
     runs-on: ubuntu-latest
 
@@ -51,24 +46,9 @@ jobs:
           DEPLOY_LINK: ${{ vars.DEPLOY_LINK }}
           LOGIN_LINK: ${{ vars.LOGIN_LINK }}
 
-      - name: test env. var 2
-        run: env
-        # env:
-        #   ENABLE_FEATURES: ${{ env.ENABLE_FEATURES }}
-        #   ENABLE_PROJECTS: ${{ env.ENABLE_PROJECTS }}
-        #   ENABLE_FUNDERS: ${{ env.ENABLE_FUNDERS }}
-        #   DEPLOY_LINK: ${{ env.DEPLOY_LINK }}
-        #   LOGIN_LINK: ${{ env.LOGIN_LINK }}
-
       - name: Build with Next.js 🏗️
         run: npx next build
         working-directory: website
-        env:
-          ENABLE_FEATURES: ${{ vars.ENABLE_FEATURES }}
-          ENABLE_PROJECTS: ${{ vars.ENABLE_PROJECTS }}
-          ENABLE_FUNDERS: ${{ vars.ENABLE_FUNDERS }}
-          DEPLOY_LINK: ${{ vars.DEPLOY_LINK }}
-          LOGIN_LINK: ${{ vars.LOGIN_LINK }}
 
       - name: Upload artifact 📡
         uses: actions/upload-pages-artifact@v3
@@ -87,9 +67,3 @@ jobs:
       - name: Publish to GitHub Pages 🚀
         id: deployment
         uses: actions/deploy-pages@v4
-        # with:
-        #   ENABLE_FEATURES: ${{ env.ENABLE_FEATURES }}
-        #   ENABLE_PROJECTS: ${{ vaenvrs.ENABLE_PROJECTS }}
-        #   ENABLE_FUNDERS: ${{ vars.ENABLE_FUNDERS }}
-        #   DEPLOY_LINK: ${{ vars.DEPLOY_LINK }}
-        #   LOGIN_LINK: ${{ vars.LOGIN_LINK }}
