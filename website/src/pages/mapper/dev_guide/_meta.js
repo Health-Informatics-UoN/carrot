@@ -1,6 +1,10 @@
 export default {
   quickstart: "Quickstart",
-  // projects_datasets_scanreports:
-  //   "Projects, Datasets, Scan Reports, and Permissions",
-  // upload_scan_report: "Uploading a Scan Report file",
+  data_structures: "Internal data structures",
+  mapping_rules: "Mapping rules",
+  api: "API",
+  azure_functions: "Azure functions",
+  migrations: "Database migration",
+  new_vocab: "Adding new vocabulary",
+  testing: "Testing",
 };

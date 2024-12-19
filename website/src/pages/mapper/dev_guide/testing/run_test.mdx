@@ -1,0 +1,27 @@
+## Running a Unit Test
+
+To run unit tests locally, we can do the following:
+
+1. Build and run the mapping tool locally, where the `.env` file should
+   contain the credentials for the dev DB.
+
+```
+docker build --tag ccom . && docker run -it --volume $PWD/api:/api
+   --env-file .env -p 8080:8000 ccom
+```
+
+2. In another terminal tab, run the following the get the name of the
+   running container and open a shell within it (be careful here if
+   you have more than one container running in docker! - It just grabs
+   the first container in the list)
+
+```
+docker exec -it `docker container ls | awk 'NR==2 {print $1}'` /bin/bash
+```
+
+3. Then run the following commands in the container:
+
+```
+cd ../api
+python manage.py test mapping
+```
