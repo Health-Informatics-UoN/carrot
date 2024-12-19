@@ -1,0 +1,5 @@
+﻿csv_file_name,field_name,code,value
+Covid19.csv,Symptom,SNOMED,
+Covid19.csv,Testtype,LOINC,
+Demographics.csv,Sex,F,Female
+Demographics.csv,Sex,M,Male

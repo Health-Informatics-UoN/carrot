@@ -1,6 +1,8 @@
-# Quickstart Guide
+import { Callout } from "nextra/components";
 
-This Quickstart guide will guide you through the usage of Carrot-Mapper. Specifically, it covers:
+# User Quickstart
+
+This Quickstart guide will guide you through the usage of Carrot Mapper. Specifically, it covers:
 
 1. [Home page](#home-page)
 2. [Gaining access](#gaining-access)
@@ -21,7 +23,7 @@ From here you can login to start using Carrot, access its GitHub repo or start a
 
 ## Gaining Access
 
-The deployed Carrot-Mapper is available at [carrot.ac.uk](https://carrot.ac.uk).
+The deployed Carrot Mapper is available at [carrot.ac.uk](https://carrot.ac.uk).
 
 A user account is required to access the site; one can be requested from the site administrator.
 
@@ -40,10 +42,16 @@ Fill in the details as required, and upload a valid Scan Report File.
 You may optionally provide a Data Dictionary file.
 If an error message occurs, fix the error in the Scan Report File (or Data Dictionary file if provided) and try again to upload.
 
-!!! caution
-Not all possible errors in the files can be checked before upload. If you are directed to the Scan Reports page after upload, this indicates that all pre-checks have completed.
-However, other errors can be checked only during the processing of the file after upload. If these occur, the `Upload Status` of the Scan Report may change to `Upload Failed`, or it may stay as `Upload in Progress` forever (over 30 minutes indicates an error).
-If this occurs, please check your files yourself for possible errors, and if that fails then contact the system administrator to check the logs.
+<Callout type="info">
+  Not all possible errors in the files can be checked before upload. If you are
+  directed to the Scan Reports page after upload, this indicates that all
+  pre-checks have completed. However, other errors can be checked only during
+  the processing of the file after upload. If these occur, the `Upload Status`
+  of the Scan Report may change to `Upload Failed`, or it may stay as `Upload in
+  Progress` forever (over 30 minutes indicates an error). If this occurs, please
+  check your files yourself for possible errors, and if that fails then contact
+  the system administrator to check the logs.
+</Callout>
 
 Once a valid Scan Report File is uploaded, the user will be redirected to the Scan Report list page.
 This should show the newly created Scan Report at the top of the table.
@@ -54,10 +62,14 @@ While this process is running, the "Upload Status" visible to the right of the r
 Once the process completes, the status will change (once the page is reloaded) to "Upload Complete".
 In the case of an unrecoverable error in processing, the status will be set to "Upload Failed".
 
-!!! Caution
-Please note that sometimes errors in processing do not result in the status being set to "Upload Failed", with the status incorrectly remaining as "Upload in Progress".
-If this status remains for more than 30 minutes then you can be sure that the process has failed.
-Please report this to the development team with a copy of the Scan Report File being used, to help us improve the checks run.
+<Callout type="info">
+  Please note that sometimes errors in processing do not result in the status
+  being set to "Upload Failed", with the status incorrectly remaining as "Upload
+  in Progress". If this status remains for more than 30 minutes then you can be
+  sure that the process has failed. Please report this to the development team
+  with a copy of the Scan Report File being used, to help us improve the checks
+  run.
+</Callout>
 
 Wait for approximately one minute to ensure the example Scan Report has been fully processed.
 Refresh the Scan Reports page to check that the Status of your Scan Report has been set to "Upload Complete" before continuing.
@@ -65,7 +77,7 @@ Refresh the Scan Reports page to check that the Status of your Scan Report has b
 ## Navigation
 
 After upload, the user is directed to the Scan Reports page before the new Scan Report has been fully processed.
-While the Scan Report continues to be processed, the contents visible on Carrot-Mapper will be populated over time.
+While the Scan Report continues to be processed, the contents visible on Carrot Mapper will be populated over time.
 
 Click on the name of the Scan Report to navigate to the list of Tables ("Tables List") within the Scan Report.
 As Tables are processed, the user can click on the name of each Table to navigate to the list of Fields ("Field List") within that Table.
@@ -98,8 +110,10 @@ You will be taken back to the Tables list, and the `PERSON ID` and `EVENT DATE` 
 
 The `Job Progress` indication for this table should now be `In Progress`. You can click this indication for more information about the creating mapping rules jobs which are running in the background.
 
-!!! note
-While creating mapping rules jobs of one table are running, you cannot set `PersonID` and `Date` of other tables in the same Scan Report.
+<Callout type="info">
+  While creating mapping rules jobs of one table are running, you cannot set
+  `PersonID` and `Date` of other tables in the same Scan Report.
+</Callout>
 
 Now do the same for `Covid.csv`, selecting `PersonID` and `Date`.
 
@@ -114,8 +128,12 @@ Now that `Person ID` and `Date Event` are set for each of the tables, the Mappin
 
 When `Job Progress` indication shows `Job Complete` for all the tables, the tables are now populated by the Mapping Rules associated to the Concepts already mapped.
 
-!!! note
-If you see `Not Started or No data yet` when hover over the `Job Progress` indication, this is usually a sign that you have not set the `Person ID` and `Date Event` on the tables. Or you just need to update the table fields again for Carrot to start collecting the data about jobs.
+<Callout type="info">
+  If you see `Not Started or No data yet` when hover over the `Job Progress`
+  indication, this is usually a sign that you have not set the `Person ID` and
+  `Date Event` on the tables. Or you just need to update the table fields again
+  for Carrot to start collecting the data about jobs.
+</Callout>
 
 Note that there are 5 or 6 rows in the table associated to each Concept.
 This fully describes how to map the source term to the OMOP standard.
@@ -144,7 +162,7 @@ You can also try _removing_ a Concept by pressing the grey `x` on the right of a
 
 ## Downloading Mapping Rules
 
-The final task in the simplest end-to-end process in Carrot-Mapper is to download the Mapping Rules in a form that can be used as input to Carrot-CDM (which will perform the transformations on the data).
+The final task in the simplest end-to-end process in Carrot Mapper is to download the Mapping Rules in a form that can be used as input to Carrot-CDM (which will perform the transformations on the data).
 
 On either `Rules` or `Review Rules` pages, you can see the `Request Download` button on the top-right hand side. Press that and choose either `Mapping JSON` or `Mapping CSV` (more human-readable version, but cannot be used as input to Carrot-CDM) to start the process of generating the chosen file. After requesting successfully, you will be redirected to `Downloads` page. While the file is being genrated you can see an indication for this on the left hand side. The generated file which is ready for downloading will be seen on `Downloads` page, after a few moment.
 

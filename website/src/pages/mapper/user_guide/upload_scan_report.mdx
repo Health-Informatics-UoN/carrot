@@ -1,95 +1,129 @@
-## Prerequisites
+import { Callout } from "nextra/components";
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [MS Azure Storage Explorer](https://azure.microsoft.com/en-us/products/storage/storage-explorer/#Download-4)
+# Overview of process
 
-## Getting Started
+A Scan Report is the basic unit representing a single data source.
+In order to create a new Scan Report in the Carrot-Mapper system,
+one must upload a _Scan Report Form_ to the system. Once uploaded,
+an ingestion process reads this file and populates the system with
+its contents. The documentation below explains this process and the
+options available to users.
 
-The most direct route to running the application locally is using the Docker quickstart.
+## The Scan Report Upload form
 
-The repository contains a docker-compose for development, so after you have setup the [configuration](#configuration), just run
+To upload a new _Scan Report Form_, navigate to the _Scan Reports_
+page and then click "New Scan Report". This opens a new web form.
 
-```bash
-docker-compose up -d
+Firstly select an existing _Data Partner_ from the dropdown list.
+This will populate the _Dataset_ field with existing _Datasets_
+linked to this _Data Partner_. These are grouped by _Project_ that
+the user has access to. Select the correct _Dataset_ that the new
+_Scan Report_ should belong to.
 
-or
+<Callout type="info">
+  If there is no appropriate _Dataset_ already existing, click the
+    _Add New_ button to the right of the _Dataset_ dropdown. This opens
+    a panel.
 
-docker compose up
-```
+    Enter a name for the _Dataset_ (which must be globally unique - if
+    you receive an error then it is likely that this _Dataset_ name is
+    already taken), and select at least one _Project_ to which it will
+    be associated. Then select the visibility, editor and admin options
+    as appropriate (see
+    [Projects, Datasets, Scan Reports, and Permissions ](projects-datasets-and-scanreports.md)
+    for an explanation of these. The _Dataset_ creator is automatically
+    assigned as an editor.
 
-to start the application stack. This runs the database, Azurite emulator, Azure functions (`workers`) and will build Carrot's backend (`web`) and frontend (`next-client`). After the command run successfully, Carrot can be accessed through `http://localhost:8000/`
+    Finally, click the "Add new Dataset" button
+    to create the new _Dataset_.
 
-Docker will mount the `app/api` directory to the web app container, so any changes in the Python code of the backend will be reflected in the running application.
+</Callout>
 
-Any code changes in the frontend app, i.e., `next-client-app`, will be reflected as well in the UI, thanks to the `app/next-client-app` directory mounted on Docker environment.
+## Setting visibility/viewers and editors - permissions
 
-Note: You may need to refresh the browser to see the UI changes after code changed in `next-client-app`.
+Once a _Dataset_ has been selected, select the appropriate
+permissions for the _Scan Report_. The user performing the upload
+is set as the _Scan Report_'s Author, and has administrator rights
+to the _Scan Report_. Additional users can be set as editors, and,
+if the _Scan Report_ is set as _RESTRICTED_, viewers. Note that
+if a user has a given level of access to the _Dataset_, then they
+inherit that same access to the _Scan Report_ automatically.
 
-## Configuration
+## Upload Form
 
-There are a few steps to set up the data and environment for Carrot to run with Docker compose.
+Choose a Scan Report in the "WhiteRabbit ScanReport" field, and
+optionally choose a dictionary file in the "Data Dictionary" field.
+The formats of these two files are as described below. Then click
+the "Submit" button to begin the upload process. This will launch an
+instance of the [UploadQueue](/mapper/dev_guide/uploadqueue).
 
-### OMOP CDM setting
+## The Scan Report file format
 
-You need a pre-seeded OMOP CDM database inside the database of Carrot.
+The Scan Report File should be in the format as output by the
+White Rabbit tool. Broadly, this is an Excel .xlsx file with the
+following non-exhaustive format. At upload, a series of checks are
+run upon the file to ensure it meets certain standards before it
+is further processed, and an error message is presented if these
+checks fail.
 
-To do this, add a folder named `vocabs` in the `root` directory of Carrot, then place there vocabulary files downloaded from [Athena](https://athena.ohdsi.org/vocabulary/list). This should be done before running `docker compose up` for the first time.
+1. `.xlsx` file format
+2. The first sheet is 'Field Overview' where:
+   - There is no empty row or column at the start of the sheet.
+   - The first 10 column headers are:
+     "Table",
+     "Field",
+     "Description",
+     "Type",
+     "Max length",
+     "N rows",
+     "N rows checked",
+     "Fraction empty",
+     "N unique values",
+     "Fraction unique"
+   - A contiguous group of rows is associated to each table in the
+     dataset. Each group should be separated from the next by a
+     blank row. There is no blank between the header row and the
+     first row of the first group. Two contiguous blank rows will be
+     detected as the end of the sheet, and no further entries will be
+     added.
+   - Within each group, a single row corresponds to a single field
+     in the associated table.
+   - Each table name in the 'Field Overview' table must be associated
+     to a single sheet with identical name. This imposes a 30-character
+     limit on the table names including `.csv` ending.
+3. 2 additional sheets named 'Table Overview' and '\_' must also be
+   present, although they are never used.
+4. In each of the sheets associated to a table from the 'Field Overview'
+   tab:
+   - Each field in the table is represented by 2 columns in the sheet.
+     The first column has in its header row the name of the field, while
+     the second column is always headed 'Frequency'. Thus a typical sheet
+     might be headed with `"Person", "Frequency", "DOB", "Frequency",
+"Observation", "Frequency"` etc.
+   - The fields in the sheet must match exactly with the field names
+     provided for this table in the 'Field Overview' sheet.
+   - Each pair of columns is populated by all values that appear in the
+     given field, with their corresponding frequency. Usually, this
+     frequency should be no less than 5 due to applying count thresholding.
+   - Pairs of columns associated to a given field can differ in length
+     from pairs of columns associated to other fields.
+   - An entry in a given pair of columns which is blank in both the field
+     name column and Frequency column will count as the end of the column.
+   - If all entries in a given field should be redacted, it can be helpful
+     to add a single entry in the field, wth value "List truncated..." to
+     show the intent.
+   - There is no empty row or column at the start of the sheet.
 
-When running `docker compose up`, OMOP CDM will be created and loaded to Carrot's database, thanks to [OMOP Lite](https://github.com/andyrae/omop-lite/pkgs/container/omop-lite) container.
+These stipulations are summarised in the following two annotated screenshots.
 
-### Preparing initial data
+The 'Field Overview' sheet:
+![](/docs/scanreport_format1.png)
 
-You need to seed the web app database with the OMOP table and field names. You can do this by using your terminal and access the `web` container on Docker or you can use Docker Desktop directly. The following instructions is for the latter method.
+Single sheet associated to a single table:
+![](/docs/scanreport_format2.png)
 
-Navigate to your Docker Desktop, choose `web` container, choose `Exec` tab, then run: `python manage.py loaddata mapping filetypes`.
+## The Data Dictionary file format
 
-To add a new admin user (Django superuser) run: `python manage.py createsuperuser`.
-
-Following this order, create inital `Data Partner`, `Dataset` (with admin as the admin user) and `Project` (with `Datasets` as the created dataset and `Members` as the admin user) by using Django Admin panel `http://localhost:8000/admin/`
-
-### Azure Functions
-
-#### Local Storage
-
-You need to set up a local storage for local development of Carrot
-
-With the `workers` container in Docker Desktop is running, open `MS Azure Storage Explorer`, and create the following `queues` (under the tab `Storage Accounts - Emulator - Queues`) and `blob containers` (under the tab `Storage Accounts - Emulator - Blob Containers`)
-
-For `queues`:
-
-```
-rules-local
-scanreports-local
-rules-exports-local
-uploadreports-local
-```
-
-For `blob containers`:
-
-```
-scan-reports
-data-dictionaries
-rules-exports
-```
-
-This setting will create the local storages for Azure functions of Carrot.
-
-#### Authentication for Azure functions
-
-For local developement using Docker, when `web` container wants to send request to `workers` container, an authentication need setting up. This should be done before running `docker compose up` for the first time.
-
-In the `app/workers` directory, add a folder named `Secrets`, and then inside that folder, add a new file named `rulestrigger.json` with the following content:
-
-```json
-{
-  "keys": [
-    {
-      "name": "default",
-      "value": "rules_key",
-      "encrypted": false
-    }
-  ]
-}
-```
-
-You should now be setup to run the [user quickstart](user_guide) using the credentials of the Django Admin user.
+The optionally-supplied Data Dictionary file must be in .csv format, and
+with the format as defined at
+[the CO-CONNECT data standards page](https://co-connect.ac.uk/co-connect-data-files-and-meta-data-standardisation/)
