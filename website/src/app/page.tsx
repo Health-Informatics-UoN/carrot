@@ -5,6 +5,7 @@ import Funders from "@/components/homepage/funders";
 import Hero from "@/components/homepage/hero";
 import { cn } from "@/lib/utils";
 import AnimatedGridPattern from "@/components/ui/animated-grid-pattern";
+import { MenuBar } from "@/components/MenuBar";
 
 export default function Default() {
   return (
@@ -21,6 +22,7 @@ export default function Default() {
         )}
       />{" "}
       {/* Content */}
+      <MenuBar />
       <div className="space-y-12 lg:space-y-32">
         <Hero />
         {process.env.ENABLE_FEATURES && <Features />}

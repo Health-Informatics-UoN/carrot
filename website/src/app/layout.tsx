@@ -1,7 +1,6 @@
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Metadata } from "next";
-import { MenuBar } from "@/components/MenuBar";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
@@ -47,15 +46,14 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="container">
+      <body>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <MenuBar />
-          {children}
+          <section className="container">{children}</section>
           <Footer />
         </ThemeProvider>
       </body>
