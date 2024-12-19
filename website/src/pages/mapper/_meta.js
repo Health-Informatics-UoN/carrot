@@ -1,4 +1,4 @@
 export default {
-  quickstart: "Quickstart",
-  deployment: "Deployment",
+  user_guide: "User Guide",
+  dev_guide: "Developer Guide",
 };

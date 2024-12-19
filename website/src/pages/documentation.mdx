@@ -1,21 +1,22 @@
-# Carrot docs
+import { Callout } from "nextra/components";
 
-Jobs coming from the HDR Gateway are put into a queue in Relay. [Bunny](/bunny) polls Relay for jobs, and POSTs the results when the job is completed.
+# Welcome to Carrot Documentation
 
-## Getting started
+*C*onvenient *a*nd *r*eusable *r*apid *O*MOP *t*ransformer: bringing together health data from across the UK.
+consists of two tools: [Carrot-Mapper web tool](mapper) for generating mapping rules, and
+[Carrot Transform ETL tool](transform) for applying mapping rules to data.
 
-Hutch tools are designed to be deployed together as a stack.
+What we do in a nutshell...
 
-### Prerequisites
-
-Docker
-
-### Deployment
-
-To build the stack, run
-
-```bash
-docker compose up
+```python
+researcher.data = coconnect.find('patient_data',
+                                 fields = [
+                                            'birth_date',
+                                            'ethnicity',
+                                            'existing_conditions'
+                                          ],
+                                 anonymous=True)
 ```
+<Callout type="info">The Carrot tools depend on a set of [data standards](standards).</Callout>
 
-This will build the component images and compose your stack.
+

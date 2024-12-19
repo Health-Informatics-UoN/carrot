@@ -1,21 +1,15 @@
-# Carrot docs
+# Carrot-Mapper
 
-Jobs coming from the HDR Gateway are put into a queue in Relay. [Bunny](/bunny) polls Relay for jobs, and POSTs the results when the job is completed.
+[Carrot-Mapper](https://github.com/Health-Informatics-UoN/CaRROT-Mapper) is a webapp which allows the user
+to use the metadata (as output by WhiteRabbit) from a dataset to produce mapping rules to the OMOP standard, in the JSON format. These can be ingested by [Carrot Transform](transform) to perform the mapping of the contents of the dataset to OMOP.
 
-## Getting started
+Carrot-Mapper provides automated mapping from a selection of vocabularies, reuse of mapping
+rules across datasets, and manual mapping rule generation.
 
-Hutch tools are designed to be deployed together as a stack.
+Carrot-Mapper also provides a number of helpful features to support and encourage standardised mappings across datasets.
 
-### Prerequisites
+Carrot-Mapper is built using Python, Django and NextJS, with a PostgreSQL database,
+and is hosted in Azure using Azure App Services, Azure Database for PostgreSQL,
+and Azure Functions.
 
-Docker
-
-### Deployment
-
-To build the stack, run
-
-```bash
-docker compose up
-```
-
-This will build the component images and compose your stack.
+![](/docs/CaRROT_Architecture_Summary.png)
