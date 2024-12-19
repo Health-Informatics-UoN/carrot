@@ -1,129 +1,116 @@
 import { Callout } from "nextra/components";
 
-# Overview of process
+# Rules
 
-A Scan Report is the basic unit representing a single data source.
-In order to create a new Scan Report in the Carrot-Mapper system,
-one must upload a _Scan Report Form_ to the system. Once uploaded,
-an ingestion process reads this file and populates the system with
-its contents. The documentation below explains this process and the
-options available to users.
+## Introduction
 
-## The Scan Report Upload form
+The Rules Azure Functions refers to a series of Durable functions, that are reponsible for generating the Rules for a given Scan Report Table.
 
-To upload a new _Scan Report Form_, navigate to the _Scan Reports_
-page and then click "New Scan Report". This opens a new web form.
+| Function                | Type         | Purpose                                                                             |
+| ----------------------- | ------------ | ----------------------------------------------------------------------------------- |
+| RulesTrigger            | HttpTrigger  | Consumes the HTTP request from the web app, adds to the queue.                      |
+| RulesQueue              | Queue        | Reads the message from the queue, passes to the Orchestrator.                       |
+| RulesOrchestrator       | Orchestrator | Orchestrates the activity, generating Concepts, and parallelising Rules Generation. |
+| RulesConceptsActivity   | Activity     | Generates the Scan Report Concepts.                                                 |
+| RulesGenerationActivity | Activity     | Generates the Scan Report Rules.                                                    |
 
-Firstly select an existing _Data Partner_ from the dropdown list.
-This will populate the _Dataset_ field with existing _Datasets_
-linked to this _Data Partner_. These are grouped by _Project_ that
-the user has access to. Select the correct _Dataset_ that the new
-_Scan Report_ should belong to.
+## Converting Concept Codes to ConceptIDs
+
+### Introduction
+
+Some scan reports (most likely from the larger data providers) will be supplied with concept _codes_ as values. In effect the mapping has already been done for us-- we just need to make sure we return valid and standard OMOP conceptIDs. In instances where concept _codes_ are provided, they will be coded within a given vocabulary e.g. SNOMED or RxNorm. The ProcessQueue Azure function has therefore been updated with the ability to look up concept codes and convert them to standard and valid OMOP codes. This removes the requirement from the data team of manually looking up concept codes and finding the relevant conceptID.
+
+The Data Team have specified a list of vocabularies that are most likely to be used.
+
+### Operation
+
+The concept code to conceptID lookup occurs as each scan report value is processed in `__init__.py`. Immediately after a value description is looked up, the code checks to see whether the dictionary contains any information on a vocabulary coding system. A dictionary may look something like:
+
+| csv_file_name | field_name | code   | value |
+| ------------- | ---------- | ------ | ----- |
+| questionnaire | sex        | 0      | male  |
+| survey        | question1  | SNOMED |
+
+In this example, all of the values within the field `question1` will be encoded as SNOMED concept codes. For example, the question might be: "Main symptom" and the answer of 'cough' would be encoded as "49727002" under the SNOMED vocabulary.
+
+For a given value, we determine whether it falls within a field defined as a vocabulary field with:
+
+```python
+code = next(
+    (
+        row["code"]
+        for row in data_dictionary
+        if str(row["field_name"]) == str(name)
+    ),
+    None,
+)
+```
+
+If the value of `code` is within our list of vocabularies, we use `omop_helpers.get_concept_from_concept_code()` to look up the standard and valid OMOP conceptID with the following:
+
+```python
+# If 'code' is in our vocab list, try and convert the ScanReportValue (concept code) to conceptID
+# If there's a faulty concept code for the vocab, fail gracefully and set concept_id to default (-1)
+if code in vocabs:
+    try:
+        concept_id = omop_helpers.get_concept_from_concept_code(
+            concept_code=value,
+            vocabulary_id=code,
+            no_source_concept=True,
+        )
+        concept_id = concept_id["concept_id"]
+    except:
+        concept_id = -1
+else:
+    concept_id = -1
+```
+
+Where `value` is the scan report value (i.e. the concept code) in that loop's iteration and `code` is the name of the vocabulary from the data dictionary's 'code' column (see [here](https://co-connect.ac.uk/co-connect-data-files-and-meta-data-standardisation/) for a standard data dictionary template.) If the supplied scan report value (concept code) is incorrect for any reason, we will simply default to setting `concept_id` to the default of -1.
+
+Here is an example if you wanted to manually look up a concept code:
+
+```python
+concept_id = omop_helpers.get_concept_from_concept_code(
+                                concept_code=49727002,
+                                vocabulary_id="SNOMED,
+                                no_source_concept=True,
+                            )
+```
+
+The argument `no_source_concept` tells the function to not return the non-standard conceptID. It will only return the standard and valid conceptID when this is set to `True`.
+
+With a conceptID in hand, we construct a dictionary called `scan_report_value_entry` with all the necessary details and append it to a list for a single `POST` to the database:
+
+```python
+
+data = []
+
+scan_report_value_entry = {
+    "created_at": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+    "updated_at": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+    "value": value,
+    "frequency": int(frequency),
+    "conceptID": concept_id,
+    "value_description": val_desc,
+    "scan_report_field": names_x_ids[name],
+}
+
+data.append(scan_report_value_entry)
+
+```
+
+### Updating ScanReportConcept
+
+By this point, we have not associated conceptIDs with scan report values using the `ScanReportConcept` model. In effect, any conceptID information from the scan report is--at present--held in the model `ScanReportValue`. We therefore need to 'move' the conceptID data from the `conceptID` field and create a record for it in `ScanReportConcept`.
 
 <Callout type="info">
-  If there is no appropriate _Dataset_ already existing, click the
-    _Add New_ button to the right of the _Dataset_ dropdown. This opens
-    a panel.
-
-    Enter a name for the _Dataset_ (which must be globally unique - if
-    you receive an error then it is likely that this _Dataset_ name is
-    already taken), and select at least one _Project_ to which it will
-    be associated. Then select the visibility, editor and admin options
-    as appropriate (see
-    [Projects, Datasets, Scan Reports, and Permissions ](projects-datasets-and-scanreports.md)
-    for an explanation of these. The _Dataset_ creator is automatically
-    assigned as an editor.
-
-    Finally, click the "Add new Dataset" button
-    to create the new _Dataset_.
-
+  The reason we have to do this is--prior to POSTing scan report values to
+  `ScanReportValue`--we have no primary keys for any scan report values. Without
+  the PKs, we can't establish a relationship between `ScanReportValue` and
+  `ScanReportConcept`. After the `POST` request we have the PKs required to
+  associate a `ScanReportConcept` to a `ScanReportValue`.
 </Callout>
 
-## Setting visibility/viewers and editors - permissions
+After POSTing the scan report values to the database, we must then return all `ScanReportValues` where the conceptID != -1. In other words, we want to return all records where we performed a concept code -> conceptID operation.
 
-Once a _Dataset_ has been selected, select the appropriate
-permissions for the _Scan Report_. The user performing the upload
-is set as the _Scan Report_'s Author, and has administrator rights
-to the _Scan Report_. Additional users can be set as editors, and,
-if the _Scan Report_ is set as _RESTRICTED_, viewers. Note that
-if a user has a given level of access to the _Dataset_, then they
-inherit that same access to the _Scan Report_ automatically.
-
-## Upload Form
-
-Choose a Scan Report in the "WhiteRabbit ScanReport" field, and
-optionally choose a dictionary file in the "Data Dictionary" field.
-The formats of these two files are as described below. Then click
-the "Submit" button to begin the upload process. This will launch an
-instance of the [UploadQueue](/mapper/dev_guide/uploadqueue).
-
-## The Scan Report file format
-
-The Scan Report File should be in the format as output by the
-White Rabbit tool. Broadly, this is an Excel .xlsx file with the
-following non-exhaustive format. At upload, a series of checks are
-run upon the file to ensure it meets certain standards before it
-is further processed, and an error message is presented if these
-checks fail.
-
-1. `.xlsx` file format
-2. The first sheet is 'Field Overview' where:
-   - There is no empty row or column at the start of the sheet.
-   - The first 10 column headers are:
-     "Table",
-     "Field",
-     "Description",
-     "Type",
-     "Max length",
-     "N rows",
-     "N rows checked",
-     "Fraction empty",
-     "N unique values",
-     "Fraction unique"
-   - A contiguous group of rows is associated to each table in the
-     dataset. Each group should be separated from the next by a
-     blank row. There is no blank between the header row and the
-     first row of the first group. Two contiguous blank rows will be
-     detected as the end of the sheet, and no further entries will be
-     added.
-   - Within each group, a single row corresponds to a single field
-     in the associated table.
-   - Each table name in the 'Field Overview' table must be associated
-     to a single sheet with identical name. This imposes a 30-character
-     limit on the table names including `.csv` ending.
-3. 2 additional sheets named 'Table Overview' and '\_' must also be
-   present, although they are never used.
-4. In each of the sheets associated to a table from the 'Field Overview'
-   tab:
-   - Each field in the table is represented by 2 columns in the sheet.
-     The first column has in its header row the name of the field, while
-     the second column is always headed 'Frequency'. Thus a typical sheet
-     might be headed with `"Person", "Frequency", "DOB", "Frequency",
-"Observation", "Frequency"` etc.
-   - The fields in the sheet must match exactly with the field names
-     provided for this table in the 'Field Overview' sheet.
-   - Each pair of columns is populated by all values that appear in the
-     given field, with their corresponding frequency. Usually, this
-     frequency should be no less than 5 due to applying count thresholding.
-   - Pairs of columns associated to a given field can differ in length
-     from pairs of columns associated to other fields.
-   - An entry in a given pair of columns which is blank in both the field
-     name column and Frequency column will count as the end of the column.
-   - If all entries in a given field should be redacted, it can be helpful
-     to add a single entry in the field, wth value "List truncated..." to
-     show the intent.
-   - There is no empty row or column at the start of the sheet.
-
-These stipulations are summarised in the following two annotated screenshots.
-
-The 'Field Overview' sheet:
-![](/docs/scanreport_format1.png)
-
-Single sheet associated to a single table:
-![](/docs/scanreport_format2.png)
-
-## The Data Dictionary file format
-
-The optionally-supplied Data Dictionary file must be in .csv format, and
-with the format as defined at
-[the CO-CONNECT data standards page](https://co-connect.ac.uk/co-connect-data-files-and-meta-data-standardisation/)
+We created a custom `ViewSet` called `ScanReportValuePKViewSet` which takes a Scan Report ID and returns all scan report values where there is a conceptID in the `conceptID` field. We then iterate over these model objects and create legitimate concept entries in `ScanReportConcept`

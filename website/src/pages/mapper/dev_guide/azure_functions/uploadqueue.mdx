@@ -1,169 +1,208 @@
 import { Callout } from "nextra/components";
 
-# User Quickstart
+# Upload queue
 
-This Quickstart guide will guide you through the usage of Carrot Mapper. Specifically, it covers:
+<Callout type="warning">
 
-1. [Home page](#home-page)
-2. [Gaining access](#gaining-access)
-3. [Uploading a first Scan Report](#uploading-a-first-scan-report)
-4. [Navigating within a Scan Report](#navigation)
-5. [Creating Mapping Rules](#creating-mapping-rules)
-6. [Downloading Mapping Rules](#downloading-mapping-rules)
+    This page is for developers of Azure Functions - not users
 
-This Quickstart guide is intended as a brief introduction to each of the areas.
-Users requiring more details should follow the links or search the documentation for their specific query.
-Developers should use the Developer Guide for technical documentation.
-
-## Home Page
-
-This [page](https://carrot.ac.uk) provides some basic introduction and information about Carrot, its functionality and its funders.
-
-From here you can login to start using Carrot, access its GitHub repo or start a discussion about anything related to Carot.
-
-## Gaining Access
-
-The deployed Carrot Mapper is available at [carrot.ac.uk](https://carrot.ac.uk).
-
-A user account is required to access the site; one can be requested from the site administrator.
-
-Users must be a member of at least one Project.
-Project membership is currently handled by the site administrator.
-
-Once logged in, the user is presented with the Scan Reports page. This page includes the list of Scan report the user has the permission to view or edit.
-
-## Uploading a first Scan Report
-
-To begin, navigate to "Upload Scan Report" using the navbar at the top of the screen.
-
-You can look for samples of a Scan report and a Data dictionary in the `samples` folder of this repo.
-
-Fill in the details as required, and upload a valid Scan Report File.
-You may optionally provide a Data Dictionary file.
-If an error message occurs, fix the error in the Scan Report File (or Data Dictionary file if provided) and try again to upload.
-
-<Callout type="info">
-  Not all possible errors in the files can be checked before upload. If you are
-  directed to the Scan Reports page after upload, this indicates that all
-  pre-checks have completed. However, other errors can be checked only during
-  the processing of the file after upload. If these occur, the `Upload Status`
-  of the Scan Report may change to `Upload Failed`, or it may stay as `Upload in
-  Progress` forever (over 30 minutes indicates an error). If this occurs, please
-  check your files yourself for possible errors, and if that fails then contact
-  the system administrator to check the logs.
 </Callout>
 
-Once a valid Scan Report File is uploaded, the user will be redirected to the Scan Report list page.
-This should show the newly created Scan Report at the top of the table.
+## Introduction
 
-After upload, an automated task is launched to ingest the contents of the file and perform a number of processing steps.
-This process can take several minutes for large Scan Report Files.
-While this process is running, the "Upload Status" visible to the right of the row will be "Upload in Progress".
-Once the process completes, the status will change (once the page is reloaded) to "Upload Complete".
-In the case of an unrecoverable error in processing, the status will be set to "Upload Failed".
+**UploadQueue** refers to an Azure Queue Trigger function which processes and saves a scan report and data dictionary to the Carrot database. It is also the name of the directory in the webapp's root directory which houses the Azure Function code. The function is triggered when a new message is added to the queue. Messages are added to the queue when a user uploads a Scan Report and Data Dictionary to the webapp.
 
-<Callout type="info">
-  Please note that sometimes errors in processing do not result in the status
-  being set to "Upload Failed", with the status incorrectly remaining as "Upload
-  in Progress". If this status remains for more than 30 minutes then you can be
-  sure that the process has failed. Please report this to the development team
-  with a copy of the Scan Report File being used, to help us improve the checks
-  run.
-</Callout>
+This guide documents the process when a scan report **and** and a data dictionary are uploaded to the system (i.e. the most complex scenario). Note, however, that a user can choose to upload a scan report without a data dictionary. The code snippets below have been extracted from `ScanReportFormView` in `views.py`. The snippets contain only the key code to illustrate a point/functionality, rather than offering the full FormView class code required for successful execution. Please refer to `api/views.py` for unabridged code.
 
-Wait for approximately one minute to ensure the example Scan Report has been fully processed.
-Refresh the Scan Reports page to check that the Status of your Scan Report has been set to "Upload Complete" before continuing.
+## Triggering the function
 
-## Navigation
+The function is triggered when a White Rabbit Scan Report file and a data dictionary are uploaded on the webapp. The code in `ScanReportFormView` carries out the following steps after form submission and during form validation:
 
-After upload, the user is directed to the Scan Reports page before the new Scan Report has been fully processed.
-While the Scan Report continues to be processed, the contents visible on Carrot Mapper will be populated over time.
+1. Creates a new object in the `ScanReport` model
+2. Connects to our Azure account
+3. Creates unique file names for the scan report and data dictionary
+4. Creates a dictionary holding the ScanReport model object and file names from Step 3 called `azure_dict`
+5. Uploads data to our Azure blob storage accounts (`scan-reports` and `data-dictionaries`) using the connecting string from Step 2
+6. Submits `azure_dict` to the message queue so the Azure function using the connection string from Step 2. This messages is requires so the function ca get the correct files from Azure blob storage
 
-Click on the name of the Scan Report to navigate to the list of Tables ("Tables List") within the Scan Report.
-As Tables are processed, the user can click on the name of each Table to navigate to the list of Fields ("Field List") within that Table.
-Similarly, clicking on a Field name in a Table will display the list of Values ("Value List") within that Field.
-In this way, the structure of the Scan Report can be navigated.
+After uploading the raw data and submitting a message to the queue, views.py doesn't carry out any further code execution - the online Azure function takes over, processes the scan report and dictionary (more on this below) and then POSTs the data back to the webapp via the Carrot API using the `requests` library.
 
-Sometimes a list is too large to be displayed all at once. In this case, the list will be displayed over a number of pages. Use the blue buttons at the bottom of the page to navigate through the pages.
+### Creating a `ScanReport` object
 
-Use the breadcrumbs at the top of the page to quickly navigate back up the Scan Report or its parent Dataset. You can also use tabs `Tables`, `Rules`, `Review Rules`, `Downloads` to navigate between these pages and functionalities of the current Scan Report.
+We create a model object in `ScanReport` so that tables, fields and values can later be associated with the correct scan report (as the scan report/dictionary is processed within the Azure Function and POST'd back to the webapp.)
 
-## Creating Mapping Rules
+```python
+scan_report = ScanReport.objects.create(
+    data_partner=form.cleaned_data["data_partner"],
+    dataset=form.cleaned_data["dataset"]
+)
+```
 
-The example Scan Report and Data Dictionary will have added some OMOP Concepts to fields and values in the Scan Report.
+### Connect to Azure Account
 
-You can hover over the Concepts to show more details about them (currently this just shows further details of how the Concept was added - in the case of the example below, they are added by vocab as defined in the Data Dictionary we supplied).
+We connect to our Azure account with the following:
 
-![](/docs/example_1.png)
+```python
+blob_service_client = BlobServiceClient.from_connection_string(os.getenv('STORAGE_CONN_STRING'))
+```
 
-### Setting Person ID and Date Event for each table
+Note that `STORAGE_CONN_STRING` has to be set either in your .env file when developing locally or within the the Azure Portal. See Sam/Vas for more details on where environment variables are kept online.
 
-The first task of creating Mapping Rules for a Scan Report is to set the Person ID and Date Event fields of each table.
+### Create unique file names
 
-Navigate to the Tables view of your Scan Report by clicking on its name on the Scan Report list page.
-This page will show the list of all the tables in the Scan Report, while the `PERSON ID` and `EVENT DATE` columns are empty.
-On the right-hand side, press the `Edit Table` link on the first table (`Demographics.csv`).
-In the first drop-down (Person ID), select `PersonID` which is one of the fields as reported by the Scan Report file.
-In the second drop-down (Date Event), select `Date_of_Birth`.
-Then press the `Save` button.
-You will be taken back to the Tables list, and the `PERSON ID` and `EVENT DATE` columns are now populated in the `Demographics.csv` row.
+We create unique datetime and random alphanumeric strings to append to the file names of the scan report and data dictionary:
 
-The `Job Progress` indication for this table should now be `In Progress`. You can click this indication for more information about the creating mapping rules jobs which are running in the background.
+```python
+rand = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+dt = '{:%Y%m%d-%H%M%S_}'.format(datetime.datetime.now())
+```
 
-<Callout type="info">
-  While creating mapping rules jobs of one table are running, you cannot set
-  `PersonID` and `Date` of other tables in the same Scan Report.
-</Callout>
+We do this so that if we ever need to cross-reference a particular scan report with a particular data dictionary, we can easily see (1) when the files were upload (specifed with `dt`) and (2) what dictionary belongs to which scan report (unique alphanumeric string defined in `rand`)
 
-Now do the same for `Covid.csv`, selecting `PersonID` and `Date`.
+### Create dictionary
 
-The Tables list will now show both tables have filled `PERSON ID` and `EVENT DATE` columns.
+We then create a dictionary containing:
 
-### Generate Initial Mapping Rules
+1. The newly created scan report ID
+2. Unique scan report file name
+3. Unique data dictionary nam
 
-Navigate to the `Rules` page associated to your Scan Report.
-This can be done by the `Rules` tab under details of a current Scan Report.
+```python
+azure_dict={
+    "scan_report_id":scan_report.id,
+    "scan_report_blob":os.path.splitext(str(form.cleaned_data.get('scan_report_file')))[0]+"_"+dt+rand+".xlsx",
+    "data_dictionary_blob":os.path.splitext(str(form.cleaned_data.get('data_dictionary_file')))[0]+"_"+dt+rand+".csv",
+}
+```
 
-Now that `Person ID` and `Date Event` are set for each of the tables, the Mapping Rules associated to those Concepts are been generated.
+### Upload data to Azure blob storage
 
-When `Job Progress` indication shows `Job Complete` for all the tables, the tables are now populated by the Mapping Rules associated to the Concepts already mapped.
+We then upload our data to Azure blob storage. Scan reports go to the container called `scan-reports` and data dictionaries go to the container called `data-dictionaries`.
 
-<Callout type="info">
-  If you see `Not Started or No data yet` when hover over the `Job Progress`
-  indication, this is usually a sign that you have not set the `Person ID` and
-  `Date Event` on the tables. Or you just need to update the table fields again
-  for Carrot to start collecting the data about jobs.
-</Callout>
+```python
+blob_client = blob_service_client.get_blob_client(container="scan-reports", blob=os.path.splitext(str(form.cleaned_data.get('scan_report_file')))[0]+"_"+dt+rand+".xlsx")
+blob_client.upload_blob(form.cleaned_data.get('scan_report_file').open())
+blob_client = blob_service_client.get_blob_client(container="data-dictionaries", blob=os.path.splitext(str(form.cleaned_data.get('data_dictionary_file')))[0]+"_"+dt+rand+".csv")
+blob_client.upload_blob(form.cleaned_data.get('data_dictionary_file').open())
+```
 
-Note that there are 5 or 6 rows in the table associated to each Concept.
-This fully describes how to map the source term to the OMOP standard.
+### Submit message to Azure queue
 
-A `Review Rules` page is available using the `Review Rules` tab near the top of the page.
-This shows only one of the Rules associated to each source-concept pair, which can be useful for reviewing.
+We then encode and submit the message defined in `azure_dict` to the Azure message queue:
 
-All the Mapping Rules associated to the Concepts, which were automatically added to our Scan Report by using a Data Dictionary file, are now available.
+```python
+queue_message=json.dumps(azure_dict)
+message_bytes = queue_message.encode('ascii')
+base64_bytes = base64.b64encode(message_bytes)
+base64_message = base64_bytes.decode('ascii')
 
-### Add further Concepts
+...
+...
+...
 
-Further mappings can be added manually.
+queue = QueueClient.from_connection_string(
+  conn_str=os.environ.get("STORAGE_CONN_STRING"),
+  queue_name=os.environ.get("SCAN_REPORT_QUEUE_NAME")
+  )
+queue.send_message(base64_message)
+```
 
-Navigate to the `Demographics.csv` table, and the `Sex` field.
-There will be a table with 3 rows: `F`, `M` and an empty row.
-Note that, thanks to our Data Dictionary file, the `Value description` column has been populated with helpful information.
-It indicates that `F` means "Female", and `M` "Male".
-To add the correct OMOP Concepts, click in the text box to the left of the `Add` button on the right-hand side of the screen, in the row associated with `F`.
-Type `8532` and press `Add`. After a moment, a green `OMOP Concept successfully added.` banner appears, along with a blue Concept tag inside the table.
-Similarly, add `8507` for the `M` row.
+Once the message has been sent, the Azure Function will automatically pick up the message and execute the code in `__init__.py`. Using the data in the message, the function will know what files to grab from blob storage for processing. By defining `scan_report_id` the function knows how to relate newly created tables, fields and values to the correct scan report.
 
-Now that these Concepts have been added, press the `Rules` tab.
-Note that new rows have been added associated to the `F` and `M` values. These were generated at the time of adding the Concepts on the previous page.
+# Azure Function Operation
 
-You can also try _removing_ a Concept by pressing the grey `x` on the right of any Concept tag, then return to the Rules page to see that the associated Mapping Rules have been deleted.
+## Accessing the File
 
-## Downloading Mapping Rules
+As soon as the ProcessQueue is triggered it uses `scan_report_blob` and `data_dictionary_blob` from the message body to download the correct files from Azure Blob Storage into a BytesIO() object.
 
-The final task in the simplest end-to-end process in Carrot Mapper is to download the Mapping Rules in a form that can be used as input to Carrot-CDM (which will perform the transformations on the data).
+The message body is accessed via:
 
-On either `Rules` or `Review Rules` pages, you can see the `Request Download` button on the top-right hand side. Press that and choose either `Mapping JSON` or `Mapping CSV` (more human-readable version, but cannot be used as input to Carrot-CDM) to start the process of generating the chosen file. After requesting successfully, you will be redirected to `Downloads` page. While the file is being genrated you can see an indication for this on the left hand side. The generated file which is ready for downloading will be seen on `Downloads` page, after a few moment.
+```python
 
-Finally, a diagram of the Mapping Rules can be viewed using the yellow `View Map Diagram` button. This will take a few minutes to show for large Scan reports.
+# Get message from queue
+message = json.dumps(
+    {
+        "id": msg.id,
+        "body": msg.get_body().decode("utf-8"),
+        "expiration_time": (
+            msg.expiration_time.isoformat() if msg.expiration_time else None
+        ),
+        "insertion_time": (
+            msg.insertion_time.isoformat() if msg.insertion_time else None
+        ),
+        "time_next_visible": (
+            msg.time_next_visible.isoformat() if msg.time_next_visible else None
+        ),
+        "pop_receipt": msg.pop_receipt,
+        "dequeue_count": msg.dequeue_count,
+    }
+)
+
+# Grab message body from storage queues,
+# extract filenames for scan reports and dictionaries
+message = json.loads(message)
+body = ast.literal_eval(message["body"])
+scan_report_blob = body["scan_report_blob"]
+data_dictionary_blob = body["data_dictionary_blob"]
+```
+
+The files are accessed from blob storage with the following code:
+
+```python
+# Grab scan report data from blob
+container_client = blob_service_client.get_container_client("scan-reports")
+blob_scanreport_client = container_client.get_blob_client(scan_report_blob)
+streamdownloader = blob_scanreport_client.download_blob()
+scanreport = BytesIO(streamdownloader.readall())
+
+# Grab data dictionary data from blob
+container_client = blob_service_client.get_container_client("data-dictionaries")
+blob_dict_client = container_client.get_blob_client(data_dictionary_blob)
+streamdownloader = blob_dict_client.download_blob()
+data_dictionary = list(csv.DictReader(streamdownloader.readall().decode('utf-8').splitlines()))
+```
+
+## Processing
+
+The next stage is to step through the Excel workbook and create model entries for each **ScanReportTable**, **ScanReportField** and **ScanReportValue** present in the file.
+
+### Scan Report Table
+
+The **Field Overview** sheet in a White Rabbit Scan Report has a 'Table' column which seperates different table names using a blank row. ProcessQueue main method iterates through the rows in the 'Table' column and appends each unique table name to the list `table_names`.
+For each table in `table_names` a new `ScanReportTable` entry is generated. The table entries are linked to the `ScanReport` model using the `scan_report_id` from the queue message body.
+The table entries are then appended to a JSON array `json_data` which forms the input send in a POST request to the [API](/mapper/dev_guide/api).
+The API automatically generates the `id` for each table that was created. These ids are extracted from the POST request response and saved in a list (`table_ids`)
+
+### Scan Report Field
+
+**Field Overview** contains all the information on the fields including the name, description and other useful columns. ProcessQueue iterates through the rows in the sheet and generates a new `ScanReportField` entry.
+Once it detects an empty line (end of a table) it saves the fields found in that table.
+This is done by appending the field entries to a JSON array `json_data`, which forms the input to a POST request made to the [API](/mapper/dev_guide/api). From the response it saves the `field_ids` and `field_names` and stores them into a dictionary as key value pairs e.g "Field Name": Field ID.
+
+### Scan Report Value
+
+Scan report values are stored in sheets named after their corresponding table. Once the fields in a table are saved, it moves to the corresponding sheet (where the sheet is the same as the table_name) and the `process_scan_report_sheet_table()` function is called on that worksheet. The function extracts the data in the following format:
+
+**Input**
+
+| ID  | Frequency | Date       | Frequency |
+| --- | --------- | ---------- | --------- |
+| 1   | 20        | 02/12/2020 | 5         |
+| 2   | 3         | 12/11/2020 | 37        |
+
+**Output**
+
+(ID, 1, 20)
+(Date, 02/12/2020, 5)
+(ID, 2, 3)
+(Date, 12/11/2020, 37)
+
+A ScanReportValue entry is generated by iterating through the output of `process_scan_report_sheet_table()`. The value entries are linked to the `ScanReportField` model using the function output and the dictionary with all the field names and ids. Same as with the other two models the value entries are appended to a JSON array `json_data`, and form the input to a POST request made to the [API](/mapper/dev_guide/api).
+
+### Data Dictionary Creation
+
+If a user uploads a data dictionary, there is a small subroutine during the `ScanReportValue` code which matches the scan report value name against the supplied data dictionary. If there's a match, the code saves the dictionary's value description to the `value_description` field in the `ScanReportValue` model:
+
+```python
+val_desc = next((row['value_description'] for row in data_dictionary if str(row['field_name']) == str(name) and str(row['code']) == str(value)), None)
+```
