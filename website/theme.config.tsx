@@ -29,6 +29,8 @@ export default {
   project: {
     link: "https://github.com/Health-Informatics-UoN/carrot",
   },
+  docsRepositoryBase:
+    "https://github.com/Health-Informatics-UoN/carrot/tree/main/website",
   head() {
     const { frontMatter } = useConfig();
 
