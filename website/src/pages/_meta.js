@@ -1,3 +1,5 @@
 export default {
-  docs: "Carrot Docs",
+  documentation: "Carrot",
+  mapper: "Carrot Mapper",
+  transform: "Carrot Transform",
 };
