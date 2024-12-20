@@ -1,3 +1,5 @@
+import { Callout } from "nextra/components";
+
 # Developer Quickstart
 
 ## Prerequisites
@@ -12,20 +14,19 @@ The most direct route to running the application locally is using the Docker qui
 The repository contains a docker-compose for development, so after you have setup the [configuration](#configuration), just run
 
 ```bash
-docker-compose up -d
-
-or
-
-docker compose up
+docker compose up -d
 ```
 
-to start the application stack. This runs the database, Azurite emulator, Azure functions (`workers`) and will build Carrot's backend (`web`) and frontend (`next-client`). After the command run successfully, Carrot can be accessed through `http://localhost:8000/`
+to start the application stack. This runs the database, Azurite emulator, Azure functions (`workers`) and will build Carrot's backend (`web`) and frontend (`next-client`). This process will be on the background and you can check it through Docker Desktop app. After the command run successfully, Carrot can be accessed through `http://localhost:3000/`
 
-Docker will mount the `app/api` directory to the web app container, so any changes in the Python code of the backend will be reflected in the running application.
+<Callout type="info">
+  Docker will mount the `app/api` directory to the web app container, so any changes in the Python code of the backend will be reflected in the running application.
 
 Any code changes in the frontend app, i.e., `next-client-app`, will be reflected as well in the UI, thanks to the `app/next-client-app` directory mounted on Docker environment.
-
+{/* TODO: Check again the below after deleting React code */}
 Note: You may need to refresh the browser to see the UI changes after code changed in `next-client-app`.
+
+</Callout>
 
 ## Configuration
 
@@ -45,9 +46,9 @@ You need to seed the web app database with the OMOP table and field names. You c
 
 Navigate to your Docker Desktop, choose `web` container, choose `Exec` tab, then run: `python manage.py loaddata mapping filetypes`.
 
-To add a new admin user (Django superuser) run: `python manage.py createsuperuser`.
+After that, add a new admin user (Django superuser) by running: `python manage.py createsuperuser`.
 
-Following this order, create inital `Data Partner`, `Dataset` (with admin as the admin user) and `Project` (with `Datasets` as the created dataset and `Members` as the admin user) by using Django Admin panel `http://localhost:8000/admin/`
+Create initial instances in Carrot app by logging to Django Admin panel `http://localhost:8000/admin/` (using the credentials in the last step), then add first `Data Partner`, `Dataset` (with `admin` as the admin user) and `Project` (with `Datasets` as the created dataset and `Members` as the admin user).
 
 ### Azure Functions
 
@@ -78,7 +79,7 @@ This setting will create the local storages for Azure functions of Carrot.
 
 #### Authentication for Azure functions
 
-For local developement using Docker, when `web` container wants to send request to `workers` container, an authentication need setting up. This should be done before running `docker compose up` for the first time.
+For local developement using Docker, when `web` container wants to send request to `workers` container, an authentication will be required and set up. This setup should be done before running `docker compose up` for the first time.
 
 In the `app/workers` directory, add a folder named `Secrets`, and then inside that folder, add a new file named `rulestrigger.json` with the following content:
 

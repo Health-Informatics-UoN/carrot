@@ -22,7 +22,7 @@ _Scan Report_ should belong to.
 
 <Callout type="info">
   If there is no appropriate _Dataset_ already existing, click the
-    _Add New_ button to the right of the _Dataset_ dropdown. This opens
+    _New Dataset_ button to the right of the _Dataset_ dropdown. This opens
     a panel.
 
     Enter a name for the _Dataset_ (which must be globally unique - if
@@ -30,11 +30,11 @@ _Scan Report_ should belong to.
     already taken), and select at least one _Project_ to which it will
     be associated. Then select the visibility, editor and admin options
     as appropriate (see
-    [Projects, Datasets, Scan Reports, and Permissions ](projects-datasets-and-scanreports.md)
+    [Projects, Datasets, Scan Reports, and Permissions ](projects_datasets_scanreports)
     for an explanation of these. The _Dataset_ creator is automatically
     assigned as an editor.
 
-    Finally, click the "Add new Dataset" button
+    Finally, click the "Create Dataset" button
     to create the new _Dataset_.
 
 </Callout>
@@ -55,7 +55,7 @@ Choose a Scan Report in the "WhiteRabbit ScanReport" field, and
 optionally choose a dictionary file in the "Data Dictionary" field.
 The formats of these two files are as described below. Then click
 the "Submit" button to begin the upload process. This will launch an
-instance of the [UploadQueue](/mapper/dev_guide/uploadqueue).
+instance of the [UploadQueue](/mapper/dev_guide/azure_functions/uploadqueue).
 
 ## The Scan Report file format
 
@@ -66,7 +66,7 @@ run upon the file to ensure it meets certain standards before it
 is further processed, and an error message is presented if these
 checks fail.
 
-1. `.xlsx` file format
+1. `.xlsx` file format with a maximum size of 2.5 MB
 2. The first sheet is 'Field Overview' where:
    - There is no empty row or column at the start of the sheet.
    - The first 10 column headers are:
@@ -124,6 +124,7 @@ Single sheet associated to a single table:
 
 ## The Data Dictionary file format
 
+{/* TODO: The below link is broken */}
 The optionally-supplied Data Dictionary file must be in .csv format, and
 with the format as defined at
 [the CO-CONNECT data standards page](https://co-connect.ac.uk/co-connect-data-files-and-meta-data-standardisation/)

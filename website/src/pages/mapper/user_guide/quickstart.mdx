@@ -19,7 +19,7 @@ Developers should use the Developer Guide for technical documentation.
 
 This [page](https://carrot.ac.uk) provides some basic introduction and information about Carrot, its functionality and its funders.
 
-From here you can login to start using Carrot, access its GitHub repo or start a discussion about anything related to Carot.
+From here you can login to start using Carrot, access its GitHub repo or start a discussion about anything related to Carrot.
 
 ## Gaining Access
 
@@ -30,7 +30,7 @@ A user account is required to access the site; one can be requested from the sit
 Users must be a member of at least one Project.
 Project membership is currently handled by the site administrator.
 
-Once logged in, the user is presented with the Scan Reports page. This page includes the list of Scan report the user has the permission to view or edit.
+Once logged in, the user is presented with the Projects page. This page includes the list of Projects the user has the membership. From here, children datasets and scan reports can be accessed.
 
 ## Uploading a first Scan Report
 
@@ -108,25 +108,9 @@ In the second drop-down (Date Event), select `Date_of_Birth`.
 Then press the `Save` button.
 You will be taken back to the Tables list, and the `PERSON ID` and `EVENT DATE` columns are now populated in the `Demographics.csv` row.
 
-The `Job Progress` indication for this table should now be `In Progress`. You can click this indication for more information about the creating mapping rules jobs which are running in the background.
-
-<Callout type="info">
-  While creating mapping rules jobs of one table are running, you cannot set
-  `PersonID` and `Date` of other tables in the same Scan Report.
-</Callout>
-
-Now do the same for `Covid.csv`, selecting `PersonID` and `Date`.
-
-The Tables list will now show both tables have filled `PERSON ID` and `EVENT DATE` columns.
-
-### Generate Initial Mapping Rules
-
-Navigate to the `Rules` page associated to your Scan Report.
-This can be done by the `Rules` tab under details of a current Scan Report.
-
 Now that `Person ID` and `Date Event` are set for each of the tables, the Mapping Rules associated to those Concepts are been generated.
 
-When `Job Progress` indication shows `Job Complete` for all the tables, the tables are now populated by the Mapping Rules associated to the Concepts already mapped.
+The `Job Progress` indication for this table should now be `In Progress`. You can click this indication for more information about the creating mapping rules jobs which are running in the background.
 
 <Callout type="info">
   If you see `Not Started or No data yet` when hover over the `Job Progress`
@@ -134,6 +118,23 @@ When `Job Progress` indication shows `Job Complete` for all the tables, the tabl
   `Date Event` on the tables. Or you just need to update the table fields again
   for Carrot to start collecting the data about jobs.
 </Callout>
+
+Now do the same for `Covid.csv`, selecting `PersonID` and `Date`.
+
+<Callout type="info">
+  While creating mapping rules jobs of a table are running, you cannot access
+  the `Edit table` page to update the table's fields again. This can be done
+  after jobs running for the table are complete.
+</Callout>
+
+The Tables list will now show both tables have filled `PERSON ID` and `EVENT DATE` columns.
+
+### Generate Initial Mapping Rules
+
+When `Job Progress` indication shows `Job Complete` for all the tables, the tables are now populated by the Mapping Rules associated to the Concepts already mapped.
+
+Navigate to the `Rules` page associated to your Scan Report.
+This can be done by the `Rules` tab under details of a current Scan Report.
 
 Note that there are 5 or 6 rows in the table associated to each Concept.
 This fully describes how to map the source term to the OMOP standard.
@@ -162,8 +163,8 @@ You can also try _removing_ a Concept by pressing the grey `x` on the right of a
 
 ## Downloading Mapping Rules
 
-The final task in the simplest end-to-end process in Carrot Mapper is to download the Mapping Rules in a form that can be used as input to Carrot-CDM (which will perform the transformations on the data).
+The final task in the simplest end-to-end process in Carrot Mapper is to download the Mapping Rules in a form that can be used as input to Carrot Transform (which will perform the transformations on the data).
 
-On either `Rules` or `Review Rules` pages, you can see the `Request Download` button on the top-right hand side. Press that and choose either `Mapping JSON` or `Mapping CSV` (more human-readable version, but cannot be used as input to Carrot-CDM) to start the process of generating the chosen file. After requesting successfully, you will be redirected to `Downloads` page. While the file is being genrated you can see an indication for this on the left hand side. The generated file which is ready for downloading will be seen on `Downloads` page, after a few moment.
+On either `Rules` or `Review Rules` pages, you can see the `Request Download` button on the top-right hand side. Press that and choose either `Mapping JSON` or `Mapping CSV` (more human-readable version, but cannot be used as input to Carrot Transform) to start the process of generating the chosen file. After requesting successfully, you will be redirected to `Downloads` page. While the file is being genrated you can see an indication for this on the left hand side. The generated file which is ready for downloading will be seen on `Downloads` page, after a few moment.
 
-Finally, a diagram of the Mapping Rules can be viewed using the yellow `View Map Diagram` button. This will take a few minutes to show for large Scan reports.
+{/* TODO: Add information about Diagram here in the future. Finally, a diagram of the Mapping Rules can be viewed using the yellow `View Map Diagram` button. This will take a few minutes to show for large Scan reports. */}
