@@ -54,9 +54,9 @@ export function AnimatedBeamMapping({ className }: { className?: string }) {
         <div className="flex flex-col justify-center">
           <Circle ref={div6Ref}>
             <img
-              className="mx-3 w-[32px]"
-              src="/carrot/carrot-logo.png"
+              src="/carrot/carrot.svg"
               alt="carrot-logo"
+              className="w-[50px]"
             />
           </Circle>
         </div>

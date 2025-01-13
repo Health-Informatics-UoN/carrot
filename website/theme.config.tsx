@@ -20,7 +20,7 @@ export default {
           width: "1.55rem",
           marginRight: "0.5rem",
         }}
-        src="/carrot/carrot-logo.png"
+        src="/carrot/carrot.svg"
         alt="carrot-logo"
       />
       Carrot Documentation
