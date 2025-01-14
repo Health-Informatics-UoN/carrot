@@ -17,14 +17,17 @@ The repository contains a docker-compose for development, so after you have setu
 docker compose up -d
 ```
 
-to start the application stack. This runs the database, Azurite emulator, Azure functions (`workers`) and will build Carrot's backend (`web`) and frontend (`next-client`). This process will be on the background and you can check it through Docker Desktop app. After the command run successfully, Carrot can be accessed through `http://localhost:3000/`
+to start the application stack. This runs the database, Azurite emulator, Azure functions (`workers`) and will build Carrot's backend (`web`) and frontend (`next-client`). This process will be on the background and you can check it through Docker Desktop app. When all of containers are up and running successfully, Carrot's frontend and backend can be accessed through `http://localhost:3000/` and `http://localhost:8000/` respectively.
+
+<Callout type="info">
+  The `omop-lite` container will be shut down automatically after successfully done its job.
+
+</Callout>
 
 <Callout type="info">
   Docker will mount the `app/api` directory to the web app container, so any changes in the Python code of the backend will be reflected in the running application.
 
 Any code changes in the frontend app, i.e., `next-client-app`, will be reflected as well in the UI, thanks to the `app/next-client-app` directory mounted on Docker environment.
-{/* TODO: Check again the below after deleting React code */}
-Note: You may need to refresh the browser to see the UI changes after code changed in `next-client-app`.
 
 </Callout>
 
