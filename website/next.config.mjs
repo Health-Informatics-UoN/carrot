@@ -8,8 +8,8 @@ const nextConfig = {
   },
   distDir: "out",
   output: "export",
-  basePath: "/carrot",
-  assetPrefix: "/carrot",
+  basePath: "/",
+  assetPrefix: "/",
 };
 
 const withNextra = nextra({
