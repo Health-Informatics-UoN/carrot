@@ -20,7 +20,7 @@ export default {
           width: "1.55rem",
           marginRight: "0.5rem",
         }}
-        src="/carrot/carrot.svg"
+        src="carrot.svg"
         alt="carrot-logo"
       />
       Carrot Documentation
@@ -48,7 +48,7 @@ export default {
           }
         />
         <title>{frontMatter.title || "Carrot Documentation"}</title>
-        <link rel="icon" type="image/x-icon" href="/carrot/icons/favicon.ico" />
+        <link rel="icon" type="image/x-icon" href="/icons/favicon.ico" />
       </>
     );
   },
@@ -83,7 +83,7 @@ export default {
             <a href={"https://www.nottingham.ac.uk/"}>
               <img
                 style={{ display: "block", width: "200px" }}
-                src="/carrot/logos/UoN-light.png"
+                src="/logos/UoN-light.png"
                 alt="UoN Logo"
                 className="dark:hidden"
               />
@@ -92,7 +92,7 @@ export default {
                   display: "none",
                   width: "200px",
                 }}
-                src="/carrot/logos/UoN-dark.png"
+                src="/logos/UoN-dark.png"
                 alt="UoN Logo"
                 className="dark:block"
               />

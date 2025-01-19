@@ -9,12 +9,12 @@ const Footer = () => {
           <Link href={"https://www.nottingham.ac.uk/"}>
             <img
               className="dark:hidden w-[200px]"
-              src="/carrot/logos/UoN-light.png"
+              src="/logos/UoN-light.png"
               alt="UoN Logo"
             />
             <img
               className="hidden dark:block w-[200px]"
-              src="/carrot/logos/UoN-dark.png"
+              src="/logos/UoN-dark.png"
               alt="UoN Logo"
             />
           </Link>

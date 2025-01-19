@@ -13,12 +13,12 @@ export const MenuBar = () => {
           <div className="text-2xl flex items-center font-semibold">
             <img
               className="w-[120px] dark:hidden"
-              src="/carrot/carrot-logo.svg"
+              src="/carrot-logo.svg"
               alt="carrot-logo"
             />
             <img
               className="w-[120px] dark:block hidden"
-              src="/carrot/carrot-logo-dark.svg"
+              src="/carrot-logo-dark.svg"
               alt="carrot-logo"
             />
           </div>

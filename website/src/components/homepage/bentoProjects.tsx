@@ -9,7 +9,7 @@ const features = [
     background: (
       <img
         className="w-[150px]"
-        src="/carrot/logos/coconnect1.png"
+        src="/logos/coconnect1.png"
         alt="CO-CONNECT"
       />
     ),
@@ -24,7 +24,7 @@ const features = [
     background: (
       <img
         className="opacity-80 p-5 w-[300px]"
-        src="/carrot/logos/alleviate.jpeg"
+        src="/logos/alleviate.jpeg"
         alt="ALLEVIATE"
       />
     ),
@@ -39,7 +39,7 @@ const features = [
     background: (
       <img
         className="opacity-80 p-5 dark:bg-white"
-        src="/carrot/logos/nbrc.png"
+        src="/logos/nbrc.png"
         alt="NOTTINGHAM BRC"
       />
     ),
@@ -54,7 +54,7 @@ const features = [
     background: (
       <img
         className="w-[300px]"
-        src="/carrot/logos/bycovid.png"
+        src="/logos/bycovid.png"
         alt="BY-COVID"
       />
     ),
@@ -69,7 +69,7 @@ const features = [
     background: (
       <img
         className="p-2 w-[200px]"
-        src="/carrot/logos/sde.png"
+        src="/logos/sde.png"
         alt="East Midlands SDE"
       />
     ),
