@@ -17,7 +17,7 @@ export const sidebarItems: SidebarItems = {
     },
     {
       label: "GitHub",
-      href: "https://github.com/Health-Informatics-UoN/Carrot-Mapper",
+      href: "https://github.com/Health-Informatics-UoN/Carrot",
       icon: Github,
     },
     {

@@ -20,7 +20,7 @@ const features = [
   {
     name: "ALLEVIATE",
     description:
-      "Alleviate has utilized Carrot to support the creation of its UK-wide pain data hub in collaboration with Health Data Research UK (HDR UK).",
+      "Alleviate has utilised Carrot to support the creation of its UK-wide pain data hub in collaboration with Health Data Research UK (HDR UK).",
     background: (
       <img
         className="opacity-80 p-5 w-[300px]"

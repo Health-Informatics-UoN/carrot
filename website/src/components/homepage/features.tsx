@@ -8,12 +8,12 @@ export default function Features() {
       <div className="items-center text-center justify-center w-full">
         <div className="flex flex-col justify-center space-y-2">
           <div className="lg:text-4xl flex justify-center text-2xl">
-            <h1 className="font-bold">Revolutionary Features </h1>
+            <h1 className="font-bold">Everything you need</h1>
           </div>
           <div className="flex text-center justify-center">
             <h1 className="text-gray-600 dark:text-gray-200 text-pretty sm:text-lg text-md">
-              Working with OMOP Data Standardization? Carrot provides advanced
-              features which can ease your tasks.
+              Working with OMOP Data Standards? Carrot provides advanced
+              features for your data pipeline.
             </h1>
           </div>
         </div>
