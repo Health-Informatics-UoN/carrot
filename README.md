@@ -21,8 +21,6 @@
   <a href="https://carrot.ac.uk/documentation" rel="dofollow"><strong>Visit our public roadmap :rocket: »</strong></a>
 </p>
 
-<br />
-
 ## Carrot Mapper
 
 [Carrot Mapper](https://github.com/Health-Informatics-UoN/carrot-mapper) is a web application for mapping datasets to OMOP, creating reusable rules in a collaborative and open way.
