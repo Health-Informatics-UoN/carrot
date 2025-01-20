@@ -18,7 +18,7 @@
   <a href="https://carrot.ac.uk/documentation" rel="dofollow"><strong>Explore the docs :green_book: »</strong></a>
 <br />
 <br />
-  <a href="https://carrot.ac.uk/documentation" rel="dofollow"><strong>Visit our public roadmap :rocket: »</strong></a>
+  <a href="https://github.com/orgs/Health-Informatics-UoN/projects/18" rel="dofollow"><strong>Visit our public roadmap :rocket: »</strong></a>
 </p>
 
 ## Carrot Mapper
