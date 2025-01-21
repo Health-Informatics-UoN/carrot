@@ -437,6 +437,32 @@ Coming soon
 
 ## Other services
 
+### Database
+
+Carrot uses PostgreSQL database.
+
+### Azure local storage
+
+Carrot uses Azurite as queues and blobs storage for Azure functions.
+
+### OMOP CDM Loading
+
+Carrot uses [omop-lite](https://github.com/AndyRae/omop-lite/pkgs/container/omop-lite) for creation and vocabs loading to its OMOP CDM in the database.
+
+**Examples**
+
+<Tabs items={['Local development', 'Azure', 'Terraform']}>
+  <Tabs.Tab>
+
+The example below runs a PostgreSQL database for Carrot on port `5432:5432`.
+Additionally, it runs Azure local storage for Carrot's workers on ports `10000:10000`, `10001:10001`, and `10002:10002`.
+
+The `command` and `AZURITE_ACCOUNTS` environment variable in this example make sure the connection between `azurite` and `workers` proper.
+
+After `db` is up, [this service](https://github.com/AndyRae/omop-lite/pkgs/container/omop-lite) runs a DDL script to create a `omop` schema in the `db`, then load the vocabs downloaded from Athena there.
+
+When `omop` schema existed, `omop-lite` will closes automatically.
+
 ```yaml
 db:
   image: postgres:13
@@ -471,18 +497,15 @@ environment:
   - AZURITE_ACCOUNTS=devstoreaccount1:Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
 ```
 
-### Database: `db`
+  </Tabs.Tab>
+  <Tabs.Tab>
 
-This service runs a PostgreSQL database in the background for Carrot on port `5432:5432`.
+Coming soon
 
-### Azure local storage: `azurite`
+  </Tabs.Tab>
+    <Tabs.Tab>
 
-This service runs a Azure local storage in the background for Carrot's workers on port `10000:10000`, `10000:10001` and `10000:10002`.
+Coming soon
 
-The `command` and `AZURITE_ACCOUNTS` environment variable in this service make sure the connection between `azurite` and `workers` proper.
-
-### OMOP CDM Loading: `omop-lite`
-
-After `db` is up, [this service](https://github.com/AndyRae/omop-lite/pkgs/container/omop-lite) runs a DDL script to create a `omop` schema in the `db`, then load the vocabs downloaded from Athena there.
-
-When `omop` schema existed, this service will closes automatically.
+  </Tabs.Tab>
+</Tabs>
