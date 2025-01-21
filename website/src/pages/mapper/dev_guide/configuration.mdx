@@ -1,4 +1,5 @@
 import { Callout, Tabs, Table, Td, Th, Tr, Code } from "nextra/components";
+import { Mandatory } from "./components/Mandatory";
 
 # Configuration
 
@@ -17,7 +18,9 @@ Carrot can be configured using environment variables which can be different depe
   </thead>
   <tbody>
     <Tr>
-      <Td>`FRONTEND_URL`</Td>
+      <Td>
+        <Mandatory>`FRONTEND_URL`</Mandatory>
+      </Td>
       <Td>
         The URL for Frontend service which `Backend` should connect to. This
         only needs to include scheme (e.g. `http://`), host (`my-fronted.com`,
@@ -26,20 +29,27 @@ Carrot can be configured using environment variables which can be different depe
       </Td>
     </Tr>
     <Tr>
-      <Td>`ALLOWED_HOSTS`</Td>
+      <Td>
+        <Mandatory>`ALLOWED_HOSTS`</Mandatory>
+      </Td>
       <Td>
         A list of strings representing the host/domain names that this Django
         site can serve.
       </Td>
     </Tr>
     <Tr>
-      <Td>`DB_ENGINE`</Td>
+      <Td>
+        <Mandatory>`DB_ENGINE`</Mandatory>
+      </Td>
       <Td>
         The database backend to use. Carrot uses `Postgres` database backend.
       </Td>
     </Tr>
     <Tr>
-      <Td>`DB_HOST` `DB_PORT` `DB_NAME` `DB_USER` `DB_PASSWORD`</Td>
+      <Td>
+        `DB_HOST` `DB_PORT` `DB_NAME` `DB_USER`
+        <Mandatory> `DB_PASSWORD`</Mandatory>
+      </Td>
       <Td>
         These settings (`port`, `host`, `name`, `user`, `password`) are required
         for PostgreSQL database connection.
@@ -50,14 +60,19 @@ Carrot can be configured using environment variables which can be different depe
       <Td>A boolean that turns on/off debug mode.</Td>
     </Tr>
     <Tr>
-      <Td>`WORKERS_URL`</Td>
+      <Td>
+        <Mandatory>`WORKERS_URL`</Mandatory>
+      </Td>
       <Td>
         The URL for `Workers` (Azure functions) service which `Backend` should
         connect to. Structure is similar to `FRONTEND_URL`.
       </Td>
     </Tr>
     <Tr>
-      <Td>`WORKERS_UPLOAD_NAME` `WORKERS_RULES_EXPORT_NAME`</Td>
+      <Td>
+        <Mandatory>`WORKERS_UPLOAD_NAME`</Mandatory>{" "}
+        <Mandatory>`WORKERS_RULES_EXPORT_NAME`</Mandatory>
+      </Td>
       <Td>
         Name of queues in Azurite that `Workers` send messages about ScanReport
         uploads and Mapping Rules exports, respectively.
@@ -65,20 +80,28 @@ Carrot can be configured using environment variables which can be different depe
     </Tr>
     <Tr>
       <Td>`WORKERS_RULES_NAME`</Td>
-      <Td>Name of point where `Backend` triggers Workers' jobs.</Td>
+      <Td>
+        Name of point where `Backend` triggers Workers' jobs. Default to
+        `RulesOrchestrator`
+      </Td>
     </Tr>
     <Tr>
       <Td>`WORKERS_RULES_KEY`</Td>
       <Td>
-        The key to authorise the request sent to `Workers` from `Backend`.
+        The key to authorise the request sent to `Workers` from `Backend`. Only
+        required in local development.
       </Td>
     </Tr>
     <Tr>
-      <Td>`STORAGE_CONN_STRING`</Td>
+      <Td>
+        <Mandatory>`STORAGE_CONN_STRING`</Mandatory>
+      </Td>
       <Td>The key to connect Backend and Azure local storage.</Td>
     </Tr>
     <Tr>
-      <Td>`SECRET_KEY`</Td>
+      <Td>
+        <Mandatory>`SECRET_KEY`</Mandatory>
+      </Td>
       <Td>
         A secret key for a particular Django installation. This is used to
         provide cryptographic signing, and should be set to a unique,
@@ -86,7 +109,9 @@ Carrot can be configured using environment variables which can be different depe
       </Td>
     </Tr>
     <Tr>
-      <Td>`SIGNING_KEY`</Td>
+      <Td>
+        <Mandatory>`SIGNING_KEY`</Mandatory>
+      </Td>
       <Td>
         A key required in JWT token generation process for Next Auth. Real value
         is used in Production.
@@ -163,7 +188,9 @@ Coming soon
   </thead>
   <tbody>
     <Tr>
-      <Td>`BACKEND_URL`</Td>
+      <Td>
+        <Mandatory>`BACKEND_URL`</Mandatory>
+      </Td>
       <Td>
         The URL for Backend service which `frontend` should connect to. This
         only needs to include scheme (e.g. `http://`), host (`my-fronted.com`,
@@ -176,7 +203,8 @@ Coming soon
       <Td>
         A list of extra safe origin domains from which Server Actions can be
         invoked. Next.js compares the origin of a Server Action request with the
-        host domain, ensuring they match to prevent CSRF attacks.
+        host domain, ensuring they match to prevent CSRF attacks. Only required
+        in local dev.
       </Td>
     </Tr>
     <Tr>
@@ -187,20 +215,29 @@ Coming soon
       </Td>
     </Tr>
     <Tr>
-      <Td>`NEXTAUTH_BACKEND_URL`</Td>
+      <Td>
+        {" "}
+        <Mandatory>`NEXTAUTH_BACKEND_URL`</Mandatory>
+      </Td>
       <Td>
         The backend base endpoint URL where `Frontend` send auth requests to.
       </Td>
     </Tr>
     <Tr>
-      <Td>`NEXTAUTH_SECRET`</Td>
+      <Td>
+        {" "}
+        <Mandatory>`NEXTAUTH_SECRET`</Mandatory>
+      </Td>
       <Td>
         Used to encrypt the NextAuth.js JWT, and to hash email verification
         tokens. Real value is used in Production.
       </Td>
     </Tr>
     <Tr>
-      <Td>`NEXTAUTH_URL`</Td>
+      <Td>
+        {" "}
+        <Mandatory>`NEXTAUTH_URL`</Mandatory>
+      </Td>
       <Td>The base URL where login and logout processes point to.</Td>
     </Tr>
   </tbody>
@@ -274,39 +311,51 @@ Coming soon
         file system. In other words, we ask Docker to look for secrets locally
         which created at [step
         2](quickstart#authentication-setup-for-azure-functions) in the dev.
-        quickstart.
+        quickstart. Only required in local development.
       </Td>
     </Tr>
     <Tr>
       <Td>`IsEncrypted`</Td>
       <Td>
         This setting represents whether the values in local.settings.json are
-        encrypted using a local machine key.
+        encrypted using a local machine key. Only required in local development.
       </Td>
     </Tr>
     <Tr>
-      <Td>`FUNCTIONS_WORKER_RUNTIME`</Td>
+      <Td>
+        {" "}
+        <Mandatory>`FUNCTIONS_WORKER_RUNTIME`</Mandatory>
+      </Td>
       <Td>
         The language or language stack of the worker runtime to load in the
         function app.
       </Td>
     </Tr>
     <Tr>
-      <Td>`DB_ENGINE`</Td>
+      <Td>
+        {" "}
+        <Mandatory>`DB_ENGINE`</Mandatory>
+      </Td>
       <Td>
         The database backend to use. Carrot's workers uses `Postgres` database
         backend.
       </Td>
     </Tr>
     <Tr>
-      <Td>`DB_HOST` `DB_PORT` `DB_NAME` `DB_USER` `DB_PASSWORD`</Td>
+      <Td>
+        `DB_HOST` `DB_PORT` `DB_NAME` `DB_USER`{" "}
+        <Mandatory>`DB_PASSWORD`</Mandatory>
+      </Td>
       <Td>
         These settings (`port`, `host`, `name`, `user`, `password`) are required
         for PostgreSQL database connection.
       </Td>
     </Tr>
     <Tr>
-      <Td>`RULES_QUEUE_NAME` `RULES_FILE_QUEUE_NAME` `WORKERS_UPLOAD_NAME`</Td>
+      <Td>
+        `RULES_QUEUE_NAME` `RULES_FILE_QUEUE_NAME`{" "}
+        <Mandatory>`WORKERS_UPLOAD_NAME`</Mandatory>
+      </Td>
       <Td>
         Name of queues in Azurite that `Workers` send messages about Rules
         actions triggers, Mapping Rules exports and ScanReport uploads,
@@ -317,11 +366,14 @@ Coming soon
       <Td>`WEBSITE_HOSTNAME`</Td>
       <Td>
         The address that can be used to reach the function app from outside.
+        Only required in local development.
       </Td>
     </Tr>
     <Tr>
-      <Td>`STORAGE_CONN_STRING` `AzureWebJobsStorage`</Td>
-      <Td>The keys to connect Workers and Azure local storage.</Td>
+      <Td>
+        `STORAGE_CONN_STRING` <Mandatory>`AzureWebJobsStorage`</Mandatory>
+      </Td>
+      <Td>The keys to connect Workers and Azure storage.</Td>
     </Tr>
   </tbody>
 </Table>
