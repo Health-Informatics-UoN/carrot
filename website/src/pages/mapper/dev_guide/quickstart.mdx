@@ -1,89 +1,36 @@
-import { Callout } from "nextra/components";
+import { Callout, Steps, Tabs } from "nextra/components";
 
 # Developer Quickstart
+
+This page will guide you through getting Carrot running locally.
+
+Start by cloning [the Carrot Mapper repository](https://github.com/Health-Informatics-UoN/carrot-mapper)
 
 ## Prerequisites
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [MS Azure Storage Explorer](https://azure.microsoft.com/en-us/products/storage/storage-explorer/#Download-4)
+- Vocabularies downloaded from [Athena](https://athena.ohdsi.org/vocabulary/list). Login to Athena requires an account which can be obtained for free.
 
 ## Getting Started
 
-The most direct route to running the application locally is using the Docker quickstart.
+Below are steps to make Carrot up and running locally.
 
-The repository contains a docker-compose for development, so after you have setup the [configuration](#configuration), just run
+<Steps>
 
-```bash
-docker compose up -d
-```
-
-to start the application stack. This runs the database, Azurite emulator, Azure functions (`workers`) and will build Carrot's backend (`web`) and frontend (`next-client`). This process will be on the background and you can check it through Docker Desktop app. When all of containers are up and running successfully, Carrot's frontend and backend can be accessed through `http://localhost:3000/` and `http://localhost:8000/` respectively.
-
-<Callout type="info">
-  The `omop-lite` container will be shut down automatically after successfully done its job.
-
-</Callout>
-
-<Callout type="info">
-  Docker will mount the `app/api` directory to the web app container, so any changes in the Python code of the backend will be reflected in the running application.
-
-Any code changes in the frontend app, i.e., `next-client-app`, will be reflected as well in the UI, thanks to the `app/next-client-app` directory mounted on Docker environment.
-
-</Callout>
-
-## Configuration
-
-There are a few steps to set up the data and environment for Carrot to run with Docker compose.
-
-### OMOP CDM setting
+### OMOP schema and vocabs setting
 
 You need a pre-seeded OMOP CDM database inside the database of Carrot.
 
-To do this, add a folder named `vocabs` in the `root` directory of Carrot, then place there vocabulary files downloaded from [Athena](https://athena.ohdsi.org/vocabulary/list). This should be done before running `docker compose up` for the first time.
+To do this, add a folder named `vocabs` in the `root` directory of Carrot, then place there vocabulary files downloaded from [Athena](https://athena.ohdsi.org/vocabulary/list).
 
-When running `docker compose up`, OMOP CDM will be created and loaded to Carrot's database, thanks to [OMOP Lite](https://github.com/andyrae/omop-lite/pkgs/container/omop-lite) container.
+Thanks to [OMOP Lite](https://github.com/andyrae/omop-lite/pkgs/container/omop-lite) container, OMOP schema will be created and vocabularies will be loaded to Carrot's database, when the app's stack is running.
 
-### Preparing initial data
+### Authentication setup for Azure functions
 
-You need to seed the web app database with the OMOP table and field names. You can do this by using your terminal and access the `web` container on Docker or you can use Docker Desktop directly. The following instructions is for the latter method.
+For local development, an authentication will be required when `api` container sends requests to `workers` container,.
 
-Navigate to your Docker Desktop, choose `web` container, choose `Exec` tab, then run: `python manage.py loaddata mapping filetypes`.
-
-After that, add a new admin user (Django superuser) by running: `python manage.py createsuperuser`.
-
-Create initial instances in Carrot app by logging to Django Admin panel `http://localhost:8000/admin/` (using the credentials in the last step), then add first `Data Partner`, `Dataset` (with `admin` as the admin user) and `Project` (with `Datasets` as the created dataset and `Members` as the admin user).
-
-### Azure Functions
-
-#### Local Storage
-
-You need to set up a local storage for local development of Carrot
-
-With the `workers` container in Docker Desktop is running, open `MS Azure Storage Explorer`, and create the following `queues` (under the tab `Storage Accounts - Emulator - Queues`) and `blob containers` (under the tab `Storage Accounts - Emulator - Blob Containers`)
-
-For `queues`:
-
-```
-rules-local
-rules-exports-local
-uploadreports-local
-```
-
-For `blob containers`:
-
-```
-scan-reports
-data-dictionaries
-rules-exports
-```
-
-This setting will create the local storages for Azure functions of Carrot.
-
-#### Authentication for Azure functions
-
-For local developement using Docker, when `web` container wants to send request to `workers` container, an authentication will be required and set up. This setup should be done before running `docker compose up` for the first time.
-
-In the `app/workers` directory, add a folder named `Secrets`, and then inside that folder, add a new file named `rulestrigger.json` with the following content:
+To set this up, at the `app/workers` directory, add a folder named `Secrets`. Inside this folder, add a new file named `rulestrigger.json` with the following content:
 
 ```json
 {
@@ -97,4 +44,113 @@ In the `app/workers` directory, add a folder named `Secrets`, and then inside th
 }
 ```
 
-You should now be setup to run the [user quickstart](/mapper/user_guide/quickstart) using the credentials of the Django Admin user.
+### Warm up
+
+At the `root` directory, run to command below to start the application stack using Docker compose.
+
+```bash
+docker compose up -d
+```
+
+This runs the database (`db`), Azurite emulator (`Azurite`), Azure functions (`workers`) and will build Carrot's backend (`api`) and frontend (`frontend`). This process will be on the background and take some time, but you can always check it through Docker Desktop app. When all of containers, except `omop-lite`, are up and running successfully, Carrot's frontend and backend can be accessed through `http://localhost:3000/` and `http://localhost:8000/admin/` respectively. **However**, please complete the remaining steps, while containers are running, to make sure Carrot running correctly.
+
+More details about Docker compose's configuration can be found [here](configuration)
+
+<Callout type="info">
+
+The `omop-lite` container, whose task is creating `omop` schema on `db` and install vocabularies there, will be shut down automatically after successfully done its jobs.
+
+</Callout>
+
+<Callout type="info">
+
+Docker will mount the `app/api` and `app/next-client-app` directories to its environment, so any changes in the code of the backend or frontend will be reflected in the running application.
+
+</Callout>
+
+### Initial data preparation
+
+You need to seed the Carrot app database with the OMOP table and field names.
+
+This can be done by either using your terminal and access the `api` container on Docker or using Docker Desktop.
+
+<Tabs items={['Using Terminal', 'Using Docker Desktop']}>
+  <Tabs.Tab>
+  At the `root` directory, open terminal and run
+
+```bash
+docker exec -it carrot-mapper-dev-api-1 bash
+```
+
+Then run
+
+```bash
+python manage.py loaddata mapping filetypes
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+Navigate to your Docker Desktop, choose `api` container, choose `Exec` tab, then run:
+
+```bash
+python manage.py loaddata mapping filetypes
+```
+
+  </Tabs.Tab>
+</Tabs>
+
+After that, add a new admin user (Django superuser) by running: `python manage.py createsuperuser`.
+
+### First instances creation
+
+Create some first instances in Carrot app by logging to Django Admin panel `http://localhost:8000/admin/` (using the credentials in the last step). Following this order, fill out the required information to create new `Data Partner`, `Dataset` and `Project`.
+
+### Azure local storage setup
+
+You need to set up an Azurite local storage for local development of Carrot
+
+To do this, with the `workers` container in Docker Desktop is running, open `MS Azure Storage Explorer`, and create the following `queues` (under the tab `Storage Accounts - Emulator - Queues`) and `blob containers` (under the tab `Storage Accounts - Emulator - Blob Containers`).
+
+<Tabs items={['Queues', 'Blob Containers']}>
+  <Tabs.Tab>
+
+```
+rules-local
+rules-exports-local
+uploadreports-local
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+```
+scan-reports
+data-dictionaries
+rules-exports
+```
+
+  </Tabs.Tab>
+</Tabs>
+
+### Check-in
+
+You should now be able to access Carrot by logging in at `http://localhost:3000/` using your admin credentials created at step 4.
+
+After log in, you will be presented with `Projects` page.
+
+Try using Carrot by steps in the [user quickstart](/mapper/user_guide/quickstart) to see if Carrot is running correctly.
+
+<Callout emoji="🎉">Congratulations on your first Carrot running!</Callout>
+
+</Steps>
+
+Since now on, to run Carrot locally, you can just run
+
+```bash
+docker compose up -d
+```
+
+and access `http://localhost:3000/`.
+
+**What next?** Explore and try using Carrot with [user quickstart](/mapper/user_guide/quickstart).
