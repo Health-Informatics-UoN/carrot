@@ -91,7 +91,7 @@ python manage.py loaddata mapping filetypes
   </Tabs.Tab>
   <Tabs.Tab>
 
-Navigate to your Docker Desktop, choose `api` container, choose `Exec` tab, then run:
+Navigate to your Docker Desktop, under `carrot-mapper-dev`, choose `api` container, choose `Exec` tab, then run:
 
 ```bash
 python manage.py loaddata mapping filetypes
@@ -100,7 +100,11 @@ python manage.py loaddata mapping filetypes
   </Tabs.Tab>
 </Tabs>
 
-After that, add a new admin user (Django superuser) by running: `python manage.py createsuperuser`.
+After that, add a new admin user (Django superuser) by running:
+
+```bash
+python manage.py createsuperuser
+```
 
 ### First instances creation
 
