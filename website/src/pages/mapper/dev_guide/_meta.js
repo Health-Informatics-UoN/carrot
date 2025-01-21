@@ -1,6 +1,6 @@
 export default {
   quickstart: "Quickstart",
-  configuration: "Configuration",
+  configuration: "Compose Configuration",
   data_structures: "Internal data structures",
   mapping_rules: "Mapping rules",
   api: "API",

@@ -1,8 +1,8 @@
 import { Callout, Tabs, Table, Td, Th, Tr, Code } from "nextra/components";
 
-# Configuration
+# Compose Stack Configuration
 
-Carrot's Compose Container stack consists of 6 services or containers working together. This page will give details about these services.
+Carrot's Compose Container stack consists of 6 services or containers working together. This page will give details about these services' configurations.
 
 ## Django Backend: `api`
 
@@ -314,76 +314,54 @@ Below is the description for the service's environment variables which are requi
   </tbody>
 </Table>
 
-## Results Obfuscation
+## Other services
 
-**Configuration Section: `Obfuscation`**
+```yaml
+db:
+  image: postgres:13
+  restart: always
+  ports:
+    - 5432:5432
+  environment:
+    - POSTGRES_PASSWORD=postgres
 
-<Table>
-  <thead>
-    <Tr>
-      <Th>Key</Th>
-      <Th>Description</Th>
-    </Tr>
-  </thead>
-  <tbody>
-    <Tr>
-      <Td>`LowNumberSuppressionThreshold`</Td>
-      <Td>
-        A positive number will set the threshold below which Relay will suppress
-        and return `0`.
+omop-lite:
+  image: ghcr.io/andyrae/omop-lite
+  volumes:
+    - ./vocabs:/vocabs
+  depends_on:
+    - db
+  environment:
+    - DB_PASSWORD=postgres
+    - DB_NAME=postgres
 
-        Defaults to `0` (effectively off).
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>`RoundingTarget`</Td>
-      <Td>
-        The target nearest number to round up to, e.g. `10` will round both
-        `171` and `179` to `180`.
+azurite:
+image: mcr.microsoft.com/azure-storage/azurite
+restart: always
+volumes:
+  - ./app/azurite:/azurite
+ports:
+  - 10000:10000
+  - 10001:10001
+  - 10002:10002
+command: azurite --blobHost azurite --queueHost azurite --tableHost azurite --location /data --debug /data/debug.log --loose --skipApiVersionCheck
+hostname: azurite
+environment:
+  - AZURITE_ACCOUNTS=devstoreaccount1:Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+```
 
-        Defaults to `0` (effectively off).
-      </Td>
-    </Tr>
+### Database: `db`
 
-  </tbody>
-</Table>
+This service runs a PostgreSQL database in the background for Carrot on port `5432:5432`.
 
-Examples:
+### Azure local storage: `azurite`
 
-<Tabs items={['Environment', 'Compose', 'JSON']}>
-  <Tabs.Tab>
-    ```bash filename=".env" copy
-    Obfuscation__LowNumberSuppressionThreshold=50
-    Obfuscation__RoundingTarget=5
-    ```
+This service runs a Azure local storage in the background for Carrot's workers on port `10000:10000`, `10000:10001` and `10000:10002`.
 
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```yaml filename="compose.yml" copy
-    environment:
-      Obfuscation__LowNumberSuppressionThreshold: 50
-      Obfuscation__RoundingTarget: 5
-    ```
+The `command` and `AZURITE_ACCOUNTS` environment variable in this service make sure the connection between `azurite` and `workers` proper.
 
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```json filename="secrets.json" copy
-    {
-      "Obfuscation": {
-        "LowNumberSuppressionThreshold": 50,
-        "RoundingTarget": 5
-      }
-    }
-    ```
+### OMOP CDM Loading: `omop-lite`
 
-  </Tabs.Tab>
-</Tabs>
+After `db` is up, [this service](https://github.com/AndyRae/omop-lite/pkgs/container/omop-lite) runs a DDL script to create a `omop` schema in the `db`, then load the vocabs downloaded from Athena there.
 
-## ASP.NET Core
-
-Since Relay is an ASP.NET Core application, there are some capabilities of that framework that can be configured in the standard way.
-
-Examples of this include [logging levels](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/logging/#configure-logging)
-and [hosting configuration](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel/endpoints) (e.g. bind addresses, TLS...).
-
-Please refer to the [ASP.NET Core documentation](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/) on these topics.
+When `omop` schema existed, this service will closes automatically.
