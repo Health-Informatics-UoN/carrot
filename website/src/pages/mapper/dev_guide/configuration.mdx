@@ -1,69 +1,47 @@
 import { Callout, Tabs, Table, Td, Th, Tr, Code } from "nextra/components";
-import { Mandatory } from "./components/Mandatory";
 
 # Configuration
 
-Relay can be configured using environment variables, or any approach supported by [ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/)
+Carrot's Compose Container stack consists of 6 services or containers working together. This page will give details about these services.
 
-Your desired approach may differ depending on the environment you're configuring, e.g.:
+## Django Backend: `api`
 
-<Tabs items={['Compose Container Stack', 'Local Development']}>
-  <Tabs.Tab>
-    If you're running Relay as part of a composed stack of containers, we recommend setting environment variables in the `compose.yml`.
+```yaml
+api:
+  image: carrot-backend
+  build:
+    context: app
+    dockerfile: api/Dockerfile
+  ports:
+    - 8000:8000
+  environment:
+    - FRONTEND_URL=http://frontend:3000
+    - ALLOWED_HOSTS=['localhost', '127.0.0.1','api', 'workers']
+    - DB_ENGINE=django.db.backends.postgresql
+    - DB_HOST=db
+    - DB_PORT=5432
+    - DB_NAME=postgres
+    - DB_USER=postgres
+    - DB_PASSWORD=postgres
+    - DEBUG=True
+    - WORKERS_UPLOAD_NAME=uploadreports-local
+    - SECRET_KEY=secret
+    - WORKERS_URL=http://workers:80
+    - WORKERS_RULES_NAME=RulesOrchestrator
+    - WORKERS_RULES_KEY=rules_key
+    - WORKERS_RULES_EXPORT_NAME=rules-exports-local
+    - STORAGE_CONN_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;
+    - SIGNING_KEY=secret
+  volumes:
+    - ./app/api:/api
+  depends_on:
+    omop-lite:
+      condition: service_completed_successfully
+```
 
-    For example:
+This service is built based on the Dockerfile inside `app/api/` folder and exposed on port `8000:8000`. It will start after the `omop-lite` service ran and did its jobs successfully. When running, it also uses the mounted code in the `api` folder so the changes will be reflected without restarting the stack.
 
-    ```yaml filename="compose.yml"
-    services:
-      # ...
-
-      relay:
-        # ...
-
-        environment:
-          ConnectionStrings__Default: Server=db_host;Port=5432;Database=hutch-relay;User Id=postgres;Password=postgres
-          RelayTaskQueue__ConnectionString: amqp://user:password@rabbitmq:5672
-
-          UpstreamTaskApi__BaseUrl: https://my-task-api.com
-          UpstreamTaskApi__CollectionId: dd52026b-5a61-4c89-b733-04ba141b3f31
-          UpstreamTaskApi__Username: user
-          UpstreamTaskApi__Password: password
-
-        # ...
-    ```
-
-  </Tabs.Tab>
-  <Tabs.Tab>
-    In development, you should use [.NET User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets), and run Relay with `DOTNET_Environment` set to `Development`.
-
-    <Callout emoji="💡">
-      Running from an IDE will set the environment to `Development` for you, and
-      provide a way to edit User Secrets.
-    </Callout>
-
-    ```json filename="secrets.json"
-    {
-      "ConnectionStrings": {
-        "Default": "Server=localhost;Port=5432;Database=hutch-relay;User Id=postgres;Password=postgres"
-      },
-      "RelayTaskQueue": {
-        "ConnectionString": "amqp://user:password@localhost:5672"
-      },
-      "UpstreamTaskApi": {
-        "BaseUrl": "https://my-task-api.com",
-        "CollectionId": "dd52026b-5a61-4c89-b733-04ba141b3f31",
-        "Username": "user",
-        "Password": "password"
-      }
-    }
-    ```
-
-  </Tabs.Tab>
-</Tabs>
-
-## Upstream Task API [#upstream-task-api]
-
-**Configuration Section: `UptreamTaskApi`**
+Below is the description for the service's environment variables which are required for it to run properly:
 
 <Table>
   <thead>
@@ -74,89 +52,106 @@ Your desired approach may differ depending on the environment you're configuring
   </thead>
   <tbody>
     <Tr>
+      <Td>`FRONTEND_URL`</Td>
       <Td>
-        <Mandatory>`BaseUrl`</Mandatory>
-      </Td>
-      <Td>
-        The Base URL for an Upstream Task API that Relay should fetch jobs from.
-        This only needs to include scheme (e.g. `https://`), host
-        (`my-task-api.com`) and optionally port `8080`
+        The URL for Frontend service which `Backend` should connect to. This only
+        needs to include scheme (e.g. `http://`), host (`my-fronted.com`, or in
+        this example, `frontend` in order to connect with service in the same
+        compose stack) and optionally port, e.g., `3000`.
       </Td>
     </Tr>
     <Tr>
+      <Td>`ALLOWED_HOSTS`</Td>
       <Td>
-        <Mandatory>`CollectionId`</Mandatory>
+        A list of strings representing the host/domain names that this Django
+        site can serve.
       </Td>
-      <Td>An ID (provided from the Upstream API) for this Task API consumer</Td>
+    </Tr>
+    <Tr>
+      <Td>`DB_ENGINE`</Td>
+      <Td>
+        The database backend to use. Carrot uses `Postgres` database backend.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`DB_HOST` `DB_PORT` `DB_NAME` `DB_USER` `DB_PASSWORD`</Td>
+      <Td>
+        These settings (`port`, `host`, `name`, `user`, `password`) are required
+        for PostgreSQL database connection.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`DEBUG`</Td>
+      <Td>A boolean that turns on/off debug mode.</Td>
+    </Tr>
+    <Tr>
+      <Td>`WORKERS_URL`</Td>
+      <Td>The URL for `Workers` (Azure functions) service which `Backend` should connect to. Structure is similar to `FRONTEND_URL`.</Td>
     </Tr>
     <Tr>
       <Td>
-        <Mandatory>`Username`</Mandatory>
+        `WORKERS_UPLOAD_NAME` `WORKERS_RULES_EXPORT_NAME`
       </Td>
-      <Td>A valid username for accessing the Task API</Td>
+      <Td>Name of queues in Azurite that `Workers` send messages about ScanReport uploads and Mapping Rules exports, respectively.</Td>
     </Tr>
     <Tr>
       <Td>
-        <Mandatory>`Password`</Mandatory>
+        `WORKERS_RULES_NAME`
       </Td>
-      <Td>A valid password for the Task API user configured above</Td>
+      <Td>Name of point where `Backend` triggers Workers' jobs.</Td>
     </Tr>
     <Tr>
-      <Td>`PollingFrequency`</Td>
-      <Td>
-        Interval in milliseconds between polling requests to the Upstream Task
-        API.
+      <Td>`WORKERS_RULES_KEY`</Td>
+      <Td>The key to authorise the request sent to `Workers` from `Backend`.</Td>
+    </Tr>
+    <Tr>
+      <Td>`STORAGE_CONN_STRING`</Td>
+      <Td>The key to connect Backend and Azure local storage.</Td>
+    </Tr>
 
-        Defaults to `5000` (5 seconds).
-      </Td>
+    <Tr>
+      <Td>`SECRET_KEY`</Td>
+      <Td>A secret key for a particular Django installation. This is used to provide cryptographic signing, and should be set to a unique, unpredictable value. Real value is used in Production.</Td>
+    </Tr>
+    <Tr>
+      <Td>`SIGNING_KEY`</Td>
+      <Td>A key required in JWT token generation process for Next Auth. Real value is used in Production.</Td>
     </Tr>
 
   </tbody>
 </Table>
 
-Examples:
+## NextJS Frontend: `frontend`
 
-<Tabs items={['Environment', 'Compose', 'JSON']}>
-  <Tabs.Tab>
-    ```bash filename=".env" copy
-    UpstreamTaskApi__BaseUrl="https://my-task-api.com"
-    UpstreamTaskApi__CollectionId="dd52026b-5a61-4c89-b733-04ba141b3f31"
-    UpstreamTaskApi__Username=user
-    UpstreamTaskApi__Password=password
-    UpstreamTaskApi__PollingFrequency=5000
-    ```
+```yaml
+frontend:
+  image: carrot-frontend
+  build:
+    context: app/next-client-app
+    dockerfile: Dockerfile
+    target: dev
+  command: npm run dev
+  ports:
+    - 3000:3000
+  environment:
+    - BACKEND_URL=http://api:8000
+    - BACKEND_ORIGIN=localhost:8000
+    - NEXTAUTH_URL=http://localhost:3000/
+    - NEXTAUTH_SECRET=verycomplexsecretkey
+    - NEXTAUTH_BACKEND_URL=http://api:8000/api/
+    - NODE_ENV=development
+    - WATCHPACK_POLLING=true
+  volumes:
+    - ./app/next-client-app:/app
+    - /app/node_modules
+    - /app/.next
+  depends_on:
+    - api
+```
 
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```yaml filename="compose.yml" copy
-    environment:
-      UpstreamTaskApi__BaseUrl: https://my-task-api.com
-      UpstreamTaskApi__CollectionId: dd52026b-5a61-4c89-b733-04ba141b3f31
-      UpstreamTaskApi__Username: user
-      UpstreamTaskApi__Password: password
-      UpstreamTaskApi__PollingFrequency: 5000
-    ```
+This service is built based on the Dockerfile inside `app/next-client-app/` folder and exposed on port `3000:3000`. It will start after the `api` service is successfully up. When running, it also uses the mounted code in the `next-client-app` folder so the changes will be reflected without restarting the stack.
 
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```json filename="secrets.json" copy
-    {
-      "UpstreamTaskApi": {
-        "BaseUrl": "https://my-task-api.com",
-        "CollectionId": "dd52026b-5a61-4c89-b733-04ba141b3f31",
-        "Username": "user",
-        "Password": "password"
-        "PollingFrequency": 5000
-      }
-    }
-    ```
-
-  </Tabs.Tab>
-</Tabs>
-
-## Database Connections [#database]
-
-**Configuration Section: `ConnectionStrings`**
+Below is the description for the service's environment variables which are required for it to run properly:
 
 <Table>
   <thead>
@@ -167,18 +162,80 @@ Examples:
   </thead>
   <tbody>
     <Tr>
+      <Td>`BACKEND_URL`</Td>
       <Td>
-        <Mandatory>`Default`</Mandatory>
+        The URL for Backend service which `frontend` should connect to. This
+        only needs to include scheme (e.g. `http://`), host (`my-fronted.com`,
+        or in this example, `api` in order to connect with service in the same
+        compose stack) and optionally port, e.g., `8000`.
       </Td>
+    </Tr>
+    <Tr>
+      <Td>`BACKEND_ORIGIN`</Td>
       <Td>
-        An ODBC/ADO.NET style connection string for a PostgreSQL 16 Server, and
-        a database name for Relay to store working state in.
+        A list of extra safe origin domains from which Server Actions can be
+        invoked. Next.js compares the origin of a Server Action request with the
+        host domain, ensuring they match to prevent CSRF attacks.
       </Td>
+    </Tr>
+    <Tr>
+      <Td>`NODE_ENV` `WATCHPACK_POLLING`</Td>
+      <Td>
+        These variables are set to enable `hot reload` feature when developing
+        NextJS app.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`NEXTAUTH_BACKEND_URL`</Td>
+      <Td>
+        The backend base endpoint URL where `Frontend` send auth requests to.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`NEXTAUTH_SECRET`</Td>
+      <Td>
+        Used to encrypt the NextAuth.js JWT, and to hash email verification
+        tokens. Real value is used in Production.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`NEXTAUTH_URL`</Td>
+      <Td>The base URL where login and logout processes point to.</Td>
     </Tr>
   </tbody>
 </Table>
 
-**Configuration Section: `Database`**
+## Azure functions: `workers`
+
+```yaml
+frontend:
+  image: carrot-frontend
+  build:
+    context: app/next-client-app
+    dockerfile: Dockerfile
+    target: dev
+  command: npm run dev
+  ports:
+    - 3000:3000
+  environment:
+    - BACKEND_URL=http://api:8000
+    - BACKEND_ORIGIN=localhost:8000
+    - NEXTAUTH_URL=http://localhost:3000/
+    - NEXTAUTH_SECRET=verycomplexsecretkey
+    - NEXTAUTH_BACKEND_URL=http://api:8000/api/
+    - NODE_ENV=development
+    - WATCHPACK_POLLING=true
+  volumes:
+    - ./app/next-client-app:/app
+    - /app/node_modules
+    - /app/.next
+  depends_on:
+    - api
+```
+
+This service is built based on the Dockerfile inside `app/next-client-app/` folder and exposed on port `3000:3000`. It will start after the `api` service is successfully up. When running, it also uses the mounted code in the `next-client-app` folder so the changes will be reflected without restarting the stack.
+
+Below is the description for the service's environment variables which are required for it to run properly:
 
 <Table>
   <thead>
@@ -189,99 +246,48 @@ Examples:
   </thead>
   <tbody>
     <Tr>
-      <Td>`ApplyMigrationsOnStartup`</Td>
+      <Td>`BACKEND_URL`</Td>
       <Td>
-        Should Relay automatically apply outstanding database migrations at
-        startup? `true` / `false`.
-
-        Defaults to `false`.
+        The URL for Backend service which `frontend` should connect to. This
+        only needs to include scheme (e.g. `http://`), host (`my-fronted.com`,
+        or in this example, `api` in order to connect with service in the same
+        compose stack) and optionally port, e.g., `8000`.
       </Td>
     </Tr>
-
-  </tbody>
-</Table>
-
-Examples:
-
-<Tabs items={['Environment', 'Compose', 'JSON']}>
-  <Tabs.Tab>
-    ```bash filename=".env" copy
-    ConnectionStrings__Default="Server=localhost;Port=5432;Database=hutch-relay;User Id=postgres;Password=postgres"
-    Database__ApplyMigrationsOnStartup=true
-    ```
-
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```yaml filename="compose.yml" copy
-    environment:
-      ConnectionStrings__Default: "Server=localhost;Port=5432;Database=hutch-relay;User Id=postgres;Password=postgres"
-      Database__ApplyMigrationsOnStartup: true
-    ```
-
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```json filename="secrets.json" copy
-    {
-      "ConnectionStrings": {
-        "Default": "Server=localhost;Port=5432;Database=hutch-relay;User Id=postgres;Password=postgres"
-      },
-      "Database": {
-        "ApplyMigrationsOnStartup": true
-      }
-    }
-    ```
-
-  </Tabs.Tab>
-</Tabs>
-
-## RelayTask Queue
-
-**Configuration Section: `RelayTaskQueue`**
-
-<Table>
-  <thead>
     <Tr>
-      <Th>Key</Th>
-      <Th>Description</Th>
-    </Tr>
-  </thead>
-  <tbody>
-    <Tr>
+      <Td>`BACKEND_ORIGIN`</Td>
       <Td>
-        <Mandatory>`ConnectionString`</Mandatory>
+        A list of extra safe origin domains from which Server Actions can be
+        invoked. Next.js compares the origin of a Server Action request with the
+        host domain, ensuring they match to prevent CSRF attacks.
       </Td>
-      <Td>A connection URL for an AMQP Server</Td>
+    </Tr>
+    <Tr>
+      <Td>`NODE_ENV` `WATCHPACK_POLLING`</Td>
+      <Td>
+        These variables are set to enable `hot reload` feature when developing
+        NextJS app.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`NEXTAUTH_BACKEND_URL`</Td>
+      <Td>
+        The backend base endpoint URL where `Frontend` send auth requests to.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`NEXTAUTH_SECRET`</Td>
+      <Td>
+        Used to encrypt the NextAuth.js JWT, and to hash email verification
+        tokens. Real value is used in Production.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`NEXTAUTH_URL`</Td>
+      <Td>The base URL where login and logout processes point to.</Td>
     </Tr>
   </tbody>
 </Table>
-
-Examples:
-
-<Tabs items={['Environment', 'Compose', 'JSON']}>
-  <Tabs.Tab>
-    ```bash filename=".env" copy
-    RelayTaskQueue__ConnectionString="amqp://user:password@localhost:5672"
-    ```
-
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```yaml filename="compose.yml" copy
-    environment:
-      RelayTaskQueue__ConnectionString: "amqp://user:password@localhost:5672"
-    ```
-
-  </Tabs.Tab>
-  <Tabs.Tab>
-    ```json filename="secrets.json" copy
-    {
-      "RelayTaskQueue": {
-        "ConnectionString": "amqp://user:password@localhost:5672"
-      },
-    }
-    ```
-
-  </Tabs.Tab>
-</Tabs>
 
 ## Results Obfuscation
 
