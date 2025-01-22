@@ -1,0 +1,21 @@
+name: ci
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      RUNNER_ALLOW_RUNASROOT: true
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: "recursive"
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+      - name: Install dependencies and build Next.js app
+        run: |
+          npm install
+          npm run build
+        working-directory: website
