@@ -2,7 +2,7 @@
  * Marks inline content as mandatory or required by adding a red asterisk after it
  * @returns
  */
-export function Mandatory({ children }) {
+export default function Mandatory({ children }) {
   return (
     <>
       {children}
