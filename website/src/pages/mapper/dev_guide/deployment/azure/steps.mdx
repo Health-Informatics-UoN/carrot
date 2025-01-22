@@ -1,26 +1,149 @@
-# Adding a new vocabulary to the database
+import { Callout, Steps, Tabs } from "nextra/components";
 
-The `omop.vocabulary` table holds the recognised vocabularies for use in automated mapping.
+# Azure Deployment Steps
 
-To add a new vocabulary to the database, 3 tables need updating: `omop.vocabulary`, `omop.concept` and `omop.concept_relationship`.
+This page will guide you through some high-level steps required to deploy Carrot Mapper on Azure.
 
-Download the required files from Athena, which should give a file structure like this :
+<Steps>
 
-![](/docs/Adding_a_vocab_file_structure.png)
+### Create resources
 
-The only required fiels are `CONCEPT_RELATIONSHIP.csv`, `CONCEPT.csv` and `VOCABULARY.csv`.
+Below are resources that need creating on Azure:
 
-Open the `VOCABULARY.csv` file (better to use a text editor than Excel, which will often reformat the file unhelpfully),
-and remove everything except the header and the line for the required vocabulary, then save the file.
+- Resource group
+- Web app for Frontend app + Application Insights
+- Web app for Backend app + Application Insights
+- Function app + Application Insights
+- Azure Database for PostgreSQL
+- Azure storage
+- Data factory
+- Key vault
 
-In PGAdmin, right-click on the `omop.vocabulary` table > Import/Export Data. Set the Import/Export toggle to "Import",
-and select the `VOCABULARY.csv` file. Set Header to "Yes", Delimiter to "Tab", then press OK. The import should proceed successfully.
-Check for success by querying the table contents.
+You need a pre-seeded OMOP CDM database inside the database of Carrot.
 
-Open the `CONCEPT.csv`, and remove all lines which do not relate to the given vocabulary - check the `vocabulary_id` column.
-Import this file in the same way to the `omop.concepts` table.
+To do this, add a folder named `vocabs` in the `root` directory of Carrot, then place there vocabulary files downloaded from [Athena](https://athena.ohdsi.org/vocabulary/list).
 
-Finally, import `CONCEPT_RELATIONSHIP.csv` to `omop.concept_relationship` in the same way - the file may require editing,
-as it may contain duplicate entries already present in the database, which will cause the import to fail. the only
-rows required are those which relate to concepts present in `CONCEPT.csv`. Ideally, an UPSERT script should be used for
-this import, though one is not available at the time of writing.
+Thanks to [OMOP Lite](https://github.com/andyrae/omop-lite/pkgs/container/omop-lite) container, OMOP schema will be created and vocabularies will be loaded to Carrot's database, when the app's stack is running.
+
+### Authentication setup for Azure functions
+
+For local development, an authentication will be required when `api` container sends requests to `workers` container,.
+
+To set this up, at the `app/workers` directory, add a folder named `Secrets`. Inside this folder, add a new file named `rulestrigger.json` with the following content:
+
+```json
+{
+  "keys": [
+    {
+      "name": "default",
+      "value": "rules_key",
+      "encrypted": false
+    }
+  ]
+}
+```
+
+### Warm up
+
+At the `root` directory, run to command below to start the application stack using Docker compose.
+
+```bash
+docker compose up -d
+```
+
+This runs the database (`db`), Azurite emulator (`Azurite`), Azure functions (`workers`) and will build Carrot's backend (`api`) and frontend (`frontend`). This process will be on the background and take some time, but you can always check it through Docker Desktop app. When all of containers, except `omop-lite`, are up and running successfully, Carrot's frontend and backend can be accessed through `http://localhost:3000/` and `http://localhost:8000/admin/` respectively. **However**, please complete the remaining steps, while containers are running, to make sure Carrot running correctly.
+
+More details about Docker compose's configuration can be found [here](configuration)
+
+<Callout type="info">
+
+The `omop-lite` container, whose task is creating `omop` schema on `db` and install vocabularies there, will be shut down automatically after successfully done its jobs.
+
+</Callout>
+
+<Callout type="info">
+
+Docker will mount the `app/api` and `app/next-client-app` directories to its environment, so any changes in the code of the backend or frontend will be reflected in the running application.
+
+</Callout>
+
+### Initial data preparation
+
+You need to seed the Carrot app database with the OMOP table and field names.
+
+This can be done by either using your terminal and access the `api` container on Docker or using Docker Desktop.
+
+<Tabs items={['Using Terminal', 'Using Docker Desktop']}>
+  <Tabs.Tab>
+  At the `root` directory, open terminal and run
+
+```bash
+docker exec -it carrot-mapper-dev-api-1 bash
+```
+
+Then run
+
+```bash
+python manage.py loaddata mapping filetypes
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+Navigate to your Docker Desktop, under `carrot-mapper-dev`, choose `api` container, choose `Exec` tab, then run:
+
+```bash
+python manage.py loaddata mapping filetypes
+```
+
+  </Tabs.Tab>
+</Tabs>
+
+After that, add a new admin user (Django superuser) by running:
+
+```bash
+python manage.py createsuperuser
+```
+
+### First instances creation
+
+Create some first instances in Carrot app by logging to Django Admin panel `http://localhost:8000/admin/` (using the credentials in the last step). Following this order, fill out the required information to create new `Data Partner`, `Dataset` and `Project`.
+
+### Azure local storage setup
+
+You need to set up an Azurite local storage for local development of Carrot
+
+To do this, with the `workers` container in Docker Desktop is running, open `MS Azure Storage Explorer`, and create the following `queues` (under the tab `Storage Accounts - Emulator - Queues`) and `blob containers` (under the tab `Storage Accounts - Emulator - Blob Containers`).
+
+<Tabs items={['Queues', 'Blob Containers']}>
+  <Tabs.Tab>
+
+```
+rules-local
+rules-exports-local
+uploadreports-local
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+```
+scan-reports
+data-dictionaries
+rules-exports
+```
+
+  </Tabs.Tab>
+</Tabs>
+
+### Check-in
+
+You should now be able to access Carrot by logging in at `http://localhost:3000/` using your admin credentials created at step 4.
+
+After log in, you will be presented with `Projects` page.
+
+Try using Carrot by steps in the [user quickstart](/mapper/user_guide/quickstart) to see if Carrot is running correctly. If you can successfully upload a new scan report, create mapping rules, and finally can export the Mapping rules JSON. That's a sign that you have successfully install and run Carrot locally.
+
+<Callout emoji="🎉">Congratulations on your first Carrot running!</Callout>
+
+</Steps>
