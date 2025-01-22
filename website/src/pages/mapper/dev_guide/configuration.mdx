@@ -441,13 +441,41 @@ Coming soon
 
 Carrot uses PostgreSQL database.
 
-### Azure local storage
+The Carrot Database would require two data components at the beginning:
+
+- An `omop` schema with loaded vocabularies
+- Seeding data about OMOP tables and fields names
+
+For local development, the former can be created by [omop-lite](https://github.com/AndyRae/omop-lite/pkgs/container/omop-lite) package as the example below ([step 1 in developer quickstart guide](quickstart#omop-schema-and-vocabs-setting)) and the latter can be done by [step 4 in developer quickstart guide](quickstart#initial-data-preparation).
+
+### Azurite
 
 Carrot uses Azurite as queues and blobs storage for Azure functions.
 
-### OMOP CDM Loading
+This storage requires pre-made `Queues` and `Blob Containers` with purposes below:
 
-Carrot uses [omop-lite](https://github.com/AndyRae/omop-lite/pkgs/container/omop-lite) for creation and vocabs loading to its OMOP CDM in the database.
+<Tabs items={['Queues', 'Blob Containers']}>
+  <Tabs.Tab>
+
+```
+Queue for Rules actions triggers, e.g., `rules`
+Queue for Mapping rules exports, e.g., `rules-exports`
+Queue for Scan reports uploads, e.g., `uploadreports`
+```
+
+Note: Queues names should match with `RULES_QUEUE_NAME` `RULES_FILE_QUEUE_NAME` `WORKERS_UPLOAD_NAME` in `Azure functions`.
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+```
+Container for ScanReport blobs, e.g., `scan-reports`
+Container for Data dictionary blobs, e.g., `data-dictionaries`
+Container for Mapping rules files, e.g., `rules-exports`
+```
+
+  </Tabs.Tab>
+</Tabs>
 
 **Examples**
 
