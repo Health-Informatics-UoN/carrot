@@ -1,0 +1,539 @@
+import { Callout, Tabs, Table, Td, Th, Tr, Code } from "nextra/components";
+import { Mandatory } from "./components/Mandatory";
+
+# Configuration
+
+Carrot can be configured using environment variables which can be different depending on the deploying approach.
+
+## Django Backend
+
+**Configuration Section**
+
+<Table>
+  <thead>
+    <Tr>
+      <Th>Key</Th>
+      <Th>Description</Th>
+    </Tr>
+  </thead>
+  <tbody>
+    <Tr>
+      <Td>
+        <Mandatory>`FRONTEND_URL`</Mandatory>
+      </Td>
+      <Td>
+        The URL for Frontend service which `Backend` should connect to. This
+        only needs to include scheme (e.g. `http://`), host (`my-fronted.com`,
+        or in this example, `frontend` in order to connect with service in the
+        same compose stack) and optionally port, e.g., `3000`.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>
+        <Mandatory>`ALLOWED_HOSTS`</Mandatory>
+      </Td>
+      <Td>
+        A list of strings representing the host/domain names that this Django
+        site can serve.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>
+        <Mandatory>`DB_ENGINE`</Mandatory>
+      </Td>
+      <Td>
+        The database backend to use. Carrot uses `Postgres` database backend.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>
+        `DB_HOST` `DB_PORT` `DB_NAME` `DB_USER`
+        <Mandatory> `DB_PASSWORD`</Mandatory>
+      </Td>
+      <Td>
+        These settings (`port`, `host`, `name`, `user`, `password`) are required
+        for PostgreSQL database connection.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`DEBUG`</Td>
+      <Td>A boolean that turns on/off debug mode.</Td>
+    </Tr>
+    <Tr>
+      <Td>
+        <Mandatory>`WORKERS_URL`</Mandatory>
+      </Td>
+      <Td>
+        The URL for `Workers` (Azure functions) service which `Backend` should
+        connect to. Structure is similar to `FRONTEND_URL`.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>
+        <Mandatory>`WORKERS_UPLOAD_NAME`</Mandatory>{" "}
+        <Mandatory>`WORKERS_RULES_EXPORT_NAME`</Mandatory>
+      </Td>
+      <Td>
+        Name of queues in Azurite that `Workers` send messages about ScanReport
+        uploads and Mapping Rules exports, respectively.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`WORKERS_RULES_NAME`</Td>
+      <Td>
+        Name of point where `Backend` triggers Workers' jobs. Default to
+        `RulesOrchestrator`
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`WORKERS_RULES_KEY`</Td>
+      <Td>
+        The key to authorise the request sent to `Workers` from `Backend`. Only
+        required in local development.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>
+        <Mandatory>`STORAGE_CONN_STRING`</Mandatory>
+      </Td>
+      <Td>The key to connect Backend and Azure local storage.</Td>
+    </Tr>
+    <Tr>
+      <Td>
+        <Mandatory>`SECRET_KEY`</Mandatory>
+      </Td>
+      <Td>
+        A secret key for a particular Django installation. This is used to
+        provide cryptographic signing, and should be set to a unique,
+        unpredictable value. Real value is used in Production.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>
+        <Mandatory>`SIGNING_KEY`</Mandatory>
+      </Td>
+      <Td>
+        A key required in JWT token generation process for Next Auth. Real value
+        is used in Production.
+      </Td>
+    </Tr>
+  </tbody>
+</Table>
+
+**Examples**
+
+<Tabs items={['Local development', 'Azure', 'Terraform']}>
+  <Tabs.Tab>
+
+Below is the setting example for Carrot Backend or `api` service which is one part of Compose Stack used for local development.
+
+```yaml
+api:
+  image: carrot-backend
+  build:
+    context: app
+    dockerfile: api/Dockerfile
+  ports:
+    - 8000:8000
+  environment:
+    - FRONTEND_URL=http://frontend:3000
+    - ALLOWED_HOSTS=['localhost', '127.0.0.1','api', 'workers']
+    - DB_ENGINE=django.db.backends.postgresql
+    - DB_HOST=db
+    - DB_PORT=5432
+    - DB_NAME=postgres
+    - DB_USER=postgres
+    - DB_PASSWORD=postgres
+    - DEBUG=True
+    - WORKERS_UPLOAD_NAME=uploadreports-local
+    - SECRET_KEY=secret
+    - WORKERS_URL=http://workers:80
+    - WORKERS_RULES_NAME=RulesOrchestrator
+    - WORKERS_RULES_KEY=rules_key
+    - WORKERS_RULES_EXPORT_NAME=rules-exports-local
+    - STORAGE_CONN_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;
+    - SIGNING_KEY=secret
+  volumes:
+    - ./app/api:/api
+  depends_on:
+    omop-lite:
+      condition: service_completed_successfully
+```
+
+This service is built based on the Dockerfile inside `app/api/` folder and exposed on port `8000:8000`. It will start after the `omop-lite` service ran and did its jobs successfully. When running, it also uses the mounted code in the `api` folder so the changes will be reflected without restarting the stack.
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+Coming soon
+
+  </Tabs.Tab>
+    <Tabs.Tab>
+
+Coming soon
+
+  </Tabs.Tab>
+</Tabs>
+
+## NextJS Frontend
+
+**Configuration Section**
+
+<Table>
+  <thead>
+    <Tr>
+      <Th>Key</Th>
+      <Th>Description</Th>
+    </Tr>
+  </thead>
+  <tbody>
+    <Tr>
+      <Td>
+        <Mandatory>`BACKEND_URL`</Mandatory>
+      </Td>
+      <Td>
+        The URL for Backend service which `frontend` should connect to. This
+        only needs to include scheme (e.g. `http://`), host (`my-fronted.com`,
+        or in this example, `api` in order to connect with service in the same
+        compose stack) and optionally port, e.g., `8000`.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`BACKEND_ORIGIN`</Td>
+      <Td>
+        A list of extra safe origin domains from which Server Actions can be
+        invoked. Next.js compares the origin of a Server Action request with the
+        host domain, ensuring they match to prevent CSRF attacks. Only required
+        in local dev.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`NODE_ENV` `WATCHPACK_POLLING`</Td>
+      <Td>
+        These variables are set to enable `hot reload` feature when developing
+        NextJS app.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>
+        {" "}
+        <Mandatory>`NEXTAUTH_BACKEND_URL`</Mandatory>
+      </Td>
+      <Td>
+        The backend base endpoint URL where `Frontend` send auth requests to.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>
+        {" "}
+        <Mandatory>`NEXTAUTH_SECRET`</Mandatory>
+      </Td>
+      <Td>
+        Used to encrypt the NextAuth.js JWT, and to hash email verification
+        tokens. Real value is used in Production.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>
+        {" "}
+        <Mandatory>`NEXTAUTH_URL`</Mandatory>
+      </Td>
+      <Td>The base URL where login and logout processes point to.</Td>
+    </Tr>
+  </tbody>
+</Table>
+
+**Examples**
+
+<Tabs items={['Local development', 'Azure', 'Terraform']}>
+  <Tabs.Tab>
+
+Below is the setting example for Carrot's Frontend or `frontend` service which is one part of Compose Stack used for local development.
+
+```yaml
+frontend:
+  image: carrot-frontend
+  build:
+    context: app/next-client-app
+    dockerfile: Dockerfile
+    target: dev
+  command: npm run dev
+  ports:
+    - 3000:3000
+  environment:
+    - BACKEND_URL=http://api:8000
+    - BACKEND_ORIGIN=localhost:8000
+    - NEXTAUTH_URL=http://localhost:3000/
+    - NEXTAUTH_SECRET=verycomplexsecretkey
+    - NEXTAUTH_BACKEND_URL=http://api:8000/api/
+    - NODE_ENV=development
+    - WATCHPACK_POLLING=true
+  volumes:
+    - ./app/next-client-app:/app
+    - /app/node_modules
+    - /app/.next
+  depends_on:
+    - api
+```
+
+This service is built based on the Dockerfile inside `app/next-client-app/` folder and exposed on port `3000:3000`. It will start after the `api` service is successfully up. When running, it also uses the mounted code in the `next-client-app` folder so the changes will be reflected without restarting the stack.
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+Coming soon
+
+  </Tabs.Tab>
+    <Tabs.Tab>
+
+Coming soon
+
+  </Tabs.Tab>
+</Tabs>
+
+## Azure functions
+
+**Configuration Section**
+
+<Table>
+  <thead>
+    <Tr>
+      <Th>Key</Th>
+      <Th>Description</Th>
+    </Tr>
+  </thead>
+  <tbody>
+    <Tr>
+      <Td>`AzureWebJobsSecretStorageType`</Td>
+      <Td>
+        Specifies the repository or provider to use for key storage. Carrot's
+        workers uses this as `files` for workers auth keys are persisted on the
+        file system. In other words, we ask Docker to look for secrets locally
+        which created at [step
+        2](quickstart#authentication-setup-for-azure-functions) in the dev.
+        quickstart. Only required in local development.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`IsEncrypted`</Td>
+      <Td>
+        This setting represents whether the values in local.settings.json are
+        encrypted using a local machine key. Only required in local development.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>
+        {" "}
+        <Mandatory>`FUNCTIONS_WORKER_RUNTIME`</Mandatory>
+      </Td>
+      <Td>
+        The language or language stack of the worker runtime to load in the
+        function app.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>
+        {" "}
+        <Mandatory>`DB_ENGINE`</Mandatory>
+      </Td>
+      <Td>
+        The database backend to use. Carrot's workers uses `Postgres` database
+        backend.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>
+        `DB_HOST` `DB_PORT` `DB_NAME` `DB_USER`{" "}
+        <Mandatory>`DB_PASSWORD`</Mandatory>
+      </Td>
+      <Td>
+        These settings (`port`, `host`, `name`, `user`, `password`) are required
+        for PostgreSQL database connection.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>
+        `RULES_QUEUE_NAME` `RULES_FILE_QUEUE_NAME`{" "}
+        <Mandatory>`WORKERS_UPLOAD_NAME`</Mandatory>
+      </Td>
+      <Td>
+        Name of queues in Azurite that `Workers` send messages about Rules
+        actions triggers, Mapping Rules exports and ScanReport uploads,
+        respectively.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`WEBSITE_HOSTNAME`</Td>
+      <Td>
+        The address that can be used to reach the function app from outside.
+        Only required in local development.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>
+        `STORAGE_CONN_STRING` <Mandatory>`AzureWebJobsStorage`</Mandatory>
+      </Td>
+      <Td>The keys to connect Workers and Azure storage.</Td>
+    </Tr>
+  </tbody>
+</Table>
+
+**Examples**
+
+<Tabs items={['Local development', 'Azure', 'Terraform']}>
+  <Tabs.Tab>
+
+Below is the setting example for Carrot's Azure functions or `workers` service which is one part of Compose Stack used for local development.
+
+```yaml
+workers:
+  image: carrot-workers
+  build:
+    context: app
+    dockerfile: workers/Dockerfile
+  ports:
+    - 8080:80
+    - 7071:80
+  environment:
+    - AzureWebJobsSecretStorageType=files
+    - IsEncrypted=false
+    - AzureWebJobsStorage=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;
+    - FUNCTIONS_WORKER_RUNTIME=python
+    - STORAGE_CONN_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;
+    - APP_URL=http://api:8000/
+    - WORKERS_UPLOAD_NAME=uploadreports-local
+    - RULES_QUEUE_NAME=rules-local
+    - RULES_FILE_QUEUE_NAME=rules-exports-local
+    - WEBSITE_HOSTNAME=localhost:7071
+    - DB_ENGINE=django.db.backends.postgresql
+    - DB_HOST=db
+    - DB_PORT=5432
+    - DB_NAME=postgres
+    - DB_USER=postgres
+    - DB_PASSWORD=postgres
+  volumes:
+    - ./app/workers:/home/site/wwwroot
+    - ./app/shared:/shared
+    - ./app/workers/Secrets:/azure-functions-host/Secrets/
+  depends_on:
+    - api
+    - azurite
+```
+
+This service is built based on the Dockerfile inside `app/workers/` folder and exposed on ports `8080:80` and `7071:80`. It will start after the `api` and `azurite` services are successfully up. When running, it also created some volumes that support its functionalities and authentication.
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+Coming soon
+
+  </Tabs.Tab>
+    <Tabs.Tab>
+
+Coming soon
+
+  </Tabs.Tab>
+</Tabs>
+
+## Other services
+
+### Database
+
+Carrot uses PostgreSQL database.
+
+The Carrot Database would require two data components at the beginning:
+
+- An `omop` schema with loaded vocabularies
+- Seeding data about OMOP tables and fields names
+
+For local development, the former can be created by [omop-lite](https://github.com/AndyRae/omop-lite/pkgs/container/omop-lite) package as the example below ([step 1 in developer quickstart guide](quickstart#omop-schema-and-vocabs-setting)) and the latter can be done by [step 4 in developer quickstart guide](quickstart#initial-data-preparation).
+
+### Azurite
+
+Carrot uses Azurite as queues and blobs storage for Azure functions.
+
+This storage requires pre-made `Queues` and `Blob Containers` with purposes below:
+
+<Tabs items={['Queues', 'Blob Containers']}>
+  <Tabs.Tab>
+
+```
+Queue for Rules actions triggers, e.g., `rules`
+Queue for Mapping rules exports, e.g., `rules-exports`
+Queue for Scan reports uploads, e.g., `uploadreports`
+```
+
+Note: Queues names should match with `RULES_QUEUE_NAME` `RULES_FILE_QUEUE_NAME` `WORKERS_UPLOAD_NAME` in `Azure functions`.
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+```
+Container for ScanReport blobs, e.g., `scan-reports`
+Container for Data dictionary blobs, e.g., `data-dictionaries`
+Container for Mapping rules files, e.g., `rules-exports`
+```
+
+  </Tabs.Tab>
+</Tabs>
+
+**Examples**
+
+<Tabs items={['Local development', 'Azure', 'Terraform']}>
+  <Tabs.Tab>
+
+The example below runs a PostgreSQL database for Carrot on port `5432:5432`.
+Additionally, it runs Azure local storage for Carrot's workers on ports `10000:10000`, `10001:10001`, and `10002:10002`.
+
+The `command` and `AZURITE_ACCOUNTS` environment variable in this example make sure the connection between `azurite` and `workers` proper.
+
+After `db` is up, [this service](https://github.com/AndyRae/omop-lite/pkgs/container/omop-lite) runs a DDL script to create a `omop` schema in the `db`, then load the vocabs downloaded from Athena there.
+
+When `omop` schema existed, `omop-lite` will closes automatically.
+
+```yaml
+db:
+  image: postgres:13
+  restart: always
+  ports:
+    - 5432:5432
+  environment:
+    - POSTGRES_PASSWORD=postgres
+
+omop-lite:
+  image: ghcr.io/andyrae/omop-lite
+  volumes:
+    - ./vocabs:/vocabs
+  depends_on:
+    - db
+  environment:
+    - DB_PASSWORD=postgres
+    - DB_NAME=postgres
+
+azurite:
+image: mcr.microsoft.com/azure-storage/azurite
+restart: always
+volumes:
+  - ./app/azurite:/azurite
+ports:
+  - 10000:10000
+  - 10001:10001
+  - 10002:10002
+command: azurite --blobHost azurite --queueHost azurite --tableHost azurite --location /data --debug /data/debug.log --loose --skipApiVersionCheck
+hostname: azurite
+environment:
+  - AZURITE_ACCOUNTS=devstoreaccount1:Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+Coming soon
+
+  </Tabs.Tab>
+    <Tabs.Tab>
+
+Coming soon
+
+  </Tabs.Tab>
+</Tabs>
