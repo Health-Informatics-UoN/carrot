@@ -1,5 +1,5 @@
 export default {
   architecture_diagram: "Architecture Diagram",
-  requirements: "requirements",
+  requirements: "Requirements",
   steps: "Step by Step",
 };
