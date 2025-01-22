@@ -1,26 +1,55 @@
-# Adding a new vocabulary to the database
+# Requirements
 
-The `omop.vocabulary` table holds the recognised vocabularies for use in automated mapping.
+## Resource group
 
-To add a new vocabulary to the database, 3 tables need updating: `omop.vocabulary`, `omop.concept` and `omop.concept_relationship`.
+A resource group is a container that holds related resources for an Azure solution. The resource group can include all the resources for the solution, or only those resources that you want to manage as a group. You decide how you want to allocate resources to resource groups based on what makes the most sense for your organization.
 
-Download the required files from Athena, which should give a file structure like this :
+## App Service (Web app)
 
-![](/docs/Adding_a_vocab_file_structure.png)
+Azure App Service is an HTTP-based service for hosting web applications, REST APIs, and mobile back ends. You can develop in your favorite language, be it .NET, .NET Core, Java, Node.js, PHP, or Python. Applications run and scale with ease on both Windows and Linux-based environments.
 
-The only required fiels are `CONCEPT_RELATIONSHIP.csv`, `CONCEPT.csv` and `VOCABULARY.csv`.
+For Carrot, you would need to create 2 web apps: One for Backend (Django) and another for Frontend (NextJS).
 
-Open the `VOCABULARY.csv` file (better to use a text editor than Excel, which will often reformat the file unhelpfully),
-and remove everything except the header and the line for the required vocabulary, then save the file.
+## Function app
 
-In PGAdmin, right-click on the `omop.vocabulary` table > Import/Export Data. Set the Import/Export toggle to "Import",
-and select the `VOCABULARY.csv` file. Set Header to "Yes", Delimiter to "Tab", then press OK. The import should proceed successfully.
-Check for success by querying the table contents.
+Azure Functions allows you to implement your system's logic as event-driven, readily available blocks of code. These code blocks are called "functions".
 
-Open the `CONCEPT.csv`, and remove all lines which do not relate to the given vocabulary - check the `vocabulary_id` column.
-Import this file in the same way to the `omop.concepts` table.
+In Carrot, there are currently 7 active `workers functions` which are hosted on one `Function App` on Azure:
 
-Finally, import `CONCEPT_RELATIONSHIP.csv` to `omop.concept_relationship` in the same way - the file may require editing,
-as it may contain duplicate entries already present in the database, which will cause the import to fail. the only
-rows required are those which relate to concepts present in `CONCEPT.csv`. Ideally, an UPSERT script should be used for
-this import, though one is not available at the time of writing.
+- RulesTrigger
+- RulesConceptsActivity
+- RulesFileQueue
+- RulesGenerationActivity
+- RulesOrchestrator
+- RulesQueue
+- UploadQueue
+
+## Azure storage
+
+Azure Storage offers highly available, massively scalable, durable, and secure storage for a variety of data objects in the cloud. Azure Storage data objects are accessible from anywhere in the world over HTTP or HTTPS via a REST API.
+
+Carrot uses Azure storage to store `queues` (e.g., Functions Triggers, Upload Scan Reports) and `blobs` (e.g., Scan Reports and Data dictionaries files).
+
+## Azure PostgreSQL database
+
+Azure Database for PostgreSQL flexible server is a relational database service in the Microsoft cloud based on the PostgreSQL open source relational database.
+
+Carrot uses Azure PostgreSQL database which holds its data about OMOP CDM, users, fields, tables, etc.
+
+## Data Factory
+
+Azure Data Factory is a managed cloud service that's built for these complex hybrid extract-transform-load (ETL), extract-load-transform (ELT), and data integration projects.
+
+Carrot uses Data factory to load, manage and organise data in Azure stora and Postgres database by workflows.
+
+## Key vault
+
+Centralizing storage of application secrets in Azure Key Vault allows you to control their distribution. Key Vault greatly reduces the chances that secrets may be accidentally leaked. When application developers use Key Vault, they no longer need to store security information in their application.
+
+Carrot uses Key vault to store secrets and keys in Backend, Frontend and Functions apps.
+
+## Azure monitors
+
+Azure Monitor is a comprehensive monitoring solution for collecting, analyzing, and responding to monitoring data from your cloud and on-premises environments. You can use Azure Monitor to maximize the availability and performance of your applications and services.
+
+Carrot uses Azure monitors for important components, e.g., Backend, Frontend and Functions apps.
