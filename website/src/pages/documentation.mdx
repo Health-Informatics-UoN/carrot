@@ -6,17 +6,9 @@ import { Callout } from "nextra/components";
 Carrot consists of two tools: [Carrot Mapper web tool](mapper) for generating mapping rules, and
 [Carrot Transform ETL tool](transform) for applying mapping rules to data.
 
-What we do in a nutshell...
+At a glance, the diagram below shows how Carrot Mapper and Transform function in the process of mapping data to OMOP CDM.
 
-```python
-researcher.data = coconnect.find('patient_data',
-                                 fields = [
-                                            'birth_date',
-                                            'ethnicity',
-                                            'existing_conditions'
-                                          ],
-                                 anonymous=True)
-```
+![](/docs/CaRROT_Architecture_Summary.png)
 
 <Callout type="info">
   The Carrot tools depend on a set of [data standards](standards).
