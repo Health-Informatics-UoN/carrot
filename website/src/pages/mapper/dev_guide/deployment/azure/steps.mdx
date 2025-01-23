@@ -281,6 +281,8 @@ A Django superuser also need creating by connecting to the Backend app and run t
 python manage.py createsuperuser
 ```
 
+Some first instances of Carrot need creating after the Backend app up and running. Doing this be access the URL: `<backend-URL>/admin/`, log in using the super user credentials, then create first `Data partner`, `Dataset`, and `Project`.
+
 ### Frontend app
 
 Navigate to `Environment variables` section under `Settings` of your Frontend web app, then add the variables below:
@@ -409,3 +411,11 @@ To use secrets in Key vault, change the value of the important environment varia
 After that, you need to click `Pull reference values` which is located on top of the `Environment variables` page to apply the values in the Key vault to your environment.
 
 </Steps>
+
+## Testing
+
+To test if Carrot is deployed successfully on Azure, open the URL of the Frontend app, then log in using admin credentials. If you can upload a scan report, add some manual and automatic Concepts, and download Mapping rules files successfuly, that's a sign that Carrot now can be used.
+
+<Callout emoji="🎉">
+  Congratulations on your first Carrot running on Azure!
+</Callout>
