@@ -1,105 +1,283 @@
-import { Callout, Steps, Tabs } from "nextra/components";
+import {
+  Callout,
+  Steps,
+  Tabs,
+  Table,
+  Td,
+  Th,
+  Tr,
+  Code,
+} from "nextra/components";
 
 # Azure Deployment Steps
 
 This page will guide you through some high-level steps required to deploy Carrot Mapper on Azure.
 
-<Steps>
-
-### Create resources
+## Create resources
 
 Below are resources that need creating on Azure:
 
-- Resource group
-- Web app for Frontend app + Application Insights
-- Web app for Backend app + Application Insights
-- Function app + Application Insights
 - Azure Database for PostgreSQL
-- Azure storage
 - Data factory
 - Key vault
 
-You need a pre-seeded OMOP CDM database inside the database of Carrot.
+<Steps>
 
-To do this, add a folder named `vocabs` in the `root` directory of Carrot, then place there vocabulary files downloaded from [Athena](https://athena.ohdsi.org/vocabulary/list).
+### Resource group
 
-Thanks to [OMOP Lite](https://github.com/andyrae/omop-lite/pkgs/container/omop-lite) container, OMOP schema will be created and vocabularies will be loaded to Carrot's database, when the app's stack is running.
+If you didn't do so, create a resource group which holds related resources for an Azure solution.
 
-### Authentication setup for Azure functions
+Choose a suitable `Subscription`, `Region` and a name for your `Resource group`.
 
-For local development, an authentication will be required when `api` container sends requests to `workers` container,.
+### Web apps
 
-To set this up, at the `app/workers` directory, add a folder named `Secrets`. Inside this folder, add a new file named `rulestrigger.json` with the following content:
+Two web apps will need creating: One for Backend and another for Frontend.
 
-```json
-{
-  "keys": [
-    {
-      "name": "default",
-      "value": "rules_key",
-      "encrypted": false
-    }
-  ]
-}
-```
+**Basics**
 
-### Warm up
+Choose a suitable `Subscription`, `Resource group`, `Region`, `Pricing plan`, and a name for your Web app.
 
-At the `root` directory, run to command below to start the application stack using Docker compose.
+Publish mode and Operating system should be `Container` and `Linux`, respectively.
 
-```bash
-docker compose up -d
-```
+**Container**
 
-This runs the database (`db`), Azurite emulator (`Azurite`), Azure functions (`workers`) and will build Carrot's backend (`api`) and frontend (`frontend`). This process will be on the background and take some time, but you can always check it through Docker Desktop app. When all of containers, except `omop-lite`, are up and running successfully, Carrot's frontend and backend can be accessed through `http://localhost:3000/` and `http://localhost:8000/admin/` respectively. **However**, please complete the remaining steps, while containers are running, to make sure Carrot running correctly.
+Choose `Other container registries` as `Image source`.
 
-More details about Docker compose's configuration can be found [here](configuration)
+For `Docker hub options`, setup as below:
 
-<Callout type="info">
-
-The `omop-lite` container, whose task is creating `omop` schema on `db` and install vocabularies there, will be shut down automatically after successfully done its jobs.
-
-</Callout>
-
-<Callout type="info">
-
-Docker will mount the `app/api` and `app/next-client-app` directories to its environment, so any changes in the code of the backend or frontend will be reflected in the running application.
-
-</Callout>
-
-### Initial data preparation
-
-You need to seed the Carrot app database with the OMOP table and field names.
-
-This can be done by either using your terminal and access the `api` container on Docker or using Docker Desktop.
-
-<Tabs items={['Using Terminal', 'Using Docker Desktop']}>
+<Tabs items={['Frontend app', 'Backend app']}>
   <Tabs.Tab>
-  At the `root` directory, open terminal and run
+  Access type: `Public`
+
+Registry server URL:
 
 ```bash
-docker exec -it carrot-mapper-dev-api-1 bash
+ghcr.io/health-informatics-uon
 ```
 
-Then run
+Image and tag:
+
+You can choose a suitable tag for the image. Look for available tags [here](https://github.com/Health-Informatics-UoN/carrot-mapper/pkgs/container/carrot%2Ffrontend).
 
 ```bash
-python manage.py loaddata mapping filetypes
+carrot/frontend:<tag>
 ```
 
   </Tabs.Tab>
   <Tabs.Tab>
 
-Navigate to your Docker Desktop, under `carrot-mapper-dev`, choose `api` container, choose `Exec` tab, then run:
+Access type: `Public`
+
+Registry server URL:
 
 ```bash
-python manage.py loaddata mapping filetypes
+ghcr.io/health-informatics-uon
+```
+
+Image and tag:
+
+You can choose a suitable tag for the image. Look for available tags [here](https://github.com/Health-Informatics-UoN/carrot-mapper/pkgs/container/carrot%2Fbackend).
+
+```bash
+carrot/backend:<tag>
 ```
 
   </Tabs.Tab>
 </Tabs>
 
-After that, add a new admin user (Django superuser) by running:
+**Networking**: As default.
+
+**Monitor + Secure**: We recommend Application Insights to be enabled.
+
+**Tags**: Give name and value for the web app's tag, if needed.
+
+### Function app
+
+Choose `App service` when prompted.
+
+**Basics**
+
+Choose a suitable `Subscription`, `Resource group`, `Region`, `Pricing plan`, and a name for your Function app.
+
+Select `Container Image` as the mode of deploying.
+
+**Storage**: Choose or create an Azure storage where the Function app will store its Blobs and Queues.
+
+**Networking**: As default.
+
+**Monitor + Secure**: We recommend Application Insights to be enabled.
+
+**Tags**: Give name and value for the web app's tag, if needed.
+
+**Container Image**: A default image will be used as you create a function app. Therefore, after the app being deployed you must change this image by doing so:
+
+- Access the newly created Function app
+- Under tab `Deployment`, choose `Deployment center`
+- Change Server URL to: `ghcr.io/health-informatics-uon`
+- Change Full Image Name and Tag to: `carrot/workers:<tag>`. Look for available tags [here](https://github.com/Health-Informatics-UoN/carrot-mapper/pkgs/container/carrot%2Fworkers).
+- Save the setting
+
+### PostgreSQL Database
+
+If you didn't have one, create a PostgreSQL Database on Azure.
+
+Follow prompted steps to create a suitable Database for Carrot.
+
+### Data Factory
+
+Data factory is useful when creating workflows/scripts to load and manage data on Azure storage and Azure database.
+
+Create one following the prompted steps.
+
+### Key vault
+
+Key vault is highly recommended to keep secrets and keys for functioning Carrot safe. If you didn't have one, create a Key Vault following the prompted steps on Azure.
+
+</Steps>
+
+## Preparation
+
+You will need to prepare your database and storage before configure other apps.
+
+<Steps>
+
+### Database
+
+Using Data factory or other ways to create a schema named `omop` in your database, then load there the vocabularies, which you would like in Carrot, downloaded from [Athena](https://athena.ohdsi.org/vocabulary/list).
+
+### Storage
+
+Navigate to the Storage account linked with you Function app, then `Data storage`.
+Add these `Queues` and `Containers`:
+
+<Tabs items={['Queues', 'Blob Containers']}>
+  <Tabs.Tab>
+
+```
+Queue for Rules actions triggers, e.g., `rules`
+Queue for Mapping rules exports, e.g., `rules-exports`
+Queue for Scan reports uploads, e.g., `uploadreports`
+```
+
+Note: Queues names should match with `RULES_QUEUE_NAME` `RULES_FILE_QUEUE_NAME` `WORKERS_UPLOAD_NAME` in `Azure functions`.
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+```
+Container for ScanReport blobs, e.g., `scan-reports`
+Container for Data dictionary blobs, e.g., `data-dictionaries`
+Container for Mapping rules files, e.g., `rules-exports`
+```
+
+  </Tabs.Tab>
+</Tabs>
+
+</Steps>
+
+## Configuration
+
+Below are some important steps to configure created apps making them working together smoothly.
+
+<Steps>
+
+### Backend app
+
+Navigate to `Environment variables` section under `Settings` of your Backend web app.
+Add the variables below:
+
+<Table>
+  <thead>
+    <Tr>
+      <Th>Key</Th>
+      <Th>Description</Th>
+    </Tr>
+  </thead>
+  <tbody>
+    <Tr>
+      <Td>`FRONTEND_URL`</Td>
+      <Td>The URL of your Frontend app.</Td>
+    </Tr>
+    <Tr>
+      <Td>`ALLOWED_HOSTS`</Td>
+      <Td>
+        A list of strings representing the host/domain names that this Django
+        site can serve. Put here the URL of your Backend app and `localhost`.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`DB_ENGINE`</Td>
+      <Td>
+        The database backend to use. Put here `django.db.backends.postgresql`.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`DB_HOST` `DB_PORT` `DB_NAME` `DB_USER` `DB_PASSWORD`</Td>
+      <Td>
+        These settings (`port`, `host`, `name`, `user`, `password`) are required
+        for PostgreSQL database connection. Put the details based on the setting
+        of your Database. `DB_PASSWORD` is recommended to be put in the Key
+        Vault.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`WORKERS_URL`</Td>
+      <Td>
+        The URL of `Workers` (Azure functions) service which `Backend` should
+        connect to.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`WORKERS_UPLOAD_NAME` `WORKERS_RULES_EXPORT_NAME`</Td>
+      <Td>
+        Name of queues in Azurite that `Workers` send messages about ScanReport
+        uploads and Mapping Rules exports, respectively. These should match with
+        the queues for ScanReport uploads and Mapping rules file exports in
+        Azure storage.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`WORKERS_RULES_KEY`</Td>
+      <Td>
+        The key to authorise the request sent to `Workers` from `Backend`. It is
+        recommended to put this in the Key Vault. TODO: how to get this?
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`STORAGE_CONN_STRING`</Td>
+      <Td>
+        The key to connect Backend and Azure local storage. Get this value by
+        navigate to the Azure storage, then `Access keys` under `Security +
+        Networking`, copy the `Connection string`. It is recommended to put this
+        in the Key Vault.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`SECRET_KEY`</Td>
+      <Td>
+        A secret key for a particular Django installation. Choose a complex key
+        for this. It is recommended to put this in the Key Vault.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`SIGNING_KEY`</Td>
+      <Td>
+        A key required in JWT token generation process for Next Auth. Choose a
+        complex key for this. It is recommended to put this in the Key Vault.
+      </Td>
+    </Tr>
+  </tbody>
+</Table>
+
+Restart your app for the environment variables to be applied.
+
+After that, you need to seed the Carrot app database with the OMOP table and field names. For now, this can be done by connecting directly to your Backend web app either by local machine or through an environment, then run the command:
+
+```bash
+python manage.py loaddata mapping filetypes
+```
+
+A Django superuser also need creating by connecting to the Backend app and run the command:
 
 ```bash
 python manage.py createsuperuser
@@ -145,5 +323,4 @@ After log in, you will be presented with `Projects` page.
 Try using Carrot by steps in the [user quickstart](/mapper/user_guide/quickstart) to see if Carrot is running correctly. If you can successfully upload a new scan report, create mapping rules, and finally can export the Mapping rules JSON. That's a sign that you have successfully install and run Carrot locally.
 
 <Callout emoji="🎉">Congratulations on your first Carrot running!</Callout>
-
 </Steps>
