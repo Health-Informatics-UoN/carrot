@@ -53,11 +53,11 @@ ghcr.io/health-informatics-uon
 
 Image and tag:
 
-You can choose a suitable tag for the image. Look for available tags [here](https://github.com/Health-Informatics-UoN/carrot-mapper/pkgs/container/carrot%2Ffrontend).
-
 ```bash
 carrot/frontend:<tag>
 ```
+
+You can choose a version of this container by using the tag for the image. Look for available tags [here](https://github.com/Health-Informatics-UoN/carrot-mapper/pkgs/container/carrot%2Ffrontend).
 
   </Tabs.Tab>
   <Tabs.Tab>
@@ -72,11 +72,11 @@ ghcr.io/health-informatics-uon
 
 Image and tag:
 
-You can choose a suitable tag for the image. Look for available tags [here](https://github.com/Health-Informatics-UoN/carrot-mapper/pkgs/container/carrot%2Fbackend).
-
 ```bash
 carrot/backend:<tag>
 ```
+
+You can choose a version of this container by using the tag for the image. Look for available tags [here](https://github.com/Health-Informatics-UoN/carrot-mapper/pkgs/container/carrot%2Fbackend).
 
   </Tabs.Tab>
 </Tabs>
@@ -109,8 +109,9 @@ Select `Container Image` as the mode of deploying.
 
 - Access the newly created Function app
 - Under tab `Deployment`, choose `Deployment center`
-- Change Server URL to: `ghcr.io/health-informatics-uon`
-- Change Full Image Name and Tag to: `carrot/workers:<tag>`. Look for available tags [here](https://github.com/Health-Informatics-UoN/carrot-mapper/pkgs/container/carrot%2Fworkers).
+- Choose `Private Registry` as Registry source
+- Change Server URL to: `https://ghcr.io`
+- Change Full Image Name and Tag to: `health-informatics-uon/carrot/workers:<tag>`. Look for available tags [here](https://github.com/Health-Informatics-UoN/carrot-mapper/pkgs/container/carrot%2Fworkers).
 - Save the setting
 
 ### PostgreSQL Database
@@ -234,17 +235,19 @@ Navigate to `Environment variables` section under `Settings` of your Backend web
     <Tr>
       <Td>`WORKERS_RULES_KEY`</Td>
       <Td>
-        The key to authorise the request sent to `Workers` from `Backend`. It is
-        recommended to put this in the Key Vault. TODO: how to get this?
+        The key to authorise the request sent to `Workers` from `Backend`. Get
+        this value by navigating to the Function app, then inside `App keys`
+        under `Functions`, copy the `_master` key. It is recommended to put this
+        in the Key Vault.
       </Td>
     </Tr>
     <Tr>
       <Td>`STORAGE_CONN_STRING`</Td>
       <Td>
         The key to connect Backend and Azure local storage. Get this value by
-        navigate to the Azure storage, then `Access keys` under `Security +
-        Networking`, copy the `Connection string`. It is recommended to put this
-        in the Key Vault.
+        navigating to the Azure storage, then inside `Access keys` under
+        `Security + Networking`, copy the `Connection string`. It is recommended
+        to put this in the Key Vault.
       </Td>
     </Tr>
     <Tr>
@@ -266,7 +269,7 @@ Navigate to `Environment variables` section under `Settings` of your Backend web
 
 Restart your app for the environment variables to be applied.
 
-After that, you need to seed the Carrot app database with the OMOP table and field names. For now, this can be done by connecting directly to your Backend web app either by local machine or through an environment, then run the command:
+After that, you need to seed the Carrot app database with the OMOP table and field names. For now, this can be done by connecting directly to your database either by local machine or through an environment, then run the command:
 
 ```bash
 python manage.py loaddata mapping filetypes
@@ -374,9 +377,9 @@ Navigate to `Environment variables` section under `Settings` of your Function ap
       <Td>`STORAGE_CONN_STRING`</Td>
       <Td>
         The key to connect Backend and Azure local storage. Get this value by
-        navigate to the Azure storage, then `Access keys` under `Security +
-        Networking`, copy the `Connection string`. It is recommended to put this
-        in the Key Vault.
+        navigating to the Azure storage, then inside `Access keys` under
+        `Security + Networking`, copy the `Connection string`. It is recommended
+        to put this in the Key Vault.
       </Td>
     </Tr>
     <Tr>
@@ -397,7 +400,7 @@ Navigate to `Environment variables` section under `Settings` of your Function ap
 
 Set up your key vault by generate Keys/Secrets under `Objects` of your Key vault app.
 Give your secret a name and add there the value of the secret.
-To use secrets in Key vault, change the value of the important environment variable to:
+To use secrets in Key vault, change the value of the important environment variables to:
 
 ```bash
 @Microsoft.KeyVault(VaultName=<key-vault-name>;SecretName=<secret-name>)
