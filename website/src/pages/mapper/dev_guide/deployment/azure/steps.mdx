@@ -13,13 +13,9 @@ import {
 
 This page will guide you through some high-level steps required to deploy Carrot Mapper on Azure.
 
-## Create resources
+## Resources Creation
 
-Below are resources that need creating on Azure:
-
-- Azure Database for PostgreSQL
-- Data factory
-- Key vault
+Let's start by create some Azure resource for Carrot:
 
 <Steps>
 
@@ -183,8 +179,7 @@ Below are some important steps to configure created apps making them working tog
 
 ### Backend app
 
-Navigate to `Environment variables` section under `Settings` of your Backend web app.
-Add the variables below:
+Navigate to `Environment variables` section under `Settings` of your Backend web app, then add the variables below:
 
 <Table>
   <thead>
@@ -283,44 +278,131 @@ A Django superuser also need creating by connecting to the Backend app and run t
 python manage.py createsuperuser
 ```
 
-### First instances creation
+### Frontend app
 
-Create some first instances in Carrot app by logging to Django Admin panel `http://localhost:8000/admin/` (using the credentials in the last step). Following this order, fill out the required information to create new `Data Partner`, `Dataset` and `Project`.
+Navigate to `Environment variables` section under `Settings` of your Frontend web app, then add the variables below:
 
-### Azure local storage setup
+<Table>
+  <thead>
+    <Tr>
+      <Th>Key</Th>
+      <Th>Description</Th>
+    </Tr>
+  </thead>
+  <tbody>
+    <Tr>
+      <Td>
+        `BACKEND_URL`
+      </Td>
+      <Td>
+        The URL of the Backend web app.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>
+        {" "}
+        `NEXTAUTH_BACKEND_URL`
+      </Td>
+      <Td>
+        The backend base endpoint URL where `Frontend` send auth requests to. Put here: `<backendUrl>/api/`
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>
+        {" "}
+        `NEXTAUTH_SECRET`
+      </Td>
+      <Td>
+        Used to encrypt the NextAuth.js JWT, and to hash email verification
+        tokens. Choose a
+        complex key for this. It is recommended to put this in the Key Vault.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>
+        {" "}
+        `NEXTAUTH_URL`
+      </Td>
+      <Td>The base URL where login and logout processes point to. Put here the URL of the Frontend web app</Td>
+    </Tr>
+  </tbody>
+</Table>
 
-You need to set up an Azurite local storage for local development of Carrot
+### Function app
 
-To do this, with the `workers` container in Docker Desktop is running, open `MS Azure Storage Explorer`, and create the following `queues` (under the tab `Storage Accounts - Emulator - Queues`) and `blob containers` (under the tab `Storage Accounts - Emulator - Blob Containers`).
+Navigate to `Environment variables` section under `Settings` of your Function app, then add the variables below:
 
-<Tabs items={['Queues', 'Blob Containers']}>
-  <Tabs.Tab>
+<Table>
+  <thead>
+    <Tr>
+      <Th>Key</Th>
+      <Th>Description</Th>
+    </Tr>
+  </thead>
+  <tbody>
+    <Tr>
+      <Td> `FUNCTIONS_WORKER_RUNTIME`</Td>
+      <Td>
+        The language or language stack of the worker runtime to load in the
+        function app. Put here `python`.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td> `DB_ENGINE`</Td>
+      <Td>
+        The database backend to use. Put here `django.db.backends.postgresql`.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`DB_HOST` `DB_PORT` `DB_NAME` `DB_USER` `DB_PASSWORD`</Td>
+      <Td>
+        These settings (`port`, `host`, `name`, `user`, `password`) are required
+        for PostgreSQL database connection. Put the details based on the setting
+        of your Database. `DB_PASSWORD` is recommended to be put in the Key
+        Vault.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`RULES_QUEUE_NAME` `RULES_FILE_QUEUE_NAME` `WORKERS_UPLOAD_NAME`</Td>
+      <Td>
+        Matching name of queues in Azurite that `Workers` send messages about
+        Rules actions triggers, Mapping Rules exports and ScanReport uploads,
+        respectively.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`STORAGE_CONN_STRING`</Td>
+      <Td>
+        The key to connect Backend and Azure local storage. Get this value by
+        navigate to the Azure storage, then `Access keys` under `Security +
+        Networking`, copy the `Connection string`. It is recommended to put this
+        in the Key Vault.
+      </Td>
+    </Tr>
+    <Tr>
+      <Td>`AzureWebJobsStorage`</Td>
+      <Td>Same value with the above.</Td>
+    </Tr>
+    <Tr>
+      <Td>`SECRET_KEY`</Td>
+      <Td>
+        Same value with `SECRET_KEY` in Backend app. It is recommended to put
+        this in the Key Vault.
+      </Td>
+    </Tr>
+  </tbody>
+</Table>
 
+### Key vault
+
+Set up your key vault by generate Keys/Secrets under `Objects` of your Key vault app.
+Give your secret a name and add there the value of the secret.
+To use secrets in Key vault, change the value of the important environment variable to:
+
+```bash
+@Microsoft.KeyVault(VaultName=<key-vault-name>;SecretName=<secret-name>)
 ```
-rules-local
-rules-exports-local
-uploadreports-local
-```
 
-  </Tabs.Tab>
-  <Tabs.Tab>
+After that, you need to click `Pull reference values` which is located on top of the `Environment variables` page to apply the values in the Key vault to your environment.
 
-```
-scan-reports
-data-dictionaries
-rules-exports
-```
-
-  </Tabs.Tab>
-</Tabs>
-
-### Check-in
-
-You should now be able to access Carrot by logging in at `http://localhost:3000/` using your admin credentials created at step 4.
-
-After log in, you will be presented with `Projects` page.
-
-Try using Carrot by steps in the [user quickstart](/mapper/user_guide/quickstart) to see if Carrot is running correctly. If you can successfully upload a new scan report, create mapping rules, and finally can export the Mapping rules JSON. That's a sign that you have successfully install and run Carrot locally.
-
-<Callout emoji="🎉">Congratulations on your first Carrot running!</Callout>
 </Steps>
