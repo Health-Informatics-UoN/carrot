@@ -165,11 +165,106 @@ api:
 This service is built based on the Dockerfile inside `app/api/` folder and exposed on port `8000:8000`. It will start after the `omop-lite` service ran and did its jobs successfully. When running, it also uses the mounted code in the `api` folder so the changes will be reflected without restarting the stack.
 
   </Tabs.Tab>
+
   <Tabs.Tab>
 
-Coming soon
+You can see, edit, add or change environment variables on Azure web app by using `Advanced edit` on the page.
+
+Below is just an example of variables that need adding to the Azure environment. Apart from these, there are some necessary variables that Azure may add to the environment automatically.
+
+```json
+[
+  { "other variables...": "values..." },
+  {
+    "name": "ALLOWED_HOSTS",
+    "value": "['backend-url', 'localhost']",
+    "slotSetting": false
+  },
+  {
+    "name": "DATA_UPLOAD_MAX_MEMORY_SIZE",
+    "value": "<you can configure the max size of uploading files here, defaulted to 2621440 B>",
+    "slotSetting": false
+  },
+  {
+    "name": "DB_ENGINE",
+    "value": "django.db.backends.postgresql",
+    "slotSetting": false
+  },
+  {
+    "name": "DB_HOST",
+    "value": "<db-host>",
+    "slotSetting": false
+  },
+  {
+    "name": "DB_NAME",
+    "value": "<db-name>",
+    "slotSetting": false
+  },
+  {
+    "name": "DB_PASSWORD",
+    "value": "<db-pass> (should be in Key vault)",
+    "slotSetting": false
+  },
+  {
+    "name": "DB_PORT",
+    "value": "5432",
+    "slotSetting": false
+  },
+  {
+    "name": "DB_USER",
+    "value": "<db-user>",
+    "slotSetting": false
+  },
+  {
+    "name": "DEBUG",
+    "value": "0",
+    "slotSetting": false
+  },
+  {
+    "name": "FRONTEND_URL",
+    "value": "<frontend-url>",
+    "slotSetting": false
+  },
+  {
+    "name": "SECRET_KEY",
+    "value": "<key> should be in Key vault",
+    "slotSetting": false
+  },
+  {
+    "name": "SIGNING_KEY",
+    "value": "<sign-key> should be in Key vault",
+    "slotSetting": false
+  },
+  {
+    "name": "STORAGE_CONN_STRING",
+    "value": "<conn-key> should be in Key vault",
+    "slotSetting": false
+  },
+  {
+    "name": "WORKERS_RULES_EXPORT_NAME",
+    "value": "rules-files",
+    "slotSetting": false
+  },
+  {
+    "name": "WORKERS_RULES_KEY",
+    "value": "<workers-key> should be in Key vault",
+    "slotSetting": false
+  },
+  {
+    "name": "WORKERS_UPLOAD_NAME",
+    "value": "upload",
+    "slotSetting": false
+  },
+  {
+    "name": "WORKERS_URL",
+    "value": "<workers-url>",
+    "slotSetting": false
+  }
+]
+```
 
   </Tabs.Tab>
+
     <Tabs.Tab>
 
 Coming soon
@@ -283,7 +378,35 @@ This service is built based on the Dockerfile inside `app/next-client-app/` fold
   </Tabs.Tab>
   <Tabs.Tab>
 
-Coming soon
+You can see, edit, add or change environment variables on Azure web app by using `Advanced edit` on the page.
+
+Below is just an example of variables that need adding to the Azure environment. Apart from these, there are some necessary variables that Azure may add to the environment automatically.
+
+```json
+[
+  { "other variables...": "values..." },
+  {
+    "name": "BACKEND_URL",
+    "value": "<backend-url>",
+    "slotSetting": false
+  },
+  {
+    "name": "NEXTAUTH_BACKEND_URL",
+    "value": "<backend-url>/api/",
+    "slotSetting": false
+  },
+  {
+    "name": "NEXTAUTH_SECRET",
+    "value": "<auth-secret> (should be in Key vault)",
+    "slotSetting": false
+  },
+  {
+    "name": "NEXTAUTH_URL",
+    "value": "<frontend-url>",
+    "slotSetting": false
+  }
+]
+```
 
   </Tabs.Tab>
     <Tabs.Tab>
@@ -373,7 +496,8 @@ Coming soon
     </Tr>
     <Tr>
       <Td>
-        `STORAGE_CONN_STRING` <Mandatory>`AzureWebJobsStorage`</Mandatory>
+        <Mandatory>`STORAGE_CONN_STRING`</Mandatory>{" "}
+        <Mandatory>`AzureWebJobsStorage`</Mandatory>
       </Td>
       <Td>The keys to connect Workers and Azure storage.</Td>
     </Tr>
@@ -427,7 +551,80 @@ This service is built based on the Dockerfile inside `app/workers/` folder and e
   </Tabs.Tab>
   <Tabs.Tab>
 
-Coming soon
+You can see, edit, add or change environment variables on Azure web app by using `Advanced edit` on the page.
+
+Below is just an example of variables that need adding to the Azure environment. Apart from these, there are some necessary variables that Azure may add to the environment automatically.
+
+```json
+[
+  { "other variables...": "values..." },
+  {
+    "name": "AzureWebJobsStorage",
+    "value": "<conn-key> same with STORAGE_CONN_STRING",
+    "slotSetting": false
+  },
+  {
+    "name": "DB_ENGINE",
+    "value": "django.db.backends.postgresql",
+    "slotSetting": false
+  },
+  {
+    "name": "DB_HOST",
+    "value": "<db-host>",
+    "slotSetting": false
+  },
+  {
+    "name": "DB_NAME",
+    "value": "<db-name>",
+    "slotSetting": false
+  },
+  {
+    "name": "DB_PASSWORD",
+    "value": "<db-pass> (should be in Key vault)",
+    "slotSetting": false
+  },
+  {
+    "name": "DB_PORT",
+    "value": "5432",
+    "slotSetting": false
+  },
+  {
+    "name": "DB_USER",
+    "value": "<db-user>",
+    "slotSetting": false
+  },
+  {
+    "name": "FUNCTIONS_EXTENSION_VERSION",
+    "value": "~4",
+    "slotSetting": false
+  },
+  {
+    "name": "FUNCTIONS_WORKER_RUNTIME",
+    "value": "python",
+    "slotSetting": false
+  },
+  {
+    "name": "STORAGE_CONN_STRING",
+    "value": "<conn-key> should be in Key vault",
+    "slotSetting": false
+  },
+  {
+    "name": "RULES_FILE_QUEUE_NAME",
+    "value": "rules-files",
+    "slotSetting": false
+  },
+  {
+    "name": "RULES_QUEUE_NAME",
+    "value": "rules",
+    "slotSetting": false
+  },
+  {
+    "name": "WORKERS_UPLOAD_NAME",
+    "value": "upload",
+    "slotSetting": false
+  }
+]
+```
 
   </Tabs.Tab>
     <Tabs.Tab>
@@ -530,7 +727,7 @@ environment:
   </Tabs.Tab>
   <Tabs.Tab>
 
-Coming soon
+There shouldn't be any additional configurations except the requirements from Azure and descriptions above when creating Azurite and Postgres Database.
 
   </Tabs.Tab>
     <Tabs.Tab>
