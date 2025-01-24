@@ -10,7 +10,7 @@ Start by cloning [the Carrot Mapper repository](https://github.com/Health-Inform
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [MS Azure Storage Explorer](https://azure.microsoft.com/en-us/products/storage/storage-explorer/#Download-4)
-- Vocabularies downloaded from [Athena](https://athena.ohdsi.org/vocabulary/list). Login to Athena requires an account which can be obtained for free.
+- Vocabularies downloaded from [Athena](https://athena.ohdsi.org/). The guide for downloading can be found [here](https://github.com/OHDSI/Vocabulary-v5.0/wiki/General-Structure,-Download-and-Use).
 
 ## Getting Started
 
@@ -22,7 +22,7 @@ Below are steps to make Carrot up and running locally.
 
 You need a pre-seeded OMOP CDM database inside the database of Carrot.
 
-To do this, add a folder named `vocabs` in the `root` directory of Carrot, then place there vocabulary files downloaded from [Athena](https://athena.ohdsi.org/vocabulary/list).
+To do this, add a folder named `vocabs` in the `root` directory of Carrot, then place there vocabulary files downloaded from Athena.
 
 Thanks to [OMOP Lite](https://github.com/andyrae/omop-lite/pkgs/container/omop-lite) container, OMOP schema will be created and vocabularies will be loaded to Carrot's database, when the app's stack is running.
 
