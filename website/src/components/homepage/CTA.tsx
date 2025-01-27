@@ -7,12 +7,12 @@ export default function CallToAction() {
   return (
     <>
       <div className="flex flex-col items-center text-center px-5 lg:gap-7 gap-4 lg:px-0">
-        <BoxReveal boxColor={"#e6a312"} duration={1.0}>
+        <BoxReveal boxColor={"#F98109"} duration={0.5}>
           <h1 className="text-pretty text-6xl">
             Join our community
           </h1>
         </BoxReveal>
-        <BoxReveal boxColor={"#e6a312"} duration={1.0}>
+        <BoxReveal boxColor={"#F98109"} duration={0.5}>
           <div className="flex gap-2 lg:flex-row flex-col">
             <a
               href={
