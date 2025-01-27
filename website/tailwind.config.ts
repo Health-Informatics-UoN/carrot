@@ -55,7 +55,6 @@ const config = {
             DEFAULT: "#3db28c",
             50: "#51c19e",
           },
-          border: "#3db28c",
           vocab: "#BEA9DF",
           reuse: "#3db28c",
           manual: "#3C579E",
