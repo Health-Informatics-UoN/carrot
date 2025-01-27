@@ -18,7 +18,7 @@ const features = [
     className: "lg:col-start-1 lg:col-end-4 lg:col-span-3",
   },
   {
-    name: "ALLEVIATE",
+    name: "Alleviate",
     description:
       "Alleviate has utilised Carrot to support the creation of its UK-wide pain data hub in collaboration with Health Data Research UK (HDR UK).",
     background: (
@@ -33,9 +33,9 @@ const features = [
     className: "lg:col-end-7 lg:col-span-3",
   },
   {
-    name: "NOTTINGHAM BRC",
+    name: "Nottingham BRC",
     description:
-      "The Nottingham BRC has leveraged Carrot in its mission to advance health informatics by driving translational research and innovation.",
+      "The Nottingham Biomedical Research Centre has leveraged Carrot in its mission to advance health informatics by driving translational research and innovation.",
     background: (
       <img
         className="opacity-80 p-5 dark:bg-white"
@@ -50,7 +50,7 @@ const features = [
   {
     name: "BY-COVID",
     description:
-      "The BY-COVID project uses Carrot to enable open data sharing on SARS-CoV-2 and other infectious diseases, boosting research and public health efforts across Europe.",
+      "The BY-COVID project used Carrot to enable open data sharing on SARS-CoV-2 and other infectious diseases, boosting research and public health efforts across Europe.",
     background: (
       <img
         className="w-[300px]"
@@ -65,7 +65,7 @@ const features = [
   {
     name: "East Midlands SDE",
     description:
-      "The East Midlands SDE project uses Carrot to transform data for Cohort Discovery.",
+      "The East Midlands NHS SDE programme uses Carrot to transform data for Cohort Discovery.",
     background: (
       <img
         className="p-2 w-[200px]"
@@ -82,10 +82,10 @@ const features = [
 export default async function BentoProjects() {
   return (
     <div>
-      <div className="flex flex-col justify-center space-y-2 mb-5">
-        <div className="lg:text-4xl flex justify-center text-2xl">
+      <div className="flex flex-col justify-center space-y-2 mb-16">
+        <div className="lg:text-4xl flex justify-center">
           <BoxReveal boxColor={"#empty"} duration={0.5}>
-            <h1 className="font-bold">Supporting Researchers</h1>
+            <h1 className="text-6xl">Supporting Research.</h1>
           </BoxReveal>
         </div>
       </div>

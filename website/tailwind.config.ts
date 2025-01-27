@@ -45,8 +45,12 @@ const config = {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       colors: {
+        background: {
+          DEFAULT: "#F98109",
+          dark: "#000000",
+        },
         carrot: {
-          DEFAULT: "#475da7",
+          DEFAULT: "#F98109",
           secondary: {
             DEFAULT: "#3db28c",
             50: "#51c19e",

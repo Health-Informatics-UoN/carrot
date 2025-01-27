@@ -10,16 +10,16 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-carrot-900 text-carrot-50 hover:bg-carrot-900/90 dark:bg-carrot-50 dark:text-carrot-900 dark:hover:bg-carrot-50/90",
+          "bg-slate-900 text-slate-50 hover:bg-slate-900/90 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90",
         destructive:
-          "bg-red-500 text-carrot-50 hover:bg-red-500/90 dark:bg-red-900 dark:text-carrot-50 dark:hover:bg-red-900/90",
+          "bg-red-500 text-slate-50 hover:bg-red-500/90 dark:bg-red-900 dark:text-slate-50 dark:hover:bg-red-900/90",
         outline:
-          "border border-carrot-200 bg-white hover:bg-carrot-100 hover:text-carrot-900 dark:border-carrot-800 dark:bg-carrot-950 dark:hover:bg-carrot-800 dark:hover:text-carrot-50",
+          "border bg-white hover:bg-slate-100 hover:text-slate-900 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 dark:hover:text-slate-50",
         secondary:
-          "bg-carrot-100 text-carrot-900 hover:bg-carrot-100/80 dark:bg-carrot-800 dark:text-carrot-50 dark:hover:bg-carrot-800/80",
+          "bg-slate-100 text-slate-900 hover:bg-slate-100/80 dark:bg-slate-800 dark:text-slate-50 dark:hover:bg-slate-800/80",
         ghost:
-          "hover:bg-carrot-100 hover:text-carrot-900 dark:hover:text-white dark:text-carrot-400 dark:hover:bg-transparent",
-        link: "text-carrot-900 underline-offset-4 hover:underline dark:text-carrot-50",
+          "hover:bg-accent hover:text-carrot dark:hover:text-carrot dark:text-white dark:hover:bg-transparent",
+        link: "text-slate-900 underline-offset-4 hover:underline dark:text-slate-50",
       },
       size: {
         default: "h-10 px-4 py-2",

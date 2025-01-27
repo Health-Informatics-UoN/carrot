@@ -14,7 +14,7 @@ export default function Default() {
       <AnimatedGridPattern
         numSquares={60}
         maxOpacity={0.1}
-        duration={1.2}
+        duration={4}
         repeatDelay={1}
         className={cn(
           "[mask-image:radial-gradient(800px_circle_at_center,white,transparent)]",
@@ -25,6 +25,9 @@ export default function Default() {
       <MenuBar />
       <div className="space-y-12 lg:space-y-32">
         <Hero />
+        <div className="min-h-[30vh]">
+          <CallToAction />
+        </div>
         {process.env.ENABLE_FEATURES && <Features />}
         {process.env.ENABLE_PROJECTS && <BentoProjects />}
         {process.env.ENABLE_FUNDERS && <Funders />}
