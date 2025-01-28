@@ -26,7 +26,7 @@ export default function CallToAction() {
             </a>
             {deployLink && (
               <a href={deployLink} target="_blank">
-                <Button className="dark:hover:bg-gray-100 hover:bg-gray-100 hover:border-carrot dark:hover:border-orange-900 text-carrot dark:text-orange-600 bg-white dark:bg-white border border-orange-600">
+                <Button className="dark:hover:bg-carrot hover:bg-carrot hover:text-white dark:hover:text-white hover:border-carrot dark:hover:border-carrot text-carrot dark:text-carrot bg-white dark:bg-white border border-carrot">
                   <Rocket className="mr-2 size-4" /> Deploy Carrot
                 </Button>
               </a>

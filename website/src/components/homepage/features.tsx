@@ -22,8 +22,7 @@ export default function Features() {
               <CardContent className="text-md text-gray-600 dark:text-gray-300">
                 Save time by{" "}
                 <span className="text-carrot">reusing mapping rules</span>{" "}
-                across datasets, ensure consistency and accuracy in your data
-                integration.
+                across datasets, ensure consistency and accuracy.
               </CardContent>
             </Card>
             <Card className="lg:w-[400px] h-[250px] z-10 flex flex-col items-center space-y-3">
@@ -33,7 +32,7 @@ export default function Features() {
                 </Circle>
               </div>
               <CardContent className="text-md text-gray-600 dark:text-gray-300">
-                Work securely with Carrot, handling only{" "}
+                Work securely handling only{" "}
                 <span className="text-carrot">metadata</span>,
                 keeping your sensitive information protected.
               </CardContent>
@@ -46,7 +45,7 @@ export default function Features() {
               </div>
               <CardContent className="text-md text-gray-600 dark:text-gray-300">
                 Easily create mapping rules to the OMOP standard with
-                Carrot&apos;s{" "}
+                our{" "}
                 <span className="text-carrot">
                   intuitive automated and manual tools
                 </span>
