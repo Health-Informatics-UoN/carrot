@@ -14,6 +14,12 @@
 </div>
 
 <p align="center">
+  <a href="https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=Health-Informatics-UoN/carrot">
+    <img src="https://github.com/codespaces/badge.svg" alt="Open in GitHub Codespaces">
+  </a>
+</p>
+
+<p align="center">
   <br />
   <a href="https://carrot.ac.uk/documentation" rel="dofollow"><strong>Explore the docs :green_book: »</strong></a>
 <br />
