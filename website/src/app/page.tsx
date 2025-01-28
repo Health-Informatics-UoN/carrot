@@ -25,7 +25,7 @@ export default function Default() {
       <MenuBar />
       <div className="space-y-12 lg:space-y-32">
         <Hero />
-        <div className="min-h-[30vh]">
+        <div className="min-h-[20vh]">
           <CallToAction />
         </div>
         {process.env.ENABLE_FEATURES && <Features />}
