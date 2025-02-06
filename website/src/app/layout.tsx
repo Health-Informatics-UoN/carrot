@@ -4,8 +4,8 @@ import { Metadata } from "next";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Carrot Mapper",
-  description: "Convenient And Reusable Rapid Omop Transformer",
+  title: "Carrot Mapper | Streamlined Data Mapping to OMOP",
+  description: "Streamlined Data Mapping to OMOP",
   keywords: [
     "OMOP CDM",
     "Data standardization",
@@ -46,7 +46,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className="bg-white dark:bg-black">
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

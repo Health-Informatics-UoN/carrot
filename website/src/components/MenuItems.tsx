@@ -1,4 +1,4 @@
-import { BookMarked, Github, LogIn, LucideIcon } from "lucide-react";
+import { BookMarked, Github, LogIn, LucideIcon, CircleDollarSign, Activity } from "lucide-react";
 
 export interface SidebarItems {
   routes: Array<{
@@ -19,6 +19,11 @@ export const sidebarItems: SidebarItems = {
       label: "GitHub",
       href: "https://github.com/Health-Informatics-UoN/Carrot",
       icon: Github,
+    },
+    {
+      label: "Status",
+      href: "https://status.carrot.ac.uk",
+      icon: Activity,
     },
     {
       label: "Login",

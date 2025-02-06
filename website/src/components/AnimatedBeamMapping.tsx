@@ -14,7 +14,7 @@ export const Circle = forwardRef<
     <div
       ref={ref}
       className={cn(
-        "z-10 flex flex-col lg:size-24 size-20 items-center dark:text-black justify-center rounded-xl border-2 border-border bg-white p-3 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)]",
+        "z-10 flex flex-col lg:size-24 size-20 items-center dark:text-black justify-center rounded-[30%] border-2 border-border bg-white p-3 shadow-[0_0_20px_-12px_rgba(0,0,0,0.8)]",
         className
       )}
     >
@@ -61,9 +61,8 @@ export function AnimatedBeamMapping({ className }: { className?: string }) {
           </Circle>
         </div>
         <div className="flex flex-col justify-center gap-2 text-center">
-          <Circle ref={div7Ref}>OMOP Mapping</Circle>
           <Circle ref={div8Ref}>
-            <h2>254761 - Cough</h2>
+            <h2><strong>254761</strong> (Cough)</h2>
           </Circle>
         </div>
       </div>
@@ -86,12 +85,12 @@ export function AnimatedBeamMapping({ className }: { className?: string }) {
         toRef={div6Ref}
         duration={5}
       />
-      <AnimatedBeam
+      {/* <AnimatedBeam
         containerRef={containerRef}
         fromRef={div6Ref}
         toRef={div7Ref}
         duration={3}
-      />
+      /> */}
       <AnimatedBeam
         containerRef={containerRef}
         fromRef={div6Ref}
