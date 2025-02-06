@@ -2,7 +2,14 @@
 
 ## Quick Start
 
-Carrot transform is run from the command line. It now supports poetry to control the python dependencies. To run from the command line, enter:
+Carrot transform is run from the command line. It now supports poetry to control the python dependencies. To install poetry, please follow the instructions [here](https://python-poetry.org/docs/).
+
+Once this is done, you can install the dependencies from the command line with the following command:
+```
+poetry install
+```
+
+To run from the command line, enter:
 
 ```
 poetry run python carrot_transform.py [args]
@@ -16,18 +23,18 @@ poetry run python carrot_transform.py -v
 There are many mandatory and optional arguments for carrot transform. In the quick start, we will demonstrate the mandatory arguments on a test case (taken from carrot-CDM) included in the repository. 
 Enter the following (as one command):
 
-``` 
+```
 poetry run python carrot_transform.py run mapstream carrottransform/examples/test/inputs\
---rules-file\
-carrottransform/examples/test/rules/rules_14June2021.json\
---person-file\
-carrottransform/examples/test/inputs/Demographics.csv\
---output-dir\
-carrottransform/examples/test/test_output\
---omop-ddl-file\
-carrottransform/config/OMOPCDM_postgresql_5.3_ddl.sql\
---omop-config-file\
-carrottransform/config/omop.json
+ --rules-file\
+ carrottransform/examples/test/rules/rules_14June2021.json\
+ --person-file\
+ carrottransform/examples/test/inputs/Demographics.csv\
+ --output-dir\
+ carrottransform/examples/test/test_output\
+ --omop-ddl-file\
+ carrottransform/config/OMOPCDM_postgresql_5.3_ddl.sql\
+ --omop-config-file\
+ carrottransform/config/omop.json
 ```
 
 This should create a set of output files in this directory:
