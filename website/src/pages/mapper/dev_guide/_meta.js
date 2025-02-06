@@ -1,6 +1,5 @@
 export default {
   quickstart: "Quickstart",
-  deployment: "Deployment",
   data_structures: "Internal data structures",
   mapping_rules: "Mapping rules",
   // api: "API",
