@@ -18,7 +18,7 @@
   <a href="https://carrot.ac.uk/documentation" rel="dofollow"><strong>Explore the docs :green_book: »</strong></a>
 <br />
 <br />
-  <a href="https://github.com/orgs/Health-Informatics-UoN/projects/18" rel="dofollow"><strong>Visit our public roadmap :rocket: »</strong></a>
+  <a href="https://github.com/orgs/Health-Informatics-UoN/projects/13/views/19" rel="dofollow"><strong>Visit our public roadmap :rocket: »</strong></a>
 </p>
 
 ## Carrot Mapper
@@ -58,22 +58,20 @@
 [carrot-mapper-containers]: https://github.com/orgs/Health-Informatics-UoN/packages?tab=packages&q=carrot
 [carrot-mapper-releases]: https://github.com/Health-Informatics-UoN/carrot-mapper/releases
 [carrot-mapper-tests]: https://github.com/Health-Informatics-UoN/Carrot-Mapper/actions/workflows/test.yml
-[carrot-mapper-releases-badge]: https://img.shields.io/github/v/tag/Health-Informatics-UoN/carrot-mapper
-[carrot-mapper-tests-badge]: https://github.com/Health-Informatics-UoN/Carrot-Mapper/actions/workflows/test.yml/badge.svg
-[carrot-roadmap]: https://github.com/orgs/Health-Informatics-UoN/projects/18
+[carrot-mapper-releases-badge]: https://img.shields.io/github/v/release/health-informatics-uon/carrot-mapper?include_prereleases&style=flat-square
+[carrot-mapper-tests-badge]: https://img.shields.io/github/actions/workflow/status/health-informatics-uon/carrot-mapper/test.yml?style=flat-square
+[carrot-roadmap]: https://github.com/orgs/Health-Informatics-UoN/projects/13/views/19
 
 [carrot-transform-repo]: https://github.com/Health-Informatics-UoN/carrot-transform
 [carrot-transform-docs]: https://carrot.ac.uk/transform/
 [carrot-transform-releases]: https://github.com/Health-Informatics-UoN/carrot-transform/releases
 [carrot-transform-tests]: https://github.com/Health-Informatics-UoN/carrot-transform/actions/workflows/pypi.publish.yml
-[carrot-transform-releases-badge]: https://img.shields.io/github/v/tag/Health-Informatics-UoN/carrot-transform
-[carrot-transform-tests-badge]: https://github.com/Health-Informatics-UoN/carrot-transform/actions/workflows/pypi.publish.yml/badge.svg
+[carrot-transform-releases-badge]: https://img.shields.io/github/v/release/health-informatics-uon/carrot-transform?include_prereleases&style=flat-square
+[carrot-transform-tests-badge]: https://img.shields.io/github/actions/workflow/status/health-informatics-uon/carrot-transform/pypi.publish.yml?style=flat-square
 
-
-[license-badge]: https://img.shields.io/github/license/health-informatics-uon/hutch-bunny.svg
-[dotnet-badge]: https://img.shields.io/badge/.NET-5C2D91?style=flat&logo=.net&logoColor=white
-[python-badge]: https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white
-[docker-badge]: https://img.shields.io/badge/docker-%230db7ed.svg?style=flat&logo=docker&logoColor=white
-[docs-badge]: https://img.shields.io/badge/docs-black?style=flat&labelColor=%23222
-[roadmap-badge]: https://img.shields.io/badge/roadmap-blue?style=flat&labelColor=%230066cc
-[github-badge]: https://img.shields.io/badge/github-black?style=flat&logo=github&logoColor=white
+[license-badge]: https://img.shields.io/github/license/health-informatics-uon/hutch-bunny.svg?style=flat-square
+[python-badge]: https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white
+[docker-badge]: https://img.shields.io/badge/docker-%230db7ed.svg?style=flat-square&logo=docker&logoColor=white
+[docs-badge]: https://img.shields.io/badge/docs-black?style=flat-square&labelColor=%23222
+[roadmap-badge]: https://img.shields.io/badge/roadmap-blue?style=flat-square&labelColor=%230066cc
+[github-badge]: https://img.shields.io/badge/github-black?style=flat-square&logo=github&logoColor=white
