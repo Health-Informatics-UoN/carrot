@@ -1,0 +1,239 @@
+# Expected Output
+
+## `condition_occurence.tsv`
+The condition_occurrence.tsv file is an OMOP CDM-formatted output file that contains diagnoses and conditions assigned to patients. These conditions are typically derived from clinical encounters, EHRs, claims data, or self-reported conditions.
+
+Examples of conditions stored in this table:
+- Acute conditions (e.g., COVID-19, Influenza).
+- Chronic diseases (e.g., Diabetes, Hypertension).
+- Injuries (e.g., Fractures, Burns).
+
+### Column description
+| Column Name                    | Description |
+|--------------------------------|-------------|
+| `condition_occurrence_id`      | Unique identifier for each condition record. |
+| `person_id`                   | The person to whom the condition applies (links to the `person` table). |
+| `condition_concept_id`         | The OMOP standardized concept ID for the condition. |
+| `condition_start_date`         | The date when the condition started. |
+| `condition_start_datetime`     | The full timestamp of when the condition started. |
+| `condition_end_date`           | The date** when the condition ended (if applicable). |
+| `condition_end_datetime`       | The full timestamp when the condition ended. |
+| `condition_type_concept_id`    | OMOP concept ID indicating how the condition was recorded (e.g., EHR, claims data). |
+| `condition_status_concept_id`  | OMOP concept ID indicating the status of the condition (e.g., active, resolved). |
+| `stop_reason`                 | Reason for stopping treatment (e.g., "Recovered", "Changed treatment"). |
+| `provider_id`                 | The ID of the provider who recorded the condition. |
+| `visit_occurrence_id`         | Links to the visit in which the condition was recorded. |
+| `visit_detail_id`             | Links to a more detailed visit entry. |
+| `condition_source_value`       | The original, non-standard value of the condition from the source data (e.g., ICD-10 code). |
+| `condition_source_concept_id`  | The concept ID corresponding to the source value before OMOP mapping. |
+| `condition_status_source_value` | The original source value for the condition status (e.g., "Active", "Resolved"). |
+
+
+
+### Mapping
+The rules file defined which input fields should be mapped to condition occurrences, for example:
+```json
+{
+  "condition_occurrence": {
+    "diagnosis": {
+      "source_field": "diagnosis_code",
+      "source_table": "Encounters",
+      "term_mapping": {
+        "J12.82": 254761,
+        "E11.9": 201826,
+        "I10": 316866
+      }
+    }
+  }
+}
+```
+The source dataset contained condition data in ICD-10 format. The tool extracted these values and converted them into standardized OMOP concept IDs.
+
+
+## `measurement.tsv`
+The measurement.tsv file is an OMOP CDM-formatted output file that contains clinical measurements and test results recorded for patients. Measurements include lab tests, vital signs, and other numeric assessments.
+
+- Examples of measurements stored in this table:
+    - Laboratory values (e.g., Hemoglobin A1c, Creatinine).
+    - Vital signs (e.g., Blood pressure, Heart rate).
+    - Other clinical assessments (e.g., BMI, Cholesterol levels)
+
+### Column description
+| Column Name                    | Description |
+|--------------------------------|-------------|
+| `measurement_id`              | Unique identifier for each measurement record. |
+| `person_id`                   | The person to whom the measurement applies (links to the `person` table). |
+| `measurement_concept_id`       | The OMOP standardized concept ID for the measurement type. |
+| `measurement_date`             | The date when the measurement was taken. |
+| `measurement_datetime`         | The full timestamp of when the measurement was taken. |
+| `measurement_time`             | The specific time when the measurement was recorded. |
+| `measurement_type_concept_id`  | OMOP concept ID indicating how the measurement was recorded (e.g., EHR, claims data). |
+| `operator_concept_id`          | OMOP concept ID for the operator used in the measurement (e.g., `<`, `>`, `=`). |
+| `value_as_number`              | Numeric result of the measurement (e.g., 120 for systolic blood pressure). |
+| `value_as_concept_id`          | OMOP concept ID if the result is categorical (e.g., "Positive" or "Negative"). |
+| `unit_concept_id`              | OMOP concept ID representing the unit of measurement (e.g., mg/dL, mmHg). |
+| `range_low`                    | Lower bound of the normal range for the measurement. |
+| `range_high`                   | Upper bound of the normal range for the measurement. |
+| `provider_id`                  | The ID of the provider who recorded the measurement. |
+| `visit_occurrence_id`          | Links to the visit in which the measurement was recorded. |
+| `visit_detail_id`              | Links to a more detailed visit entry. |
+| `measurement_source_value`     | The original, non-standard value of the measurement from the source data. |
+| `measurement_source_concept_id` | The concept ID corresponding to the source value before OMOP mapping. |
+| `unit_source_value`            | The original unit of measurement before OMOP standardization. |
+| `value_source_value`           | The original recorded value before transformation. |
+
+
+### Mapping
+- The rules file (`rules_14June2021.json`) defined which input fields should be mapped to measurement values.
+- Example mapping rule:
+```json
+{
+  "measurement": {
+    "lab_test": {
+      "source_field": "test_code",
+      "source_table": "LabResults",
+      "term_mapping": {
+        "789-8": 37398191,
+        "8480-6": 40762499,
+        "17856-6": 3020891
+      }
+    }
+  }
+}
+```
+- This rule maps LOINC lab test codes (e.g., "789-8" for Hemoglobin A1c) to OMOP concept IDs.
+
+## `observation.tsv`
+The observation.tsv file is an OMOP CDM-formatted output file that contains non-clinical or miscellaneous patient observations. Observations in OMOP CDM typically represent facts about a person that do not fall under measurements, conditions, or procedures.
+
+- Examples of observations:
+    - Social determinants of health (e.g., race, smoking status).
+    - Family medical history.
+    - Self-reported conditions.
+    - Survey responses.
+
+
+
+### Columns description
+
+| Column Name                  | Description |
+|------------------------------|-------------|
+| `observation_id`             | Unique identifier for each observation record. |
+| `person_id`                  | The person to whom the observation applies (links to the `person` table). |
+| `observation_concept_id`     | The OMOP standardized concept ID for the type of observation. |
+| `observation_date`           | The date when the observation was recorded. |
+| `observation_datetime`       | The full timestamp of the observation. |
+| `observation_type_concept_id` | OMOP concept ID indicating the source type of the observation (e.g., EHR, patient-reported). |
+| `value_as_number`            | If the observation has a numeric value, it appears here. |
+| `value_as_string`            | If the observation is text-based, it appears here. |
+| `value_as_concept_id`        | If the observation is a standardized concept, the concept ID appears here. |
+| `qualifier_concept_id`       | OMOP concept ID for any additional details related to the observation. |
+| `unit_concept_id`            | If applicable, the unit of measurement (e.g., mg, cm). |
+| `provider_id`                | The ID of the provider who recorded the observation. |
+| `visit_occurrence_id`        | Links to the visit in which the observation was recorded. |
+| `observation_source_value`   | The original, non-standard value from the source data (e.g., raw race category). |
+| `observation_source_concept_id` | The concept ID corresponding to the source value before OMOP mapping. |
+| `unit_source_value`          | The original unit of measurement before OMOP standardization. |
+| `qualifier_source_value`     | The original source value for the qualifier. |
+
+
+### Mapping
+The rules file defined which input fields should be mapped to observations:
+```json
+{
+  "observation": {
+    "race": {
+      "source_field": "race",
+      "source_table": "Demographics",
+      "term_mapping": {
+        "Asian": 35825508,
+        "Black": 8515,
+        "White": 8527
+      }
+    }
+  }
+}
+```
+This rule maps race categories (Asian, Black, White) to OMOP concept IDs. The Demographics.csv file contained race data and the tool extracted the race field and converted it into standard OMOP codes.
+
+## `person_ids.tsv`
+The Person ID Mapping Table is a lookup table that maps original subject IDs from the source system to standardized OMOP person_ids. This transformation ensures that all records referring to the same individual use a consistent identifier, facilitating data integration across multiple tables.
+
+Why is this necessary?
+- Many datasets use hashed or encrypted subject IDs that are not sequential or standardized.
+- The OMOP CDM requires numeric person_ids to maintain consistency across tables like condition_occurrence, measurement, and observation`.
+- This mapping ensures that every source subject ID is assigned a unique person_id.
+
+### Column description
+| Column Name       | Description |
+|-------------------|-------------|
+| `SOURCE_SUBJECT`  | The original hashed or encrypted subject ID from the source system. |
+| `TARGET_SUBJECT`  | The newly assigned person ID in the OMOP CDM format. |
+
+### Mapping
+The tool scanned input datasets (e.g. `Demographics.csv`) and collected unique subject identifiers.
+Each unique `SOURCE_SUBJECT` was assigned a numeric `TARGET_SUBJECT` (OMOP person_id), ensuring consistency across tables.
+The assigned `person_ids` were propagated across all transformed OMOP CDM tables (`condition_occurrence.tsv`, `measurement.tsv`, etc.).
+
+
+## `person.tsv`
+The `person.tsv` file in OMOP CDM format contains demographic and personal information about each individual in the database.
+
+### Column description
+| Column Name                         | Description |
+|-------------------------------------|-------------|
+| `person_id`                         | Unique identifier for each person. |
+| `gender_concept_id`                 | The OMOP standardized concept ID for gender. |
+| `year_of_birth`                     | The year the person was born. |
+| `month_of_birth`                    | The month the person was born. |
+| `day_of_birth`                      | The day the person was born. |
+| `birth_datetime`                    | The full birth date and time. |
+| `race_concept_id`                   | The OMOP standardized concept ID for race. |
+| `ethnicity_concept_id`              | The OMOP standardized concept ID for ethnicity. |
+| `location_id`                       | The location ID for the person (if applicable). |
+| `provider_id`                       | The provider ID for the person's care (if applicable). |
+| `care_site_id`                      | The care site ID for the person's care (if applicable). |
+| `person_source_value`               | The original value of the person identifier from the source data. |
+| `gender_source_value`               | The original source value for the gender. |
+| `gender_source_concept_id`          | The concept ID for the source gender. |
+| `race_source_value`                 | The original source value for the race. |
+| `race_source_concept_id`            | The concept ID for the source race. |
+| `ethnicity_source_value`            | The original source value for the ethnicity. |
+| `ethnicity_source_concept_id`       | The concept ID for the source ethnicity. |
+
+### Mapping
+The rules file defines how the fields from the input person.tsv map to OMOP concepts for gender, race, and ethnicity. The key mappings are:
+```json
+{
+  "person": {
+    "gender": {
+      "source_field": "gender_source_value",
+      "source_table": "person",
+      "term_mapping": {
+        "M": 8507,   // Male mapped to concept ID 8507
+        "F": 8532    // Female mapped to concept ID 8532
+      }
+    },
+    "race": {
+      "source_field": "race_source_value",
+      "source_table": "person",
+      "term_mapping": {
+        "Asian": 35825508,
+        "Black": 8515,
+        "White": 8527
+      }
+    },
+    "ethnicity": {
+      "source_field": "ethnicity_source_value",
+      "source_table": "person",
+      "term_mapping": {
+        "Hispanic": 38003563,
+        "Non-Hispanic": 38003564
+      }
+    }
+  }
+}
+```
+
+## `summary.tsv`
+
