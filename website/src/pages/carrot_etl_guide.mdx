@@ -1,0 +1,937 @@
+{/* ----- Imports ----- */}
+
+import WarningIcon from '@/components/icons/WarningIcon';
+import HighlightedText, { GreenHighlightedText } from '@/components/HighlightedText';
+
+
+
+{/* ----- Landing View of the Documentation ----- */}
+
+# Welcome to the Carrot’s Data Engineering Procedure for OMOP representation.
+
+The Carrot’s Data Engineering Process for OMOP standard vocabulary process primarily consist of Data Pre-processing, Metadata Profiling and Metadata Mapping. 
+
+<div>
+The following document sets the Standardised Opera.ng Procedure (SOP) that must be followed and applied during the engineering of data for conversion to an [OMOP](https://www.ohdsi.org/data-standardization/) representation. 
+</div>
+
+Figure 1 illustrates the 3 main data engineering stages and the associated soQware tools that are used, this process is commonly known as an [Extract, Transform and Load (ETL) process](https://ohdsi.github.io/TheBookOfOhdsi/ExtractTransformLoad.html). 
+
+
+<div style={{ display: "inline-flex",  marginTop: "8px" }}>
+  <WarningIcon />
+  <span>This document only covers the ‘Extract and Transform’ sections of an ETL process as per the Figure below.</span>
+</div>
+
+<figure style={{ textAlign: "center" }}>
+  <img 
+    src="/docs/Carrot-SOP/omop-etl-process.png" 
+    alt="ETL Process Diagram" 
+    width="600" 
+    style={{ display: "block", margin: "15px auto" }} 
+  />
+  <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+    Figure 1: The stages of Health Infomatics Data Engineering.
+  </figcaption>
+</figure>
+
+
+<span style={{ paddingTop: "20px", display: "inline-block" }}>
+  <GreenHighlightedText> Moving to the Data Engineering Overview section -> </GreenHighlightedText>
+</span>
+
+
+{/* ----- End of Section ----- */}
+
+
+
+
+
+
+{/* ----- Data Engineering Overview of the Documentation ----- */}
+
+## Data Engineering Overview
+Figure 2 portrays the high-level view of the 3 stages and the main processes they are comprised of:
+
+<div style={{ display: "flex", alignItems:  "center", gap: "5px"}}>
+<div style={{ flex: "1" }}>
+
+
+- **Stage 1: Data Pre-processing**
+<div>
+The pre-processing stage focuses on the ‘important aXributes’ of a dataset that need to be mapped to the OMOP Common Data Model for discoverability.
+
+A meeting with the dataset owner is necessary to understand the context and select the key data attributes to be made discoverable. From this a subset of the data is then anonymised by the data owner and refactored (reorganised), producing a pre-processed dataset. This is then reviewed by the data owner to determine if it is fit for purpose and is fully anonymised.
+
+The output of Stage 1 is an anonymised dataset ready for profiling together with a formaXed data dictionary.
+</div>
+
+- **Stage 2: Metadata Profiling**
+
+<div>
+The metadata profiling stage assesses the structure of a pre-processed dataset.
+
+The pre-processed dataset is loaded into the OHDSI White Rabbit tool, this produces a sta.s.cal profile of the data called a ‘Scan Report’ that further de-identifies data by removing the rela.onships between data attributes. This is then checked to ensure that the data has been rigorously anonymised.
+
+The output of Stage 2 is a Verified Scan Report spreadsheet.
+</div>
+
+- **Stage 3: Metadata Mapping**
+
+<div>
+The metadata mapping stage takes the dataset attributes and maps them to OHDSI OMOP Common Data Model for discoverability.
+
+Individual dataset attributes are mapped to ‘Standard’ OMOP terms (e.g., these could be from SNOMED CT, RxNORM or LOINC controlled international standardised healthcare vocabularies), this process creates rules. The resultant rule set is then reviewed for correctness and completeness.
+</div>
+
+The output of Stage 3 is a mapped rule set in a JSON 
+</div>
+
+  <div style={{ flex: "1", textAlign: "right" }}>
+    <figure style={{ display: "inline-block", textAlign: "center" }}>
+      <img 
+        src="/docs/Carrot-SOP/data-engineering-overview.png" 
+        alt="Data Engineering Overview" 
+        width="330"
+        height="870"
+        style={{ maxWidth: "100%", height: "auto" }} 
+      />
+      <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+        Figure 2: Data Engineering Overview
+      </figcaption>
+    </figure>
+  </div>
+
+</div>
+
+
+<span style={{ paddingTop: "20px", display: "inline-block" }}>
+  <GreenHighlightedText> Moving to the Data Pre-Processing section -> </GreenHighlightedText>
+</span>
+
+
+{/* ----- End of Section ----- */}
+
+
+
+
+
+{/* ----- Data Pre-processing of the Documentation ----- */}
+
+## Stage 1: Data Pre-processing
+
+### Select Data
+
+<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px" }}>
+  
+  <div style={{ flex: "1" }}>
+    It is necessary to understand the context of each dataset to allow a representative conversion to be performed.
+
+    1. **Meet with Data Owner**
+    <div style={{ marginTop: "0px" }}>
+      - Discuss their dataset(s) and specific requirements.<br/>
+      - Understand what each dataset represents (so you understand their context and perspectives).<br/>
+      - Explain the data engineering process (so they understand your perspective and what Health Informatics can offer).
+    </div>
+
+    2. **Choose Data Set(s)**
+    <div style={{ marginTop: "0px" }}>
+      - Discuss with the data owner which dataset(s) they would like converted.
+    </div>
+  
+
+    3. **Select data and conversion goals:**
+    <div style={{ marginTop: "0px" }}>
+      - The aim is ‘Data Discoverability’.
+      - Define conversion goals, i.e., what is to be converted for discoverability.
+      - Select data attributes to be converted – not all data attributes are necessary for discoverability, a minimal set of data attributes may just be necessary.
+    </div>
+
+    4. **Define Working processes**
+    <div style={{ marginTop: "0px" }}>
+    - Understand where each dataset is located.
+
+    - Understand what the security arrangements are.
+
+    - Understand access rights to the dataset.
+
+    - Define communica.on and feedback mechanisms and frequency thereof – these can be emails, weekly meetings, etc.
+    </div>
+
+</div>
+
+  <div style={{ flex: "0.5", textAlign: "right" }}>
+    <figure style={{ display: "inline-block", textAlign: "center" }}>
+      <img 
+        src="/docs/Carrot-SOP/3.png" 
+        alt="Selecting Data during Data Pre-processing" 
+        width="200"
+        height="250"
+        style={{ 
+          maxWidth: "100%", 
+          height: "auto", 
+          border: "1px solid #ddd", 
+          padding: "5px" 
+        }} 
+      />
+      <figcaption style={{ marginTop: "8px", marginRight: "50px", fontStyle: "italic", color: "#666" }}>
+        Figure 3: Selecting 
+        Data during Data Pre-processing
+      </figcaption>
+    </figure>
+  </div>
+
+</div>
+
+
+
+
+
+### Data Anonymisation
+
+<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px" }}>
+  <div style={{ flex: "1" }}>
+
+  The anonymisation of data is paramount, it is critical that the following steps are carefully followed.
+
+
+  <WarningIcon />It is the responsibility of the Data Owner to de-identify datasets before they are supplied for OMOP conversion.
+
+
+
+  1. **Define Data Anonymisation**
+  <div style={{ marginTop: "0px" }}>
+  - Identify the Personally identifiable information (PII) / Personal Data: data attributes (**[see PII definition and description](#pii-section)**).
+  - Locate and highlight the Direct-Identifier data.
+  - Locate and highlight the Pseudo-Identifier data.
+  - Discuss with Data Owner which Pseudo-Identifier data should be removed (**[see PII definition and description](#pii-section)**) – Date of Birth must be removed!
+  </div>
+
+
+  2. **Anonymise dataset**
+  <div style={{ marginTop: "0px" }}>
+  - It is the responsibility of the Data Owner to de-identify datasets!
+  - <HighlightedText>Direct identifier data ‘must be removed’</HighlightedText> from each dataset – remove the row data from the columns, do not delete the columns.
+  - <HighlightedText>Remove agreed Pseudo-Identifier data</HighlightedText> – again, remove the row data, do not delete the columns.
+      
+      - **<HighlightedText>Date of Birth</HighlightedText> <u>must be removed!</u>**
+  </div>
+  </div>
+
+  <div style={{ flex: "0.5", textAlign: "center" }}>
+  <figure style={{ display: "inline-block", textAlign: "center", margin: "0 auto" }}>
+    <img 
+      src="/docs/Carrot-SOP/4.png" 
+      alt="Data Anonymisation during data pre-processing" 
+      width="200"
+      height="250"
+      style={{ 
+        maxWidth: "100%", 
+        height: "auto", 
+        border: "1px solid #ddd", 
+        padding: "5px" 
+      }} 
+    />
+    <figcaption style={{ marginTop: "8px", marginRight: "70px", fontStyle: "italic", color: "#666" }}>
+      Figure 4: Data Anonymisation
+      during Data Pre-processing
+    </figcaption>
+  </figure>
+</div>
+
+
+</div>
+
+<div id="pii-section">
+  ### Personally Identifiable Information (PII) / Personal Data
+
+  This means any informaton relating to an identified or identifiable natural person (data subject); an identifiable natural person is one who can be identified, **directly or indirectly**, in particular by reference to an identifier such as a name, an identification number, location data, an online identifier or to one or more factors specific to the physical, physiological, genetic, mental, economic, cultural or social identity of that natural person [Information Commissioner's Office](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/personal-information-what-is-it/what-is-personal-data/what-is-personal-data/).
+
+  <figure style={{ textAlign: "center", margin: "15px auto" }}>
+    <img 
+      src="/docs/Carrot-SOP/5.png" 
+      alt="Example of Direct and Indirect Identifiers" 
+      width="500" 
+      style={{ display: "block", margin: "0 auto" }} 
+    />
+    <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+      Figure 5: Example of Direct and Indirect Identifiers
+    </figcaption>
+  </figure>
+
+
+  PII refers to data that can be used to identify, locate, or contact individuals or establishments, or reveal the characteristics or other details about them. PII might consist of direct iden.fiers, such as the name, social security number or other information that is unique to an individual. Indirect identifiers include uncommon race, ethnicity, extreme age, unusual occupa.on and other details [CDC](https://www.cdc.gov/nchs/training/confidentiality/training/page581.html).
+
+  #### Direct Identifiers
+
+  - ‘Direct identifiers are variables that point explicitly to particular individuals or units’ [University of Tennessee](https://research.utk.edu/research-integrity/human-research-protection-program/for-researchers/guidance-2/understanding-identifiable-data/).
+
+  - ‘Information that explicitly identifies a person’ [Devaux](https://medium.com/statice/data-privacy-and-protection-techniques-db42576d8b3f#:~:text=Direct%20identifiers%20are%20information%20that,data%20to%20identify%20a%20person.).
+
+  Direct identifier data must be removed from datasets, as follows:
+
+  <figure style={{ textAlign: "center", margin: "15px auto" }}>
+    <img 
+      src="/docs/Carrot-SOP/Direct-Identifier.png" 
+      alt="Example of Direct Identifiers" 
+      width="500" 
+      style={{ display: "block", margin: "0 auto" }} 
+    />
+    <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+      Figure 6: Example of Removing Direct Identifiers.
+    </figcaption>
+  </figure>
+
+
+
+  #### Indirect / Quasi-Identifiers
+
+  - ‘A quasi-identifier (also called a semi-key) is a subset of attributes which uniquely identifies most entities in the real world or tuples in a table’ [Motwani and Xu, 2007](https://userpages.cs.umbc.edu/kunliu1/p3dm08/proceedings/2.pdf).
+
+  - ‘Information that can be combined with additional data to identify a person’ [Devaux, 2020](https://medium.com/statice/data-privacy-and-protection-techniques-db42576d8b3f#:~:text=Direct%20identifiers%20are%20information%20that,data%20to%20identify%20a%20person.).
+
+  The majority of quasi-identifier data must be removed, as follows:
+
+  <figure style={{ textAlign: "center", margin: "15px auto" }}>
+    <img 
+      src="/docs/Carrot-SOP/Indirect-Identifier.png" 
+      alt="Example of Removing Indirect Identifiers" 
+      width="400" 
+      style={{ display: "block", margin: "0 auto" }} 
+    />
+    <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+      Figure 7: Example of Removing Indirect Identifiers.
+    </figcaption>
+  </figure>
+
+
+</div>
+
+
+### Refactor Data
+
+<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px" }}>
+  <div style={{ flex: "1" }}>
+
+  <div style={{ marginTop: "0px" }}>
+  The anonymisation of data is paramount, it is critical that the following steps are carefully followed.
+  </div>
+  <div style={{ marginTop: "0px" }}>
+  <WarningIcon /> It is the responsibility of the Data Owner to de-identify datasets before they are supplied for OMOP conversion.
+  </div>
+
+  1. **Organise Data Tables**
+  <div style={{ marginTop: "0px" }}>
+  - Create a demographics table, consisting of:
+      - Identifier
+      - Date of Birth 
+      - Sex at Birth 
+      - Ethnicity
+  <div>
+  - The rest of the data can then be arranged as deemed fit by the data owner and / or the CARROT data team, each table must include:
+      - 1 x identifying column per table.
+      - 1 x date event per table.
+  </div>
+  </div>
+
+
+  2. **Create Dataset Extract**
+  <div style={{ marginTop: "0px" }}>
+  - First, check the [CARROT4OMOP Data Standards](https://carrot4omop.ac.uk/standards/#data-dictionary-file) page for exact requirements.
+
+  - Extract the data from the data source – this can be done in 2 ways:
+      - export tables to CSV files (1 per table);
+      - create a view within the database.
+
+  - Prepare a data dictionary for mapping. 
+  </div>
+  </div>
+
+  <div style={{ flex: "0.5", textAlign: "right" }}>
+    <figure style={{ display: "inline-block", textAlign: "center", margin: "0 auto" }}>
+      <img 
+        src="/docs/Carrot-SOP/6.png" 
+        alt="Refactoring the data in data preprocessing section" 
+        width="200"
+        height="250"
+        style={{ 
+          maxWidth: "100%", 
+          height: "auto", 
+          border: "1px solid #ddd", 
+          padding: "5px" 
+        }} 
+      />
+      <figcaption style={{ marginTop: "8px", marginRight: "70px", fontStyle: "italic", color: "#666" }}>
+        Figure 8: Refactoring the 
+        Data in Data Preprocessing.
+      </figcaption>
+    </figure>
+  </div>
+
+</div>
+
+
+### Review
+
+<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px" }}>
+  <div style={{ flex: "1" }}>
+
+  <div>
+  It is essential that all data extracts are reviewed prior to Stage 2.
+  </div>
+
+  <div style={{ marginTop: "0px" }}>
+  1. **Review Dataset Extract**
+  <div style={{ marginTop: "0px" }}>
+  - Check the agreed data attributes chosen in Stage 1 are selected.
+  - Check that the dataset has been anonymised as per Stage 2.
+  - Check the demographics table exists and contains these 4 data attributes:
+
+      - Identifier
+      - Date of Birth
+      - Sex
+      - Ethnicity
+
+  - Check that there is a date event to map to per dataset table and that it conforms to [CARROT4OMOP](https://carrot4omop.ac.uk/standards/#data-dictionary-file).
+  - Check that there is a date event to map to per dataset table.
+
+  - <HighlightedText>CHECK WHETHER THE DATA DICTIONARY FOLLOWS OMOP DATA STANDARDS. </HighlightedText>
+
+  </div>
+  </div>
+
+  </div>
+
+  <div style={{ flex: "0.5", textAlign: "right" }}>
+    <figure style={{ display: "inline-block", textAlign: "center", margin: "0 auto" }}>
+      <img 
+        src="/docs/Carrot-SOP/7.png" 
+        alt="Reviewing in data preprocessing section" 
+        width="200"
+        height="250"
+        style={{ 
+          maxWidth: "100%", 
+          height: "auto", 
+          border: "1px solid #ddd", 
+          padding: "5px" 
+        }} 
+      />
+      <figcaption style={{ marginTop: "8px", marginRight: "70px", fontStyle: "italic", color: "#666" }}>
+        Figure 9: Reviewing 
+        in Data Preprocessing.
+      </figcaption>
+    </figure>
+  </div>
+
+</div>
+
+<span style={{ paddingTop: "20px", display: "inline-block" }}>
+  <GreenHighlightedText> Moving to the Metadata Profiling section -> </GreenHighlightedText>
+</span>
+
+
+{/* ----- End of Section ----- */}
+
+
+
+
+
+{/* ----- Metadata Profiling of the Documentation ----- */}
+
+## Stage 2: Metadata Profiling
+
+<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px" }}>
+  <div style={{ flex: "1" }}>
+
+  <div>
+  The understand a dataset’s metadata the [WhiteRabbit](https://github.com/OHDSI/WhiteRabbit) statistical profiling tool from [OHDSI](https://www.ohdsi.org/analytic-tools/whiterabbit-for-etl-design/) is used. **This tool has been vetted by <u>UoN Information Security</u> and Compliance team and <u>passed the UoN DPIA process</u>**.
+  </div>
+
+  A full [User Guide and Introduction to WhiteRabbit](https://ohdsi.github.io/WhiteRabbit/WhiteRabbit.html) is here:
+
+  - https://ohdsi.github.io/WhiteRabbit/WhiteRabbit.html
+  - https://github.com/OHDSI/WhiteRabbit
+
+
+  ### Profile Data
+  <div style={{ marginTop: "0px" }}>
+  **1. Setup WhiteRabbit**
+
+      - Open the WhiteRabbit tool.
+
+  Metadata extraction for csv files:
+  - Locations screen:
+      - Enter **‘Working Folder’** location (see image below).
+      - Click **‘Test Connection’** to ensure that it is working.
+      - Then go to the **‘Scan’** tab Screen.
+  </div>
+
+  </div>
+
+  <div style={{ flex: "0.5", textAlign: "right" }}>
+    <figure style={{ display: "inline-block", textAlign: "center", margin: "0 auto" }}>
+      <img 
+        src="/docs/Carrot-SOP/8.png" 
+        alt="Profiling data in metadata profiling section" 
+        width="200"
+        height="250"
+        style={{ 
+          maxWidth: "100%", 
+          height: "auto", 
+          border: "1px solid #ddd", 
+          padding: "5px" 
+        }} 
+      />
+      <figcaption style={{ marginTop: "8px", marginRight: "70px", fontStyle: "italic", color: "#666" }}>
+        Figure 10: Profiling Data in Metadata Profiling. 
+      </figcaption>
+    </figure>
+  </div>
+
+
+</div>
+
+<div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "10px", marginRight: "10px" }}>
+  <figure style={{ textAlign: "center", margin: "0 auto" }}>
+    <img 
+      src="/docs/Carrot-SOP/9.png" 
+      alt="Example of White Rabbit 'location' screen option" 
+      width="700" 
+      style={{ display: "block", margin: "0 auto" }} 
+    />
+    <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+      Figure 11: Example of White Rabbit 'Location' Screen Option
+    </figcaption>
+  </figure>
+</div>
+
+
+
+**1.1 Setup White Rabbit (Second Part)**
+<div style={{ marginTop: "0px" }}>
+- Scan Screen:
+    - Click on the ‘Scan’ tab.
+    - Click ‘Add’, to add the required dataset .csv files. 
+    - The **‘Min Cell Count’ is set to 5 by default**, this can be altered according to the data owner’s requirements.
+    - Press ‘Scan Tables’ to run WhiteRabbit.
+    - This will produce a ‘Scan Report’ for the dataset metadata within the Working Directory.
+- **For Databases**
+
+    - Please refer to the [WhiteRabbit User Guide](https://ohdsi.github.io/WhiteRabbit/WhiteRabbit.html), for setting up the tool to scan a database.
+</div>
+
+<div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "10px", marginRight: "10px" }}>
+  <figure style={{ textAlign: "center", margin: "0 auto" }}>
+    <img 
+      src="/docs/Carrot-SOP/11.png" 
+      alt="Example of White Rabbit's 'Scan' screen option." 
+      width="700" 
+      style={{ display: "block", margin: "0 auto" }} 
+    />
+    <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+      Figure 12: Example of White Rabbit's 'Scan' Screen Option
+    </figcaption>
+  </figure>
+</div>
+
+
+
+
+<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "20px" }}>
+  <div style={{ flex: "1" }}>
+    
+  ### Checking Scan Report
+
+  #### Examine Scan Report
+  - Open the WhiteRabbit Scan Report Excel file from the Working Directory.
+  - Check:
+      - A sheet has been created for each `.csv` file added to WhiteRabbit.
+      - Check the name of each sheet tab and ensure it is the same as the `.csv` file name it represents. 
+      - Check **Field Overview** sheet results are correct.
+
+  #### Check Anonymisation
+  - Check all Direct Identifier data values are not present within the Scan Report.
+  - Check all Indirect Identifier data values are not present within the Scan Report.
+
+  See [Personally Identifiable Information](#pii-section) for **Direct and Indirect Identifier** information.
+
+  </div>
+
+  <div style={{ flex: "0.5", textAlign: "right", alignSelf: "flex-start", marginTop: "40px" }}>
+    <figure style={{ display: "inline-block", textAlign: "center", margin: "0 auto" }}>
+      <img 
+        src="/docs/Carrot-SOP/12.png" 
+        alt="Checking Scan report in metadata profiling" 
+        width="200"
+        height="250"
+        style={{ 
+          maxWidth: "100%", 
+          height: "auto", 
+          border: "1px solid #ddd", 
+          padding: "5px" 
+        }} 
+      />
+      <figcaption style={{ marginTop: "8px", marginRight: "60px", fontStyle: "italic", color: "#666" }}>
+        Figure 13: Checking Scan 
+        Report in Metadata Profiling.
+      </figcaption>
+    </figure>
+  </div>
+
+</div>
+
+<div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "10px", marginRight: "10px" }}>
+  <figure style={{ textAlign: "center", margin: "0 auto" }}>
+    <img 
+      src="/docs/Carrot-SOP/13.png" 
+      alt="Example of WhiteRabbit Scan Report - Aspects to Check" 
+      width="700" 
+      style={{ display: "block", margin: "0 auto" }} 
+    />
+    <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+      Figure 14: Example of WhiteRabbit Scan Report - Aspects to Check.
+    </figcaption>
+  </figure>
+</div>
+
+<span style={{ paddingTop: "20px", display: "inline-block" }}>
+  <GreenHighlightedText> Moving to the Metadata Mapping Section -> </GreenHighlightedText>
+</span>
+
+
+
+{/* ----- End of Section ----- */}
+
+
+
+
+
+{/* ----- Metadata Section of the Documentation ----- */}
+
+## Stage 3: Metadata Mapping
+
+
+<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "20px" }}>
+  <div style={{ flex: "1" }}>
+
+  ### Upload to Carrot Scan Report
+
+  **Upload Scan Report**
+
+  - Log into [CARROT](https://ccom.azurewebsites.net/):
+  - Upload Scan Report:
+    - Click **Scan Reports** Tab.
+    - Click **New Scan Report Upload** option.
+    - Choose **Data Partner** - from drop-down list. 
+    - Choose **Dataset** - from drop-down list.
+    - Choose **Visibility**: Public or Restricted
+      - Public = All registered users of CARROT can view the scan report.
+      - Restricted = Only defined/specific registered users of CARROT can view the scan report.
+
+  - Define **Editors** (users allowed to edit the dataset)
+  - Define **Viewers** (users allowed to view a ‘restricted’ dataset)
+  - Create the **Scan Report Name**.
+  - Choose **WhiteRabbit ScanReport** file location for upload.
+  - Choose **Data Dictionary** file location for upload. 
+  - Check all items entered are correct.
+  - Click **‘Submit’** button to upload the Scan Report.
+  </div>
+
+  <div style={{ flex: "0.5", textAlign: "right", alignSelf: "flex-start", marginTop: "40px" }}>
+    <figure style={{ display: "inline-block", textAlign: "center", margin: "0 auto" }}>
+      <img 
+        src="/docs/Carrot-SOP/14.png" 
+        alt="Upload mapping in metadata mapping" 
+        width="200"
+        height="250"
+        style={{ 
+          maxWidth: "100%", 
+          height: "auto", 
+          border: "1px solid #ddd", 
+          padding: "5px" 
+        }} 
+      />
+      <figcaption style={{ marginTop: "8px", marginRight: "60px", fontStyle: "italic", color: "#666" }}>
+        Figure 15: Upload Mapping
+        in Metadata Mapping.
+      </figcaption>
+    </figure>
+  </div>
+
+</div>
+
+<div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "10px", marginRight: "10px" }}>
+  <figure style={{ textAlign: "center", margin: "0 auto" }}>
+    <img 
+      src="/docs/Carrot-SOP/15.png" 
+      alt="Example of CARROT software tool screens for New Scan Report Upload" 
+      width="700" 
+      style={{ display: "block", margin: "0 auto" }} 
+    />
+    <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+      Figure 16: Example of CARROT Software Tool Screens for New Scan Report Upload.
+    </figcaption>
+  </figure>
+</div>
+
+
+
+
+
+<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "20px" }}>
+  <div style={{ flex: "1" }}>
+
+  ### Check the Scan Report Upload
+
+  While logged into the CARROT tool:
+  - Click **Scan Reports**.
+  - Select **Scan Reports** tab.
+  - Check the progress of your Scan Report upload – it will show one of the following three (see diagram): 
+    - <span style={{ color: "green", fontWeight: "bold" }}>Upload Complete</span>
+    - <span style={{ color: "orange", fontWeight: "bold" }}>Upload In Progress</span>
+    - <span style={{ color: "red", fontWeight: "bold" }}>Upload Failed</span>
+  - Refresh the web browser to check on upload progress.
+  </div>
+
+  <div style={{ flex: "0.5", textAlign: "right", alignSelf: "flex-start", marginTop: "40px" }}>
+    <figure style={{ display: "inline-block", textAlign: "center", margin: "0 auto" }}>
+      <img 
+        src="/docs/Carrot-SOP/16.png" 
+        alt="Upload to CARROT in metadata mapping" 
+        width="160"
+        height="190"
+        style={{ 
+          maxWidth: "100%", 
+          height: "auto", 
+          border: "1px solid #ddd", 
+          padding: "5px" 
+        }} 
+      />
+      <figcaption style={{ marginTop: "8px",marginRight: "100px", fontStyle: "italic", color: "#666" }}>
+        Figure 17: Upload to CARROT
+        in Metadata Mapping.
+      </figcaption>
+    </figure>
+  </div>
+
+</div>
+
+<div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "20px", marginRight: "40px" }}>
+  <figure style={{ textAlign: "center", margin: "0 auto" }}>
+    <img 
+      src="/docs/Carrot-SOP/17.png" 
+      alt="Example of CARROT tool Scan Report Status page" 
+      width="700" 
+      style={{ display: "block", margin: "0 auto" }} 
+    />
+    <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+      Figure 18: Example of CARROT Tool Scan Report Status Page
+    </figcaption>
+  </figure>
+</div>
+
+
+
+<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "20px" }}>
+  <div style={{ flex: "1" }}>
+
+    ### Map Rules
+
+    #### Choose Dataset
+
+    - Log into [CARROT](https://ccom.azurewebsites.net/):
+    - Click **Datasets** Tab.
+    - Click on the <i>Dataset ID</i> or <i>Name</i>.
+    - Click on the <i>Dataset ID</i>, <i>Data Partner</i> or <i>Name</i>.
+    - You will then be presented with a list of metadata tables.
+
+    - <HighlightedText>Before you map rules, you must set the Person ID and Date Event for each table<i>(see diagram below)</i>:</HighlightedText>
+      - Click **‘Edit Table’**
+      - Select **<i>Person ID</i>** to map to for the Table. 
+      - Select **<i>Date Event</i>** to map to for the Table.  
+      - Click **‘Update’** Table-Name.csv.
+
+    - Now the system is ready to map rules!
+
+    #### Enter Rules
+
+    - Choose the required table & click.
+    - You will then be shown the data attributes for that table.
+    - There are two levels at which rules can be mapped to
+    data attributes:
+
+      **(a) For all values per data attribute:**
+
+          - Enter the <u>OMOP Concept ID</u> in the box.
+          - Press **‘ADD’**
+          - This will then map the OMOP Concept ID to all of the values for that individual data attribute.
+
+      **(b) For individual values per data attribute:**
+
+          - Click on the data variable to enter the set of values.
+          - Enter the <u>OMOP Concept ID</u> in the box for each individual value as needed.
+          - Press **‘ADD’**
+
+  </div>
+
+  <div style={{ flex: "0.5", textAlign: "right", alignSelf: "flex-start", marginTop: "40px" }}>
+    <figure style={{ display: "inline-block", textAlign: "center", margin: "0 auto" }}>
+      <img 
+        src="/docs/Carrot-SOP/18.png" 
+        alt="Upload mapping rules in metadata mapping" 
+        width="160"
+        height="190"
+        style={{ 
+          maxWidth: "100%", 
+          height: "auto", 
+          border: "1px solid #ddd", 
+          padding: "5px" 
+        }} 
+      />
+      <figcaption style={{ marginTop: "8px", marginRight: "100px", fontStyle: "italic", color: "#666" }}>
+        Figure 19: Upload Mapping Rules in
+        Metadata Mapping.
+      </figcaption>
+    </figure>
+  </div>
+
+</div>
+
+<div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "10px", marginRight: "40px" }}>
+  <figure style={{ textAlign: "center", margin: "0 auto" }}>
+    <img 
+      src="/docs/Carrot-SOP/19.png" 
+      alt="Setting Person ID and Date Event for each Dataset Metadata Table" 
+      width="700" 
+      style={{ display: "block", margin: "0 auto" }} 
+    />
+    <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+      Figure 20: Setting Person ID and Date Event for Each Dataset Metadata Table.
+    </figcaption>
+  </figure>
+</div>
+
+
+
+<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "20px" }}>
+  <div style={{ flex: "1" }}>
+
+    ### Check Map Rules
+
+    #### Choose Dataset
+
+    - Log into [CARROT]():
+    - Click **Datasets** Tab.
+    - Click on the <i>Dataset ID</i> or <i>Name</i>.
+    - Click on the <i>Dataset ID</i>, <i>Data Partner</i> or <i>Name</i>.
+    - Click on ‘RULES’ button.
+    - There are the following options (see diagram below):
+        - Download Mapping JSON 
+        - View Map Diagram
+        - Download Map Diagram 
+        - Download Mapping CSV 
+        - Show Summary View
+        - Analyse Rules
+    - Check your mapped ruleset using one of the above options.
+
+    **Export Mapping Ruleset:**
+
+    - Click ‘Download Mapping JSON’
+    - The JSON file will then be exported from CARROT and downloaded to your system.
+
+  </div>
+
+  <div style={{ flex: "0.5", textAlign: "right", alignSelf: "flex-start", marginTop: "40px" }}>
+    <figure style={{ display: "inline-block", textAlign: "center", margin: "0 auto" }}>
+      <img 
+        src="/docs/Carrot-SOP/20.png" 
+        alt="Check mapping rules in metadata mapping" 
+        width="200"
+        height="250"
+        style={{ 
+          maxWidth: "100%", 
+          height: "auto", 
+          border: "1px solid #ddd", 
+          padding: "5px" 
+        }} 
+      />
+      <figcaption style={{ marginTop: "8px", marginRight: "70px", fontStyle: "italic", color: "#666" }}>
+        Figure 21: Check Mapping Rules
+        in Metadata Mapping.
+      </figcaption>
+    </figure>
+  </div>
+
+</div>
+
+
+<div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "10px", marginRight: "40px" }}>
+  <figure style={{ textAlign: "center", margin: "0 auto" }}>
+    <img 
+      src="/docs/Carrot-SOP/21.png" 
+      alt="Example of Dataset Mapping Rule options" 
+      width="700" 
+      style={{ display: "block", margin: "0 auto" }} 
+    />
+    <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+      Figure 22: Example of Dataset Mapping Rule Options.
+    </figcaption>
+  </figure>
+</div>
+
+<span style={{ paddingTop: "20px", display: "inline-block" }}>
+  <GreenHighlightedText> Moving to the Reference section -> </GreenHighlightedText>
+</span>
+
+
+{/* ----- End of Section ----- */}
+
+
+
+
+
+{/* ----- Reference Section of the Documentation ----- */}
+
+## Reference
+
+- Motwani, R., & Xu, Y. (2007). Efficient Algorithms for Masking and Finding Quasi-Iden.fiers. Available at: https://theory.stanford.edu/~xuying/papers/quasi_vldb1.pdf
+
+- Wilkinson, M., Dumon.er, M., Aalbersberg, I. et al. The FAIR Guiding Principles for scientific data management and stewardship. Sci Data 3, 160018 (2016). Available at: https://www.nature.com/articles/sdata201618
+
+- OHDSI: https://www.ohdsi.org/
+
+- WhiteRabbit: https://www.ohdsi.org/analy.c-tools/whiterabbit-for-etl-design/
+
+- The FAIR principles explained: https://www.youtube.com/watch?v=5OeCrQE3HhE
+
+- Information Commissioner’s Office - What is Personal Data: https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/personal-information-what-is-it/what-is-personal-data/what-is-personal-data/
+
+- Devaux, E. (2020). How “anonymous” is anonymized data? Available at: https://medium.com/sta.ce/data-privacy-and-protection-techniques-db42576d8b3f#
+
+
+<span style={{ paddingTop: "20px", display: "inline-block" }}>
+  <GreenHighlightedText> Moving to the Bibliography section -> </GreenHighlightedText>
+</span>
+
+
+{/* ----- End of Section ----- */}
+
+
+
+
+{/* ----- Bibliography Section of the Documentation ----- */}
+
+## Bibliography
+
+- FAIR Principles: https://www.go-fair.org/fair-principles/
+
+- Pseudonymization vs anonymization: differences under the GDPR: https://www.statice.ai/post/pseudonymization-vs-anonymization
+
+- How “anonymous” is anonymized data?: https://www.statice.ai/post/how-anonymous-is-anonymized-data
+
+- Lubarsky, B (2007). Re-identification of “anonymized data”. https://georgetownlawtechreview.org/wp-content/uploads/2017/04/Lubarsky-1-GEO.-L.TECH.-REV.-202.pdf
+
+
+<span style={{ paddingTop: "20px", display: "inline-block" }}>
+  <GreenHighlightedText> End of the Carrot User Documentation. Thank You!</GreenHighlightedText>
+</span>
