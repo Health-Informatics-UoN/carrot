@@ -12,10 +12,10 @@ import HighlightedText, { GreenHighlightedText } from '@/components/HighlightedT
 The Carrot’s Data Engineering Process for OMOP standard vocabulary process primarily consist of Data Pre-processing, Metadata Profiling and Metadata Mapping. 
 
 <div>
-The following document sets the Standardised Opera.ng Procedure (SOP) that must be followed and applied during the engineering of data for conversion to an [OMOP](https://www.ohdsi.org/data-standardization/) representation. 
+The following document sets the Standardised Operating Procedure (SOP) that must be followed and applied during the engineering of data for conversion to an [OMOP](https://www.ohdsi.org/data-standardization/) representation. 
 </div>
 
-Figure 1 illustrates the 3 main data engineering stages and the associated soQware tools that are used, this process is commonly known as an [Extract, Transform and Load (ETL) process](https://ohdsi.github.io/TheBookOfOhdsi/ExtractTransformLoad.html). 
+Figure 1 illustrates the 3 main data engineering stages and the associated software tools that are used, this process is commonly known as an [Extract, Transform and Load (ETL) process](https://ohdsi.github.io/TheBookOfOhdsi/ExtractTransformLoad.html). 
 
 
 <div style={{ display: "inline-flex",  marginTop: "8px" }}>
@@ -31,7 +31,7 @@ Figure 1 illustrates the 3 main data engineering stages and the associated soQwa
     style={{ display: "block", margin: "15px auto" }} 
   />
   <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
-    Figure 1: The stages of Health Infomatics Data Engineering.
+    Figure 1: The stages of Health Informatics Data Engineering.
   </figcaption>
 </figure>
 
@@ -59,11 +59,11 @@ Figure 2 portrays the high-level view of the 3 stages and the main processes the
 
 - **Stage 1: Data Pre-processing**
 <div>
-The pre-processing stage focuses on the ‘important aXributes’ of a dataset that need to be mapped to the OMOP Common Data Model for discoverability.
+The pre-processing stage focuses on the ‘important attributes’ of a dataset that need to be mapped to the OMOP Common Data Model for discoverability.
 
 A meeting with the dataset owner is necessary to understand the context and select the key data attributes to be made discoverable. From this a subset of the data is then anonymised by the data owner and refactored (reorganised), producing a pre-processed dataset. This is then reviewed by the data owner to determine if it is fit for purpose and is fully anonymised.
 
-The output of Stage 1 is an anonymised dataset ready for profiling together with a formaXed data dictionary.
+The output of Stage 1 is an anonymised dataset ready for profiling together with a formatted data dictionary.
 </div>
 
 - **Stage 2: Metadata Profiling**
@@ -71,7 +71,7 @@ The output of Stage 1 is an anonymised dataset ready for profiling together with
 <div>
 The metadata profiling stage assesses the structure of a pre-processed dataset.
 
-The pre-processed dataset is loaded into the OHDSI White Rabbit tool, this produces a sta.s.cal profile of the data called a ‘Scan Report’ that further de-identifies data by removing the rela.onships between data attributes. This is then checked to ensure that the data has been rigorously anonymised.
+The pre-processed dataset is loaded into the OHDSI White Rabbit tool, this produces a statsitical profile of the data called a ‘Scan Report’ that further de-identifies data by removing the relationships between data attributes. This is then checked to ensure that the data has been rigorously anonymised.
 
 The output of Stage 2 is a Verified Scan Report spreadsheet.
 </div>
@@ -155,7 +155,7 @@ The output of Stage 3 is a mapped rule set in a JSON
 
     - Understand access rights to the dataset.
 
-    - Define communica.on and feedback mechanisms and frequency thereof – these can be emails, weekly meetings, etc.
+    - Define communication and feedback mechanisms and frequency thereof – these can be emails, weekly meetings, etc.
     </div>
 
 </div>
@@ -260,7 +260,7 @@ The output of Stage 3 is a mapped rule set in a JSON
   </figure>
 
 
-  PII refers to data that can be used to identify, locate, or contact individuals or establishments, or reveal the characteristics or other details about them. PII might consist of direct iden.fiers, such as the name, social security number or other information that is unique to an individual. Indirect identifiers include uncommon race, ethnicity, extreme age, unusual occupa.on and other details [CDC](https://www.cdc.gov/nchs/training/confidentiality/training/page581.html).
+  PII refers to data that can be used to identify, locate, or contact individuals or establishments, or reveal the characteristics or other details about them. PII might consist of direct identifiers, such as the name, social security number or other information that is unique to an individual. Indirect identifiers include uncommon race, ethnicity, extreme age, unusual occupation and other details [CDC](https://www.cdc.gov/nchs/training/confidentiality/training/page581.html).
 
   #### Direct Identifiers
 
@@ -328,7 +328,7 @@ The output of Stage 3 is a mapped rule set in a JSON
       - Sex at Birth 
       - Ethnicity
   <div>
-  - The rest of the data can then be arranged as deemed fit by the data owner and / or the CARROT data team, each table must include:
+  - The rest of the data can then be arranged as deemed fit by the data owner and / or the data team, each table must include:
       - 1 x identifying column per table.
       - 1 x date event per table.
   </div>
@@ -337,7 +337,7 @@ The output of Stage 3 is a mapped rule set in a JSON
 
   2. **Create Dataset Extract**
   <div style={{ marginTop: "0px" }}>
-  - First, check the [CARROT4OMOP Data Standards](https://carrot4omop.ac.uk/standards/#data-dictionary-file) page for exact requirements.
+  - First, check the [CARROT4OMOP Data Standards](https://carrot.ac.uk/standards) page for exact requirements.
 
   - Extract the data from the data source – this can be done in 2 ways:
       - export tables to CSV files (1 per table);
@@ -392,7 +392,7 @@ The output of Stage 3 is a mapped rule set in a JSON
       - Sex
       - Ethnicity
 
-  - Check that there is a date event to map to per dataset table and that it conforms to [CARROT4OMOP](https://carrot4omop.ac.uk/standards/#data-dictionary-file).
+  - Check that there is a date event to map to per dataset table and that it conforms to [CARROT4OMOP](https://carrot.ac.uk/standards).
   - Check that there is a date event to map to per dataset table.
 
   - <HighlightedText>CHECK WHETHER THE DATA DICTIONARY FOLLOWS OMOP DATA STANDARDS. </HighlightedText>
@@ -618,14 +618,14 @@ The output of Stage 3 is a mapped rule set in a JSON
 
   **Upload Scan Report**
 
-  - Log into [CARROT](https://ccom.azurewebsites.net/):
+  - Log into [Carrot](https://carrot.ac.uk):
   - Upload Scan Report:
     - Click **Scan Reports** Tab.
     - Click **New Scan Report Upload** option.
     - Choose **Data Partner** - from drop-down list. 
     - Choose **Dataset** - from drop-down list.
     - Choose **Visibility**: Public or Restricted
-      - Public = All registered users of CARROT can view the scan report.
+      - Public = All registered users of Carrot can view the scan report.
       - Restricted = Only defined/specific registered users of CARROT can view the scan report.
 
   - Define **Editors** (users allowed to edit the dataset)
@@ -683,7 +683,7 @@ The output of Stage 3 is a mapped rule set in a JSON
 
   ### Check the Scan Report Upload
 
-  While logged into the CARROT tool:
+  While logged into the Carrot tool:
   - Click **Scan Reports**.
   - Select **Scan Reports** tab.
   - Check the progress of your Scan Report upload – it will show one of the following three (see diagram): 
@@ -708,7 +708,7 @@ The output of Stage 3 is a mapped rule set in a JSON
         }} 
       />
       <figcaption style={{ marginTop: "8px",marginRight: "100px", fontStyle: "italic", color: "#666" }}>
-        Figure 17: Upload to CARROT
+        Figure 17: Upload to Carrot
         in Metadata Mapping.
       </figcaption>
     </figure>
@@ -725,7 +725,7 @@ The output of Stage 3 is a mapped rule set in a JSON
       style={{ display: "block", margin: "0 auto" }} 
     />
     <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
-      Figure 18: Example of CARROT Tool Scan Report Status Page
+      Figure 18: Example of Carrot Tool Scan Report Status Page
     </figcaption>
   </figure>
 </div>
@@ -739,7 +739,7 @@ The output of Stage 3 is a mapped rule set in a JSON
 
     #### Choose Dataset
 
-    - Log into [CARROT](https://ccom.azurewebsites.net/):
+    - Log into [Carrot](https://carrot.ac.uk):
     - Click **Datasets** Tab.
     - Click on the <i>Dataset ID</i> or <i>Name</i>.
     - Click on the <i>Dataset ID</i>, <i>Data Partner</i> or <i>Name</i>.
@@ -820,7 +820,7 @@ The output of Stage 3 is a mapped rule set in a JSON
 
     #### Choose Dataset
 
-    - Log into [CARROT]():
+    - Log into [Carrot](https://carrot.ac.uk):
     - Click **Datasets** Tab.
     - Click on the <i>Dataset ID</i> or <i>Name</i>.
     - Click on the <i>Dataset ID</i>, <i>Data Partner</i> or <i>Name</i>.
