@@ -1,6 +1,6 @@
 {/* ----- Imports ----- */}
 
-import WarningIcon from '@/components/icons/WarningIcon';
+import { Callout } from "nextra/components";
 import HighlightedText from '@/components/HighlightedText';
 
 
@@ -17,11 +17,9 @@ The following document sets the Standardised Operating Procedure (SOP) that must
 
 Figure 1 illustrates the 3 main data engineering stages and the associated software tools that are used, this process is commonly known as an [Extract, Transform and Load (ETL) process](https://ohdsi.github.io/TheBookOfOhdsi/ExtractTransformLoad.html). 
 
-
-<div style={{ display: "inline-flex",  marginTop: "8px" }}>
-  <WarningIcon />
-  <span>This document only covers the ‘Extract and Transform’ sections of an ETL process as per the Figure below.</span>
-</div>
+<Callout type="warning">
+  This document only covers the ‘Extract and Transform’ sections of an ETL process as per the Figure below.
+</Callout>
 
 <figure style={{ textAlign: "center" }}>
   <img 
@@ -185,7 +183,9 @@ The output of Stage 3 is a mapped rule set in a JSON
   The anonymisation of data is paramount, it is critical that the following steps are carefully followed.
 
 
-  <WarningIcon />It is the responsibility of the Data Owner to de-identify datasets before they are supplied for OMOP conversion.
+<Callout type="warning">
+  It is the responsibility of the Data Owner to de-identify datasets before they are supplied for OMOP conversion.
+</Callout>
 
 
 
@@ -307,7 +307,9 @@ The output of Stage 3 is a mapped rule set in a JSON
   The anonymisation of data is paramount, it is critical that the following steps are carefully followed.
   </div>
   <div style={{ marginTop: "0px" }}>
-  <WarningIcon /> It is the responsibility of the Data Owner to de-identify datasets before they are supplied for OMOP conversion.
+  <Callout type="warning">
+    It is the responsibility of the Data Owner to de-identify datasets before they are supplied for OMOP conversion.
+  </Callout>
   </div>
 
   1. **Organise Data Tables**
@@ -871,9 +873,9 @@ The output of Stage 3 is a mapped rule set in a JSON
 
 ## Reference
 
-- Motwani, R., & Xu, Y. (2007). Efficient Algorithms for Masking and Finding Quasi-Iden.fiers. Available at: https://theory.stanford.edu/~xuying/papers/quasi_vldb1.pdf
+- Motwani, R., & Xu, Y. (2007). Efficient Algorithms for Masking and Finding Quasi-Identifiers. Available at: https://theory.stanford.edu/~xuying/papers/quasi_vldb1.pdf
 
-- Wilkinson, M., Dumon.er, M., Aalbersberg, I. et al. The FAIR Guiding Principles for scientific data management and stewardship. Sci Data 3, 160018 (2016). Available at: https://www.nature.com/articles/sdata201618
+- Wilkinson, M., Dumontier, M., Aalbersberg, I. et al. The FAIR Guiding Principles for scientific data management and stewardship. Sci Data 3, 160018 (2016). Available at: https://www.nature.com/articles/sdata201618
 
 - OHDSI: https://www.ohdsi.org/
 
