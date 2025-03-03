@@ -21,8 +21,3 @@ const HighlightedText: React.FC<HighlightedTextProps> = ({ children, color = "#f
 };
 
 export default HighlightedText;
-
-// Green Highlighted Text Component
-export const GreenHighlightedText: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  return <HighlightedText color="#90EE90">{children}</HighlightedText>;
-};
