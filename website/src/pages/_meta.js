@@ -3,4 +3,5 @@ export default {
   mapper: "Carrot Mapper",
   transform: "Carrot Transform [WIP]",
   standards: "Data Standards",
+  carrot_etl_guide: "Carrot User Documentation",
 };
