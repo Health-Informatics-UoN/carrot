@@ -260,21 +260,63 @@ Navigate to `Environment variables` section under `Settings` of your Backend web
 
 Restart your app for the environment variables to be applied.
 
-{/* TODO: Add more information about how to do the steps below locally */}
+---
 
-After that, you need to seed the Carrot app database with the OMOP table and field names. For now, this can be done by connecting directly to your database either by local machine or through an environment, then run the command:
+After that, Carrot will proceed to the next steps.
+
+- **Automatic Data Seeding**: The Carrot will seed the app database automatically with the OMOP table and field names.
+
+<div id="superuserCredentials">
+  - **Super User Creation**: A **default Django super user** will be created
+  with the following credentials:
+  <div>- **Username**: `admin` - **Password**: `Password123!`</div>
+</div>
+
+<Callout type="info">
+  **However** if you want to{" "}
+  <u>**create a new superuser with custom credentials**</u>, follow one of the
+  methods below:
+</Callout>
+
+This can be done by **either using your terminal and access the `api` container on `Docker` or using `Docker Desktop`**.
+
+<Tabs items={['Using Terminal', 'Using Docker Desktop']}>
+  <Tabs.Tab>
+  At the `root` directory, open terminal and run
 
 ```bash
-python manage.py loaddata mapping filetypes
+docker exec -it carrot-mapper-dev-api-1 bash
 ```
 
-A Django superuser also need creating by connecting to the Backend app and run the command:
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+Navigate to your Docker Desktop, under `carrot-mapper-dev`, choose `api` container, choose `Exec` tab, then run:
+
+  </Tabs.Tab>
+</Tabs>
+
+After that, add a new admin user (Django superuser) by running:
 
 ```bash
 python manage.py createsuperuser
 ```
 
-Some first instances of Carrot also need creating after the Backend app up and running. Doing this be access the URL: `<backend-URL>/admin/`, log in using the super user credentials, then create first `Data partner`, `Dataset`, and `Project`.
+**This will allow you to create a new superuser with your desired credentials.**
+
+---
+
+<div>
+  Once all containers are running successfully and a superuser has been created
+  (if required), the initial instances of Carrot must be set up after the
+  backend application is up and running.
+</div>
+
+Please follow these steps to create the first instances:
+
+- **To access the Carrot Admin portal**, use the given URL: `<backend-URL>/admin/`.
+- **Log in** using the **default [superuser credentials](#superuserCredentials)** or the **new superuser credentials created in the previous step**.
+- Then **create first** `Data partner`, `Dataset`, and `Project`.
 
 ### Frontend app
 
