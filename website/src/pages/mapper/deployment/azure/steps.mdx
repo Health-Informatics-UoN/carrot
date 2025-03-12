@@ -258,24 +258,50 @@ Navigate to `Environment variables` section under `Settings` of your Backend web
   </tbody>
 </Table>
 
-Restart your app for the environment variables to be applied.
+**Before restarting the application, you need decide the method of superuser credentials setup.**
+<div id="superuserCredentialsAzure">
+  <Callout type="warning">
+    Either you use the **default superuser credentials** or **custom superuser credentials**.
+  </Callout>
+</div>
 
-{/* TODO: Add more information about how to do the steps below locally */}
+**If you wish to use the default superuser credentials**, you can **skip the setup for custom super user credentials** and use the **default credentials** to log in to the Django Admin Panel (see below).
 
-After that, you need to seed the Carrot app database with the OMOP table and field names. For now, this can be done by connecting directly to your database either by local machine or through an environment, then run the command:
 
-```bash
-python manage.py loaddata mapping filetypes
-```
+- **Default superuser credentials**: By default, Carrot creates a superuser with the following credentials:
+  <div>
+    - Username: `admin`
+    - Password: `Password123!`
+  </div>
 
-A Django superuser also need creating by connecting to the Backend app and run the command:
+- **Custom superuser credentials**: If you wish to create a new super user with custom credentials, do the following:
+  <div>
+    - Add environment variables to the Backend app:
+      <div>
+        ```yaml
+        environment:
+          - SUPERUSER_DEFAULT_USERNAME : your_username
+          - SUPERUSER_DEFAULT_EMAIL : your_email
+          - SUPERUSER_DEFAULT_PASSWORD : your_password
+        ```
+      </div>
+    - Replace `your_username`, `your_email`, and `your_password` with your desired credentials.
+  </div>
 
-```bash
-python manage.py createsuperuser
-```
+**The credentials will be applied after restarting the Backend app.**
 
-Some first instances of Carrot also need creating after the Backend app up and running. Doing this be access the URL: `<backend-URL>/admin/`, log in using the super user credentials, then create first `Data partner`, `Dataset`, and `Project`.
+---
 
+Now, **restart your app for the environment variables to be applied**.
+
+After that, Carrot will seed the app's database with the OMOP table and field names. 
+
+Some **First Instances of Carrot** also need creating after the Backend app up and running. 
+<div>
+  - Doing this be access the URL: `<backend-URL>/admin/`, log in using the [superuser credentials](#superuserCredentialsAzure).
+
+  - Then create first instance of the `Data partner`, `Dataset`, and `Project`.
+</div>
 ### Frontend app
 
 Navigate to `Environment variables` section under `Settings` of your Frontend web app, then add the variables below:
