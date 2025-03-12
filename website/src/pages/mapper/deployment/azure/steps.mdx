@@ -97,14 +97,14 @@ Select `Container Image` as the mode of deploying.
 **Tags**: Give name and value for the web app's tag, if needed.
 
 **Container Image**: A default image will be used as you create a function app. Therefore, after the app being deployed you must change this image by doing so:
-  <div>
-    1. Access the newly created Function app.
-    2. Under tab `Deployment`, choose `Deployment center`.
-    3. Choose `Private Registry` as Registry source.
-    4. Change Server URL to: `https://ghcr.io`.
-    5. Change Full Image Name and Tag to: `health-informatics-uon/carrot/workers:<tag>`. Look for available tags [here](https://github.com/Health-Informatics-UoN/carrot-mapper/pkgs/container/carrot%2Fworkers).
-    6. Save the Settings.
-  </div>
+
+- Access the newly created Function app.
+- Under tab `Deployment`, choose `Deployment center`.
+- Choose `Private Registry` as Registry source.
+- Change Server URL to: `https://ghcr.io`.
+- Change Full Image Name and Tag to: `health-informatics-uon/carrot/workers:<tag>`. Look for available tags [here](https://github.com/Health-Informatics-UoN/carrot-mapper/pkgs/container/carrot%2Fworkers).
+- Save the Settings.
+
 
 ### PostgreSQL Database
 
@@ -288,24 +288,17 @@ Navigate to `Environment variables` section under `Settings` of your Backend web
     2. Replace `your_username`, `your_email`, and `your_password` with your desired credentials.
   </div>
 
-**The credentials will be applied after restarting the Backend app.**
 
 ---
 
-**Now, do the following steps:**
+**Now, do the following steps for creating the first instance:**
 
-1. **Restart your app for the environment variables to be applied**.
+  1. **Restart your app** for the environment variables to be applied.
 
-2. After that, Carrot will seed the app's database with the OMOP table and field names. 
+  2. **Access the Admin Panel** using the URL: `<backend-URL>/admin/`, log in using the [superuser credentials](#superuserCredentialsAzure).
 
-3. Some **First Instances of Carrot** also need creating after the Backend app up and running. 
+  3. Then create first instance of the `Data partner`, `Dataset`, and `Project`.
 
-    **Follow these steps to create the first instances:**
-    <div>
-      1. Doing this by access the URL: `<backend-URL>/admin/`, log in using the [superuser credentials](#superuserCredentialsAzure).
-
-      2. Then create first instance of the `Data partner`, `Dataset`, and `Project`.
-    </div>
 
 ### Frontend app
 

@@ -61,7 +61,7 @@ Before running the Docker Compose, decide whether to use **Default Superuser Cre
   <div>
     1. Locate the `docker-compose.yml` file in the `root` directory of Carrot.
     2. Open the file and find the `api` service.
-    3. Make changes in the `environment` section of the `api` service as follows:
+    3. Add the following variables to  the `environment` section of the `api` service as follows:
 
       ```yaml
       environment:
@@ -78,9 +78,6 @@ Before running the Docker Compose, decide whether to use **Default Superuser Cre
 </Callout>
 
 Once you change the environment variables, **your custom super user credentials will be replaced with the default super user credentials**.
-  <div>
-    - Now you can use your **superuser credentials** to **log in to the Django Admin panel** (steps are mentioned later in this guide).
-  </div>
 
 ### Warm up
 
