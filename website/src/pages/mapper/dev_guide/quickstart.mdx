@@ -59,18 +59,18 @@ Before running the Docker Compose, decide whether to use **Default Superuser Cre
 
 - <u>**Custom Superuser Credentials**</u>: If you **wish to create a new super user with custom credentials**, do the following:
   <div>
-  - Locate the `docker-compose.yml` file in the `root` directory of Carrot.
-  - Open the file and find the `api` service.
-  - Make changes in the `environment` section of the `api` service as follows:
+    1. Locate the `docker-compose.yml` file in the `root` directory of Carrot.
+    2. Open the file and find the `api` service.
+    3. Make changes in the `environment` section of the `api` service as follows:
 
-    ```yaml
-    environment:
-      - SUPERUSER_DEFAULT_USERNAME : your_username
-      - SUPERUSER_DEFAULT_EMAIL : your_email
-      - SUPERUSER_DEFAULT_PASSWORD : your_password
-    ```
+      ```yaml
+      environment:
+        - SUPERUSER_DEFAULT_USERNAME : your_username
+        - SUPERUSER_DEFAULT_EMAIL : your_email
+        - SUPERUSER_DEFAULT_PASSWORD : your_password
+      ```
 
-  - Replace `your_username`, `your_email`, and `your_password` with your desired credentials.
+    4. Replace `your_username`, `your_email`, and `your_password` with your desired credentials.
   </div>
 
 <Callout type="warning">
@@ -125,9 +125,9 @@ Since we already have the **Superuser credentials set up**, we can now proceed t
 
 Create some first instances in Carrot app by logging to Django Admin panel `http://localhost:8000/admin/`.
 
-- You can **logging the Admin Panel** using the [superuser credentials](#superuserCredentials), either the **default credentials** or the **custom credentials** you configured earlier.
-- Once logged in, you will be presented with the Django Admin panel.
-- Following this order, fill out the required information to create new instance of `Data Partner`, `Dataset` and `Project`.
+1. You can **logging the Admin Panel** using the [superuser credentials](#superuserCredentials), either the **default credentials** or the **custom credentials** you configured earlier.
+2. Once logged in, you will be presented with the Django Admin panel.
+3. Following this order, fill out the required information to create new instance of `Data Partner`, `Dataset` and `Project`.
 
 ### Azure local storage setup
 
