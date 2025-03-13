@@ -98,12 +98,13 @@ Select `Container Image` as the mode of deploying.
 
 **Container Image**: A default image will be used as you create a function app. Therefore, after the app being deployed you must change this image by doing so:
 
-- Access the newly created Function app
-- Under tab `Deployment`, choose `Deployment center`
-- Choose `Private Registry` as Registry source
-- Change Server URL to: `https://ghcr.io`
+- Access the newly created Function app.
+- Under tab `Deployment`, choose `Deployment center`.
+- Choose `Private Registry` as Registry source.
+- Change Server URL to: `https://ghcr.io`.
 - Change Full Image Name and Tag to: `health-informatics-uon/carrot/workers:<tag>`. Look for available tags [here](https://github.com/Health-Informatics-UoN/carrot-mapper/pkgs/container/carrot%2Fworkers).
-- Save the setting
+- Save the Settings.
+
 
 ### PostgreSQL Database
 
@@ -255,26 +256,53 @@ Navigate to `Environment variables` section under `Settings` of your Backend web
         complex key for this. It is recommended to put this in the Key Vault.
       </Td>
     </Tr>
+    <Tr>
+      <Td>`SUPERUSER_DEFAULT_USERNAME` `SUPERUSER_DEFAULT_EMAIL` `SUPERUSER_DEFAULT_PASSWORD`</Td>
+      <Td>
+        Optional superuser credentials. Add these if you would like to setup custom credentials for Django superuser. Read more below.
+      </Td>
+    </Tr>
   </tbody>
 </Table>
 
-Restart your app for the environment variables to be applied.
+<div id="superuserCredentialsAzure">
+  <Callout type="warning">
+    **Before restarting the application, you need decide the method of superuser credentials setup**, which is using either **default** superuser credentials or **custom** superuser credentials.
+  </Callout>
+</div>
 
-{/* TODO: Add more information about how to do the steps below locally */}
 
-After that, you need to seed the Carrot app database with the OMOP table and field names. For now, this can be done by connecting directly to your database either by local machine or through an environment, then run the command:
+- **Default superuser credentials**: By default, Carrot creates a superuser with the following credentials:
+  <div>
+    - Username: `admin`
+    - Password: `Password123!`
+    - Email: `user@carrot`
+  </div>
 
-```bash
-python manage.py loaddata mapping filetypes
-```
+  **If you wish to use the default superuser credentials**, you can skip the steps below.
 
-A Django superuser also need creating by connecting to the Backend app and run the command:
+- **Custom superuser credentials**: If you wish to create a new super user with custom credentials, do the following:
+  <div>
+    1. Add three more environment variables below to the Backend app's `Environment Variables`:
+      <div>
+        ```
+          - SUPERUSER_DEFAULT_USERNAME : your_username
+          - SUPERUSER_DEFAULT_EMAIL : your_email
+          - SUPERUSER_DEFAULT_PASSWORD : your_password
+        ```
+      </div>
+    2. Replace `your_username`, `your_email`, and `your_password` with your desired credentials.
+  </div>
 
-```bash
-python manage.py createsuperuser
-```
 
-Some first instances of Carrot also need creating after the Backend app up and running. Doing this be access the URL: `<backend-URL>/admin/`, log in using the super user credentials, then create first `Data partner`, `Dataset`, and `Project`.
+---
+
+**Restart your app** for the environment variables to be applied, and then create the first instances in Carrot by the following steps:
+
+  1. **Access the Admin Panel** using the URL: `<backend-URL>/admin/`, log in using the [superuser credentials](#superuserCredentialsAzure).
+
+  2. Create first instance of `Data partner`, `Dataset`, and `Project`.
+
 
 ### Frontend app
 
