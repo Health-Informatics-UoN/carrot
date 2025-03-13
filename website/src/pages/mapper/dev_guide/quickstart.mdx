@@ -44,40 +44,39 @@ To set this up, at the `app/workers` directory, add a folder named `Secrets`. In
 }
 ```
 
-### Environment variables setup for Super User Credentials.
+### Superuser Credentials setup
 
 Before running the Docker Compose, decide whether to use **Default Superuser Credentials** or **Custom Superuser Credentials** for logging into the Django Admin Panel.
 
 <div id="superuserCredentials">
   - <u>**Default Super User Creation**</u>: By default, **Carrot creates a superuser** with the following credentials:
     <div>
-    - **Username**: `admin` 
+    - **Username**: `admin`
     - **Password**: `Password123!`
+    - **Email**: `user@carrot`
     </div>
-  **Note:** If you wish to use these **default credentials**, you can **skip the setup** for **<u>custom super user credentials</u>**.
+  **Note:** If you wish to use these **default credentials**, you can skip the steps below.
 </div>
 
 - <u>**Custom Superuser Credentials**</u>: If you **wish to create a new super user with custom credentials**, do the following:
   <div>
     1. Locate the `docker-compose.yml` file in the `root` directory of Carrot.
-    2. Open the file and find the `api` service.
-    3. Add the following variables to  the `environment` section of the `api` service as follows:
+    2. Add the following variables to  the `environment` section of the `api` service as follows:
 
       ```yaml
       environment:
-        - SUPERUSER_DEFAULT_USERNAME : your_username
-        - SUPERUSER_DEFAULT_EMAIL : your_email
-        - SUPERUSER_DEFAULT_PASSWORD : your_password
+        - SUPERUSER_DEFAULT_USERNAME=<your_username>
+        - SUPERUSER_DEFAULT_EMAIL=<your_email>
+        - SUPERUSER_DEFAULT_PASSWORD=<your_password>
+        - ...other variables
       ```
 
-    4. Replace `your_username`, `your_email`, and `your_password` with your desired credentials.
+    3. Replace `your_username`, `your_email`, and `your_password` with your desired credentials.
   </div>
 
 <Callout type="warning">
-  **Custom superuser credentials must be set before running Docker-Compose**. If not, the **default credentials created by the Carrot will be applied**.
+  **Custom superuser credentials must be set before running Docker Compose for the first time**. If not, the **default superuser credentials will be applied**.
 </Callout>
-
-Once you change the environment variables, **your custom super user credentials will be replaced with the default super user credentials**.
 
 ### Warm up
 
@@ -91,13 +90,13 @@ This runs the database (`db`), Azurite emulator (`Azurite`), Azure functions (`w
 
 When all of containers, except `omop-lite`, are up and running successfully, Carrot's frontend and backend can be accessed through `http://localhost:3000/` and `http://localhost:8000/admin/` respectively.
 
-- **However**, please complete the remaining steps, while containers are running, to make sure Carrot is running correctly.
+**However**, please complete the remaining steps, while containers are running, to make sure Carrot is running correctly.
 
 More details about Docker compose's configuration can be found [here](configuration).
 
 <Callout type="info">
 
-The `omop-lite` container, whose task is creating `omop` schema on `db` and install vocabularies there, will be shut down automatically after successfully done its jobs.
+The `omop-lite` container, whose task is creating `omop` schema on `db` and install vocabularies there, will be shut down automatically after successfully done its jobs. The execution time for `omop-lite` may vary depending of the size of the Vocabs folder.
 
 </Callout>
 
@@ -106,17 +105,6 @@ The `omop-lite` container, whose task is creating `omop` schema on `db` and inst
 Docker will mount the `app/api` and `app/next-client-app` directories to its environment, so any changes in the code of the backend or frontend will be reflected in the running application.
 
 </Callout>
-
-### Initial data preparation
-
-When running the Docker Compose for the first time, wait until the `omop-lite` container shuts down. **The execution time may vary depending of the size of the Vocabs folder**.
-
-**Following the containers are up and running, Carrot will proceed to the next steps.**
-  <div>
-  - **Automatic Data Seeding**: The system will automatically populate the required database tables and data when the application starts.
-  </div>
-
-Since we already have the **Superuser credentials set up**, we can now proceed to the next steps.
 
 ### First instances creation
 
