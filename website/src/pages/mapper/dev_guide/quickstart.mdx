@@ -44,6 +44,30 @@ To set this up, at the `app/workers` directory, add a folder named `Secrets`. In
 }
 ```
 
+### Superuser Credentials setup
+A superuser needs to be created to access the Django admin dashboard and Carrot frontend.
+
+To do that, superuser credentials need adding as environment variables by doing the following steps:
+
+    - Locate the `docker-compose.yml` file in the `root` directory of Carrot.
+    - Add the following variables to  the `environment` section of the `api` service:
+
+      ```yaml
+      environment:
+        - SUPERUSER_DEFAULT_USERNAME=<superuser_username>
+        - SUPERUSER_DEFAULT_PASSWORD=<superuser_password>
+        - SUPERUSER_DEFAULT_EMAIL=<superuser_email> // Defaulted to `user@carrot`
+        - ...other variables
+      ```
+
+    - Replace `superuser_username`, `superuser_email`, and `superuser_password` with your desired credentials.
+    - After the [Warm up](#warm-up) step is done, a superuser will be created automatically with the credentials you chose above.
+
+
+<Callout type="info">
+  Without the superuser credentials in the environment variables, no users will be created. However, you can still add a superuser later by doing it manually (using the command `python manage.py createsuperuser` on the `api` container) or automatically (using steps above, and then restarting the containers).
+</Callout>
+
 ### Warm up
 
 At the `root` directory, run to command below to start the application stack using Docker compose.
@@ -52,13 +76,17 @@ At the `root` directory, run to command below to start the application stack usi
 docker compose up -d
 ```
 
-This runs the database (`db`), Azurite emulator (`Azurite`), Azure functions (`workers`) and will build Carrot's backend (`api`) and frontend (`frontend`). This process will be on the background and take some time, but you can always check it through Docker Desktop app. When all of containers, except `omop-lite`, are up and running successfully, Carrot's frontend and backend can be accessed through `http://localhost:3000/` and `http://localhost:8000/admin/` respectively. **However**, please complete the remaining steps, while containers are running, to make sure Carrot running correctly.
+This runs the database (`db`), Azurite emulator (`Azurite`), Azure functions (`workers`) and will build Carrot's backend (`api`) and frontend (`frontend`). This process will be on the background and take some time, but you can always check it through Docker Desktop app.
 
-More details about Docker compose's configuration can be found [here](configuration)
+When all of containers, except `omop-lite`, are up and running successfully, Carrot's frontend and backend can be accessed through `http://localhost:3000/` and `http://localhost:8000/admin/` respectively.
+
+**However**, please complete the remaining steps, while containers are running, to make sure Carrot is running correctly.
+
+More details about Docker compose's configuration can be found [here](configuration).
 
 <Callout type="info">
 
-The `omop-lite` container, whose task is creating `omop` schema on `db` and install vocabularies there, will be shut down automatically after successfully done its jobs.
+The `omop-lite` container, whose task is creating `omop` schema on `db` and install vocabularies there, will be shut down automatically after successfully done its jobs. The execution time for `omop-lite` may vary depending of the size of the Vocabs folder.
 
 </Callout>
 
@@ -68,47 +96,13 @@ Docker will mount the `app/api` and `app/next-client-app` directories to its env
 
 </Callout>
 
-### Initial data preparation
-
-You need to seed the Carrot app database with the OMOP table and field names.
-
-This can be done by either using your terminal and access the `api` container on Docker or using Docker Desktop.
-
-<Tabs items={['Using Terminal', 'Using Docker Desktop']}>
-  <Tabs.Tab>
-  At the `root` directory, open terminal and run
-
-```bash
-docker exec -it carrot-mapper-dev-api-1 bash
-```
-
-Then run
-
-```bash
-python manage.py loaddata mapping filetypes
-```
-
-  </Tabs.Tab>
-  <Tabs.Tab>
-
-Navigate to your Docker Desktop, under `carrot-mapper-dev`, choose `api` container, choose `Exec` tab, then run:
-
-```bash
-python manage.py loaddata mapping filetypes
-```
-
-  </Tabs.Tab>
-</Tabs>
-
-After that, add a new admin user (Django superuser) by running:
-
-```bash
-python manage.py createsuperuser
-```
-
 ### First instances creation
 
-Create some first instances in Carrot app by logging to Django Admin panel `http://localhost:8000/admin/` (using the credentials in the last step). Following this order, fill out the required information to create new `Data Partner`, `Dataset` and `Project`.
+Create some first instances in Carrot app by logging to Django Admin panel `http://localhost:8000/admin/`.
+
+1. You can **log in to the Admin Panel** using the [superuser credentials](#superuser-credentials-setup) you configured earlier.
+2. Once logged in, you will be presented with the Django Admin panel.
+3. Following this order, fill out the required information to create new instance of `Data Partner`, `Dataset` and `Project`.
 
 ### Azure local storage setup
 

@@ -98,12 +98,13 @@ Select `Container Image` as the mode of deploying.
 
 **Container Image**: A default image will be used as you create a function app. Therefore, after the app being deployed you must change this image by doing so:
 
-- Access the newly created Function app
-- Under tab `Deployment`, choose `Deployment center`
-- Choose `Private Registry` as Registry source
-- Change Server URL to: `https://ghcr.io`
+- Access the newly created Function app.
+- Under tab `Deployment`, choose `Deployment center`.
+- Choose `Private Registry` as Registry source.
+- Change Server URL to: `https://ghcr.io`.
 - Change Full Image Name and Tag to: `health-informatics-uon/carrot/workers:<tag>`. Look for available tags [here](https://github.com/Health-Informatics-UoN/carrot-mapper/pkgs/container/carrot%2Fworkers).
-- Save the setting
+- Save the Settings.
+
 
 ### PostgreSQL Database
 
@@ -255,26 +256,23 @@ Navigate to `Environment variables` section under `Settings` of your Backend web
         complex key for this. It is recommended to put this in the Key Vault.
       </Td>
     </Tr>
+    <Tr>
+      <Td>`SUPERUSER_DEFAULT_USERNAME` `SUPERUSER_DEFAULT_PASSWORD` `SUPERUSER_DEFAULT_EMAIL` </Td>
+      <Td>
+        Credentials required to create the first superuser in Carrot. Without these variables, no superuser will be created.
+        `SUPERUSER_DEFAULT_EMAIL` is defaulted to `user@carrot`.
+      </Td>
+    </Tr>
   </tbody>
 </Table>
 
-Restart your app for the environment variables to be applied.
 
-{/* TODO: Add more information about how to do the steps below locally */}
+**Restart your app** for the environment variables to be applied, and then create the first instances in Carrot by the following steps:
 
-After that, you need to seed the Carrot app database with the OMOP table and field names. For now, this can be done by connecting directly to your database either by local machine or through an environment, then run the command:
+  1. **Access the Admin Panel** using the URL: `<backend-URL>/admin/`, log in using the superuser credentials in the `Environment variables` section.
 
-```bash
-python manage.py loaddata mapping filetypes
-```
+  2. Create first instance of `Data partner`, `Dataset`, and `Project`.
 
-A Django superuser also need creating by connecting to the Backend app and run the command:
-
-```bash
-python manage.py createsuperuser
-```
-
-Some first instances of Carrot also need creating after the Backend app up and running. Doing this be access the URL: `<backend-URL>/admin/`, log in using the super user credentials, then create first `Data partner`, `Dataset`, and `Project`.
 
 ### Frontend app
 
