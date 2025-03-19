@@ -45,37 +45,27 @@ To set this up, at the `app/workers` directory, add a folder named `Secrets`. In
 ```
 
 ### Superuser Credentials setup
+A superuser needs to be created to access the Django admin dashboard and Carrot frontend.
 
-Before running the Docker Compose, decide whether to use **Default Superuser Credentials** or **Custom Superuser Credentials** for logging into the Django Admin Panel.
+To do that, superuser credentials need adding as environment variables by doing the following steps:
 
-<div id="superuserCredentials">
-  - <u>**Default Super User Creation**</u>: By default, **Carrot creates a superuser** with the following credentials:
-    <div>
-    - **Username**: `admin`
-    - **Password**: `Password123!`
-    - **Email**: `user@carrot`
-    </div>
-  **Note:** If you wish to use these **default credentials**, you can skip the steps below.
-</div>
-
-- <u>**Custom Superuser Credentials**</u>: If you **wish to create a new super user with custom credentials**, do the following:
-  <div>
-    1. Locate the `docker-compose.yml` file in the `root` directory of Carrot.
-    2. Add the following variables to  the `environment` section of the `api` service as follows:
+    - Locate the `docker-compose.yml` file in the `root` directory of Carrot.
+    - Add the following variables to  the `environment` section of the `api` service:
 
       ```yaml
       environment:
-        - SUPERUSER_DEFAULT_USERNAME=<your_username>
-        - SUPERUSER_DEFAULT_EMAIL=<your_email>
-        - SUPERUSER_DEFAULT_PASSWORD=<your_password>
+        - SUPERUSER_DEFAULT_USERNAME=<superuser_username>
+        - SUPERUSER_DEFAULT_PASSWORD=<superuser_password>
+        - SUPERUSER_DEFAULT_EMAIL=<superuser_email> // Defaulted to `user@carrot`
         - ...other variables
       ```
 
-    3. Replace `your_username`, `your_email`, and `your_password` with your desired credentials.
-  </div>
+    - Replace `superuser_username`, `superuser_email`, and `superuser_password` with your desired credentials.
+    - After the [Warm up](#warm-up) step is done, a superuser will be created automatically with the credentials you chose above.
 
-<Callout type="warning">
-  **Custom superuser credentials must be set before running Docker Compose for the first time**. If not, the **default superuser credentials will be applied**.
+
+<Callout type="info">
+  Without the superuser credentials in the environment variables, no users will be created. However, you can still add a superuser later by doing it manually (using the command `python manage.py createsuperuser` on the `api` container) or automatically (using steps above, and then restarting the containers)
 </Callout>
 
 ### Warm up
@@ -110,7 +100,7 @@ Docker will mount the `app/api` and `app/next-client-app` directories to its env
 
 Create some first instances in Carrot app by logging to Django Admin panel `http://localhost:8000/admin/`.
 
-1. You can **log in to the Admin Panel** using the [superuser credentials](#superuserCredentials), either the **default credentials** or the **custom credentials** you configured earlier.
+1. You can **log in to the Admin Panel** using the [superuser credentials](#superuser-credentials-setup) you configured earlier.
 2. Once logged in, you will be presented with the Django Admin panel.
 3. Following this order, fill out the required information to create new instance of `Data Partner`, `Dataset` and `Project`.
 

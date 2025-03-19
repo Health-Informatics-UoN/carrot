@@ -257,49 +257,19 @@ Navigate to `Environment variables` section under `Settings` of your Backend web
       </Td>
     </Tr>
     <Tr>
-      <Td>`SUPERUSER_DEFAULT_USERNAME` `SUPERUSER_DEFAULT_EMAIL` `SUPERUSER_DEFAULT_PASSWORD`</Td>
+      <Td>`SUPERUSER_DEFAULT_USERNAME` `SUPERUSER_DEFAULT_PASSWORD` `SUPERUSER_DEFAULT_EMAIL` </Td>
       <Td>
-        Optional superuser credentials. Add these if you would like to setup custom credentials for Django superuser. Read more below.
+        Credentials required to create the first superuser in Carrot. Without these variables, no superuser will be created.
+        `SUPERUSER_DEFAULT_EMAIL` is defaulted to `user@carrot`.
       </Td>
     </Tr>
   </tbody>
 </Table>
 
-<div id="superuserCredentialsAzure">
-  <Callout type="warning">
-    **Before restarting the application, you need decide the method of superuser credentials setup**, which is using either **default** superuser credentials or **custom** superuser credentials.
-  </Callout>
-</div>
-
-
-- **Default superuser credentials**: By default, Carrot creates a superuser with the following credentials:
-  <div>
-    - Username: `admin`
-    - Password: `Password123!`
-    - Email: `user@carrot`
-  </div>
-
-  **If you wish to use the default superuser credentials**, you can skip the steps below.
-
-- **Custom superuser credentials**: If you wish to create a new super user with custom credentials, do the following:
-  <div>
-    1. Add three more environment variables below to the Backend app's `Environment Variables`:
-      <div>
-        ```
-          - SUPERUSER_DEFAULT_USERNAME : your_username
-          - SUPERUSER_DEFAULT_EMAIL : your_email
-          - SUPERUSER_DEFAULT_PASSWORD : your_password
-        ```
-      </div>
-    2. Replace `your_username`, `your_email`, and `your_password` with your desired credentials.
-  </div>
-
-
----
 
 **Restart your app** for the environment variables to be applied, and then create the first instances in Carrot by the following steps:
 
-  1. **Access the Admin Panel** using the URL: `<backend-URL>/admin/`, log in using the [superuser credentials](#superuserCredentialsAzure).
+  1. **Access the Admin Panel** using the URL: `<backend-URL>/admin/`, log in using the superuser credentials in the `Environment variables` section.
 
   2. Create first instance of `Data partner`, `Dataset`, and `Project`.
 
