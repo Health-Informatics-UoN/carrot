@@ -44,6 +44,41 @@ To set this up, at the `app/workers` directory, add a folder named `Secrets`. In
 }
 ```
 
+### Storage and Queue setup
+
+You need to set up an local storage for local development of Carrot.
+
+
+**Note:** The default storage is `MinIO` and the Queue is `Azure Blob Queue`. 
+<div>
+  <Callout type="info">
+    If you wish to use `MinIO` as a Storage and `Azure Blob Queue` as a Queue, you can skip this step.
+  </Callout>
+</div>
+
+However, If you wish to **use Azure Blob and Blob Queue as a Storage and Queue**, do the following steps:
+
+1. Locate the `docker-compose.yml` file in the `root` directory of Carrot.
+
+2. Locate the `api` and `workers` services in the `docker-compose.yml` file.
+
+3. Change the environment variables of `STORAGE_TYPE` from `minio` to `azure` for both services (see example below).
+
+```yaml
+api:
+  ...
+  environment:
+    - STORAGE_TYPE=azure
+
+workers:
+  ...
+  environment:
+    - STORAGE_TYPE=azure
+```
+
+4. Save the changes and your Storage and Queue setup is now ready to build. 
+
+
 ### Superuser Credentials setup
 A superuser needs to be created to access the Django admin dashboard and Carrot frontend.
 
@@ -76,7 +111,15 @@ At the `root` directory, run to command below to start the application stack usi
 docker compose up -d
 ```
 
-This runs the database (`db`), Azurite emulator (`Azurite`), Azure functions (`workers`) and will build Carrot's backend (`api`) and frontend (`frontend`). This process will be on the background and take some time, but you can always check it through Docker Desktop app.
+This runs the following containers below: 
+
+- Database (`db`)
+- Azurite emulator (`Azurite`)
+- MinIO  (`minio`) if `STORAGE_TYPE` is `minio`
+- Azure functions (`workers`)
+- After that, it will build Carrot's backend (`api`) and frontend (`frontend`). 
+
+This process will be on the background and take some time, but you can always check it through Docker Desktop app.
 
 When all of containers, except `omop-lite`, are up and running successfully, Carrot's frontend and backend can be accessed through `http://localhost:3000/` and `http://localhost:8000/admin/` respectively.
 
@@ -104,32 +147,73 @@ Create some first instances in Carrot app by logging to Django Admin panel `http
 2. Once logged in, you will be presented with the Django Admin panel.
 3. Following this order, fill out the required information to create new instance of `Data Partner`, `Dataset` and `Project`.
 
-### Azure local storage setup
+### Resource setup
 
-You need to set up an Azurite local storage for local development of Carrot
+Since we already setup the storage and queue configurations, carrot will automatically create the necessary resources for you [(see the configurations)](#storage-and-queue-setup).
 
-To do this, with the `workers` container in Docker Desktop is running, open `MS Azure Storage Explorer`, and create the following `queues` (under the tab `Storage Accounts - Emulator - Queues`) and `blob containers` (under the tab `Storage Accounts - Emulator - Blob Containers`).
+The resources are:
+<div>
+  <Tabs items={['MinIO', 'Azure Blob']}>
+    <Tabs.Tab label="MinIO">
+      <div>
+        <div>
+          <strong>BUCKETS</strong> = [ `scan-reports`, `data-dictionaries`, `rules-exports` ]
+        </div>
+        <div>
+          <strong>QUEUES</strong> = [ `rules-local`, `rules-exports-local`, `uploadreports-local` ]
+        </div>
+      </div>
+    </Tabs.Tab>
+    <Tabs.Tab label="Azure Blob">
+      <div>
+        <div>
+          <strong>BLOB CONTAINERS</strong> = [ `scan-reports`, `data-dictionaries`, `rules-exports` ]
+        </div>
+        <div>
+          <strong>QUEUES</strong> = [ `rules-local`, `rules-exports-local`, `uploadreports-local` ]
+        </div>
+      </div>
+    </Tabs.Tab>
+  </Tabs>
+</div>
 
-<Tabs items={['Queues', 'Blob Containers']}>
-  <Tabs.Tab>
+**Automatic Containers & Queues Creation**
 
-```
-rules-local
-rules-exports-local
-uploadreports-local
-```
+- If you are using `MinIO` as a storage, the carrot will create the necessary buckets and set up the Queues for you automatically.
 
-  </Tabs.Tab>
-  <Tabs.Tab>
+- If you are using `Azure Blob` as a storage, the carrot will create the necessary Blob Containers and set up the Queues for you automatically.
 
-```
-scan-reports
-data-dictionaries
-rules-exports
-```
+---
 
-  </Tabs.Tab>
-</Tabs>
+**[Optional] - Checking the resources**
+
+<div>
+  You can check the created resources by following the steps below:    
+</div>
+
+
+- If you are **using `MinIO` as a storage**, do the following steps: 
+
+  1. Access the MinIO Console at http://localhost:9001
+
+  2. Login to the MinIO Admin page using the following credentials below:
+
+  ```
+  Username : minioadmin
+
+  Password : minioadmin
+  ```
+
+  3. You will be presented with the MinIO Console. You can check the created buckets by clicking on the `Buckets` tab.
+
+
+- If you are **using `Azure Blob` as a storage**, do the following steps:
+
+  1. Open `MS Azure Storage Explorer` app on your local machine.
+
+  2. Locate `Storage Accounts` -> `Emulator` -> `Blob Containers` and you will see the created Blob Containers.
+
+  3. Locate `Storage Accounts` -> `Emulator` -> `Queues` and you will see the created Queues.
 
 ### Check-in
 
@@ -150,5 +234,7 @@ docker compose up -d
 ```
 
 and access `http://localhost:3000/`.
+
+**Note**: If you re-run the Carrot-Mapper app, it wiil check if the resources are already created. If they are, it will skip the creation process.
 
 **What next?** Explore and try using Carrot with [user quickstart](/mapper/user_guide/quickstart).
