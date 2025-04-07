@@ -244,32 +244,8 @@ Navigate to `Environment variables` section under `Settings` of your Backend web
     <Tr>
       <Td>`STORAGE_TYPE`</Td>
       <Td>
-        The type of storage to use. Put here `minio` or `azure` based on your
-        choice. If you wish to use Azure Blob as a storage, use `azure`. If you 
-        wish to use MinIO, use `minio`.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>`MINIO_ACCESS_KEY` `MINIO_SECRET_KEY`</Td>
-      <Td>
-        The MinIO Crendentials (username and password) to access MinIO storage Console and API. If you **use
-        MinIO as a storage, these variables are required**.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>`MINIO_ENDPOINT`</Td>
-      <Td>
-        The `MINIO_ENDPOINT` is the URL of the MinIO server for creating and accessing storage buckets and objects. **If you use
-        `STORAGE_TYPE=minio`, this variable is required**. 
-
-        **Note: Create your own MinIO endpoint when you deploy MinIO in production.**
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>`MINIO_SECURE`</Td>
-      <Td>
-        The `MINIO_SECURE` is a boolean value that determines whether to use secure connections to MinIO. **If you use
-        `STORAGE_TYPE=minio`, this variable is required**.
+        The type of storage to use.  This variable is required to let Carrot know which storage
+        type to use. **Only put `azure` for Azure deployment**.
       </Td>
     </Tr>
   </tbody>
@@ -387,32 +363,8 @@ Navigate to `Environment variables` section under `Settings` of your Function ap
     <Tr>
       <Td>`STORAGE_TYPE`</Td>
       <Td>
-        The type of storage to use. Put here `minio` or `azure` based on your
-        choice. If you wish to use Azure Blob as a storage, use `azure`. If you 
-        wish to use MinIO, use `minio`.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>`MINIO_ACCESS_KEY` `MINIO_SECRET_KEY`</Td>
-      <Td>
-        The MinIO Crendentials (username and password) to access MinIO storage Console and API. If you **use
-        MinIO as a storage, these variables are required**.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>`MINIO_ENDPOINT`</Td>
-      <Td>
-        The `MINIO_ENDPOINT` is the URL of the MinIO server for creating and accessing storage buckets and objects. **If you use
-        `STORAGE_TYPE=minio`, this variable is required**. 
-
-        **Note: Create your own MinIO endpoint when you deploy MinIO in production.**
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>`MINIO_SECURE`</Td>
-      <Td>
-        The `MINIO_SECURE` is a boolean value that determines whether to use secure connections to MinIO. **If you use
-        `STORAGE_TYPE=minio`, this variable is required**.
+        The type of storage to use.  This variable is required to let Carrot know which storage
+        type to use. **Only put `azure` for Azure deployment**.
       </Td>
     </Tr>
     <Tr>

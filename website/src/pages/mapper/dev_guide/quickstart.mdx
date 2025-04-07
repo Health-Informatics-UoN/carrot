@@ -44,40 +44,6 @@ To set this up, at the `app/workers` directory, add a folder named `Secrets`. In
 }
 ```
 
-### Storage and Queue setup
-
-You need to set up an local storage for local development of Carrot.
-
-
-**Note:** The default storage is `MinIO` and the Queue is `Azure Blob Queue`. 
-<div>
-  <Callout type="info">
-    If you wish to use `MinIO` as a Storage and `Azure Blob Queue` as a Queue, you can skip this step.
-  </Callout>
-</div>
-
-However, If you wish to **use Azure Blob and Blob Queue as a Storage and Queue**, do the following steps:
-
-1. Locate the `docker-compose.yml` file in the `root` directory of Carrot.
-
-2. Locate the `api` and `workers` services in the `docker-compose.yml` file.
-
-3. Change the environment variables of `STORAGE_TYPE` from `minio` to `azure` for both services (see example below).
-
-```yaml
-api:
-  ...
-  environment:
-    - STORAGE_TYPE=azure
-
-workers:
-  ...
-  environment:
-    - STORAGE_TYPE=azure
-```
-
-4. Save the changes and your Storage and Queue setup is now ready to build. 
-
 
 ### Superuser Credentials setup
 A superuser needs to be created to access the Django admin dashboard and Carrot frontend.
@@ -107,9 +73,23 @@ To do that, superuser credentials need adding as environment variables by doing 
 
 At the `root` directory, run to command below to start the application stack using Docker compose.
 
-```bash
-docker compose up -d
-```
+**There are two options for storage services: `minio` or `azure`.**
+
+1. **Azure as a Storage service:** 
+
+  If you want to use Azure as a Storage service, use the following command:
+
+  ```bash
+  docker compose up -d
+  ```
+
+2. **MinIO as a Storage service:** 
+
+  If you want to use MinIO as a Storage service, use the following command:
+
+  ```bash
+  STORAGE_TYPE=minio docker compose --profile minio up -d
+  ```
 
 This runs the following containers below: 
 
@@ -147,9 +127,9 @@ Create some first instances in Carrot app by logging to Django Admin panel `http
 2. Once logged in, you will be presented with the Django Admin panel.
 3. Following this order, fill out the required information to create new instance of `Data Partner`, `Dataset` and `Project`.
 
-### Resource setup
+### Resource Information & Validation [Optional]
 
-Since we already setup the storage and queue configurations, carrot will automatically create the necessary resources for you [(see the configurations)](#storage-and-queue-setup).
+Since we already decided the type of storage service and warmed up the `docker-compose`, carrot will automatically create the necessary resources for you (see the configurations).
 
 The resources are:
 <div>
@@ -185,7 +165,7 @@ The resources are:
 
 ---
 
-**[Optional] - Checking the resources**
+** - Checking the resources**
 
 <div>
   You can check the created resources by following the steps below:    
@@ -229,8 +209,16 @@ Try using Carrot by steps in the [user quickstart](/mapper/user_guide/quickstart
 
 Since now on, to run Carrot locally, you can just run
 
+1. If you are using `Azure Blob` as a storage:
+
 ```bash
 docker compose up -d
+```
+
+2. If you are using `MinIO` as a storage:
+
+```bash
+STORAGE_TYPE=minio docker compose --profile minio up -d
 ```
 
 and access `http://localhost:3000/`.
