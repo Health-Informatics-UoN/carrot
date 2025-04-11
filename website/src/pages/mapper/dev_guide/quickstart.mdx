@@ -73,25 +73,70 @@ To do that, superuser credentials need adding as environment variables by doing 
 
 At the `root` directory, run to command below to start the application stack using Docker compose.
 
-**There are two options for storage services: `minio` or `azure`.**
+**There are two options for storage services: `azure` or `minio` .**
 
-1. **Azure as a Storage service:** 
+<div>
+  <Tabs items={['Azure Blob','MinIO', ]}>
+    <Tabs.Tab label="Azure Blob">
+      <div>
+        If you want to **use Azure as a Storage service**, use the following command:
 
-  If you want to use Azure as a Storage service, use the following command:
+        ```bash
+        docker compose up -d
+        ```
 
-  ```bash
-  docker compose up -d
-  ```
+        Since, we decided to use **Azure as a Storage**, Carrot will automatically create the necessary resources which are mentioned below:
 
-2. **MinIO as a Storage service:** 
+        - **BLOB CONTAINERS** = [ `scan-reports`, `data-dictionaries`, `rules-exports` ]
+        - **QUEUES** = [`rules-local`, `rules-exports-local`, `uploadreports-local` ]
 
-  If you want to use MinIO as a Storage service, use the following command:
+        ---
 
-  ```bash
-  STORAGE_TYPE=minio docker compose --profile minio up -d
-  ```
+      **[Optional]** - You can **check the created Azure resources** by following the steps below:  
 
-This runs the following containers below: 
+        1. Open `MS Azure Storage Explorer` app on your local machine.
+
+        2. Locate `Storage Accounts` -> `Emulator` -> `Blob Containers` and you will see the created Blob Containers.
+
+        3. Locate `Storage Accounts` -> `Emulator` -> `Queues` and you will see the created Queues.
+
+      </div>
+    </Tabs.Tab>
+    <Tabs.Tab label="MinIO">
+      <div>
+        If you want to use **MinIO as a Storage service**, use the following command:
+
+        ```bash
+        STORAGE_TYPE=minio docker compose --profile minio up -d
+        ```
+
+        Since, we decided to use **MinIO as a storage**, Carrot will automatically create the necessary resources which are mentioned below:
+        
+        - **BLOB CONTAINERS** = [ `scan-reports`, `data-dictionaries`, `rules-exports` ]
+        - **QUEUES** = [`rules-local`, `rules-exports-local`, `uploadreports-local` ]
+
+        ---
+
+      **[Optional]** - You can **check the created MinIO resources** by following the steps below:  
+
+        1. Access the MinIO Console at http://localhost:9001
+
+        2. Login to the MinIO Admin page using the following credentials below:
+
+        ```
+        Username : minioadmin
+
+        Password : minioadmin
+        ```
+
+          3. You will be presented with the MinIO Console. You can check the created buckets by clicking on the `Buckets` tab.
+      </div>
+    </Tabs.Tab>
+  </Tabs>
+</div>
+---
+
+**After running the `docker-compose`, Carrot runs the following containers below:**
 
 - Database (`db`)
 - Azurite emulator (`Azurite`)
@@ -126,74 +171,6 @@ Create some first instances in Carrot app by logging to Django Admin panel `http
 1. You can **log in to the Admin Panel** using the [superuser credentials](#superuser-credentials-setup) you configured earlier.
 2. Once logged in, you will be presented with the Django Admin panel.
 3. Following this order, fill out the required information to create new instance of `Data Partner`, `Dataset` and `Project`.
-
-### Resource Information & Validation [Optional]
-
-Since we already decided the type of storage service and warmed up the `docker-compose`, carrot will automatically create the necessary resources for you (see the configurations).
-
-The resources are:
-<div>
-  <Tabs items={['MinIO', 'Azure Blob']}>
-    <Tabs.Tab label="MinIO">
-      <div>
-        <div>
-          <strong>BUCKETS</strong> = [ `scan-reports`, `data-dictionaries`, `rules-exports` ]
-        </div>
-        <div>
-          <strong>QUEUES</strong> = [ `rules-local`, `rules-exports-local`, `uploadreports-local` ]
-        </div>
-      </div>
-    </Tabs.Tab>
-    <Tabs.Tab label="Azure Blob">
-      <div>
-        <div>
-          <strong>BLOB CONTAINERS</strong> = [ `scan-reports`, `data-dictionaries`, `rules-exports` ]
-        </div>
-        <div>
-          <strong>QUEUES</strong> = [ `rules-local`, `rules-exports-local`, `uploadreports-local` ]
-        </div>
-      </div>
-    </Tabs.Tab>
-  </Tabs>
-</div>
-
-**Automatic Containers & Queues Creation**
-
-- If you are using `MinIO` as a storage, the carrot will create the necessary buckets and set up the Queues for you automatically.
-
-- If you are using `Azure Blob` as a storage, the carrot will create the necessary Blob Containers and set up the Queues for you automatically.
-
----
-
-** - Checking the resources**
-
-<div>
-  You can check the created resources by following the steps below:    
-</div>
-
-
-- If you are **using `MinIO` as a storage**, do the following steps: 
-
-  1. Access the MinIO Console at http://localhost:9001
-
-  2. Login to the MinIO Admin page using the following credentials below:
-
-  ```
-  Username : minioadmin
-
-  Password : minioadmin
-  ```
-
-  3. You will be presented with the MinIO Console. You can check the created buckets by clicking on the `Buckets` tab.
-
-
-- If you are **using `Azure Blob` as a storage**, do the following steps:
-
-  1. Open `MS Azure Storage Explorer` app on your local machine.
-
-  2. Locate `Storage Accounts` -> `Emulator` -> `Blob Containers` and you will see the created Blob Containers.
-
-  3. Locate `Storage Accounts` -> `Emulator` -> `Queues` and you will see the created Queues.
 
 ### Check-in
 
