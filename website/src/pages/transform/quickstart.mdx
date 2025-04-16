@@ -12,13 +12,14 @@ Alternatively, if you are working with the source code, install dependencies usi
 poetry install
 ```
 To install poetry, please follow the instructions [here](https://python-poetry.org/docs/).
-
+If using poetry with the source code, you will need to prepend the examples with 'poetry run'. For example, `poetry run carrot-transform -v`
 
 ## Running Carrot-Transform
 To execute Carrot-Transform, run:
 ```
 carrot-transform [command] [options]
 ```
+
 
 For example, you can get the version number with:
 ```
@@ -32,19 +33,20 @@ Enter the following (as one command):
 To process a test dataset included in the repository, run:
 ```bash
 carrot-transform run mapstream \
-  --input-dir carrottransform/examples/test/inputs \
-  --rules-file carrottransform/examples/test/rules/rules_14June2021.json \
-  --person-file carrottransform/examples/test/inputs/Demographics.csv \
+  --input-dir @carrot/examples/test/inputs \
+  --rules-file @carrot/examples/test/rules/rules_14June2021.json \
+  --person-file @carrot/examples/test/inputs/Demographics.csv \
   --output-dir carrottransform/examples/test/test_output \
-  --omop-ddl-file carrottransform/config/OMOPCDM_postgresql_5.3_ddl.sql \
-  --omop-config-file carrottransform/config/omop.json
+  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.3_ddl.sql \
+  --omop-config-file @carrot/config/omop.json
 ```
+The '@carrot' is an alias to the folder containing the carrot-transform module, which can be used with either installation method. When using your own files, use your file path, and omit this.
 
 This will generate a set of output files in this directory:
 ```bash
 carrottransform/examples/test/test_output
 ```
-
+If it doesn't exist, this directory should be created for you.
 
 
 ## Arguments
