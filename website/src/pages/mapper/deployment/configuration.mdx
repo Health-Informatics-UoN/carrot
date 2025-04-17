@@ -129,7 +129,7 @@ Carrot can be configured using environment variables which can be different depe
         <Tr>
       <Td><Mandatory>`STORAGE_TYPE`</Mandatory></Td>
         <Td>
-        The type of storage to use.  This variable is required to let Carrot know which storage
+        The type of storage to use and the options are`Azure` and `MinIO`. This variable is required to let Carrot know which storage
         type to use. Use `azure` for Azure Storage and deployment in Azure. 
       </Td>
     </Tr>
@@ -553,8 +553,8 @@ Coming soon
       <Tr>
       <Td><Mandatory>`STORAGE_TYPE`</Mandatory></Td>
         <Td>
-        The type of storage to use.  This variable is required to let Carrot know which storage
-        type to use. Use `azure` for Azure Storage and deployment in Azure. 
+        The type of storage to use and the options are`Azure` and `MinIO`. This variable is required to let Carrot know which storage
+        type to use. The  Use `azure` for Azure Storage and deployment in Azure. 
       </Td>
     </Tr>
   </tbody>
@@ -712,9 +712,11 @@ For local development, the former can be created by [omop-lite](https://github.c
 
 ### Azurite
 
-Carrot uses Azurite as queues and blobs storage for Azure functions.
+Carrot uses Azurite as queues and blobs storage for Azure functions. 
 
-Since we already setup the `STORAGE_TYPE` as `azure`, carrot will **automatically create the necessary resources such as `Queue` & `Containers` for you** (see below).
+**Note**: Azurite is only required and utilized for local development. 
+
+Since we already setup the `STORAGE_TYPE` as `azure`, Carrot will **automatically create the necessary resources such as `Queue` & `Containers` for you** (see below).
 
 <Tabs items={['Queues', 'Blob Containers']}>
   <Tabs.Tab>
