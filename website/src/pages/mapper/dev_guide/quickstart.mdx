@@ -73,38 +73,10 @@ To do that, superuser credentials need adding as environment variables by doing 
 
 At the `root` directory, run to command below to start the application stack using Docker compose.
 
-**There are two options for storage services: `azure` or `minio` .**
-
 <div>
-  <Tabs items={['Azure Blob','MinIO', ]}>
-    <Tabs.Tab label="Azure Blob">
-      <div>
-        If you want to **use Azure as a Storage service**, use the following command:
-
-        ```bash
-        docker compose up -d
-        ```
-
-        Since, we decided to use **Azure as a Storage**, Carrot will automatically create the necessary resources which are mentioned below:
-
-        - **BLOB CONTAINERS** = [ `scan-reports`, `data-dictionaries`, `rules-exports` ]
-        - **QUEUES** = [`rules-local`, `rules-exports-local`, `uploadreports-local` ]
-
-        ---
-
-      **[Optional]** - You can **check the created Azure resources** by following the steps below:  
-
-        1. Open `MS Azure Storage Explorer` app on your local machine.
-
-        2. Locate `Storage Accounts` -> `Emulator` -> `Blob Containers` and you will see the created Blob Containers.
-
-        3. Locate `Storage Accounts` -> `Emulator` -> `Queues` and you will see the created Queues.
-
-      </div>
-    </Tabs.Tab>
+  <Tabs items={['MinIO' ]}>
     <Tabs.Tab label="MinIO">
       <div>
-        If you want to use **MinIO as a Storage service**, use the following command:
 
         ```bash
         STORAGE_TYPE=minio docker compose --profile minio up -d
@@ -186,19 +158,17 @@ Try using Carrot by steps in the [user quickstart](/mapper/user_guide/quickstart
 
 Since now on, to run Carrot locally, you can just run
 
-1. If you are using `Azure Blob` as a storage:
-
-```bash
-docker compose up -d
-```
-
-2. If you are using `MinIO` as a storage:
-
 ```bash
 STORAGE_TYPE=minio docker compose --profile minio up -d
 ```
 
 and access `http://localhost:3000/`.
+
+- To stop the application, run:
+
+```bash
+STORAGE_TYPE=minio docker compose --profile minio down
+```
 
 **Note**: If you re-run the Carrot-Mapper app, it wiil check if the resources are already created. If they are, it will skip the creation process.
 
