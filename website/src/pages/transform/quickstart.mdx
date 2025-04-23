@@ -35,7 +35,6 @@ To process a test dataset included in the repository, run:
 carrot-transform run mapstream \
   --input-dir @carrot/examples/test/inputs \
   --rules-file @carrot/examples/test/rules/rules_14June2021.json \
-  --person-file @carrot/examples/test/inputs/Demographics.csv \
   --output-dir carrottransform/examples/test/test_output \
   --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.3_ddl.sql \
   --omop-config-file @carrot/config/omop.json
@@ -56,7 +55,6 @@ If it doesn't exist, this directory should be created for you.
 |--------------------|------------------------------------------------|
 | `--input-dir`      | Directory containing input files               |
 | `--rules-file`     | JSON file with mapping rules                   |
-| `--person-file`    | CSV file where the first column contains person IDs |
 | `--output-dir`     | Directory for OMOP-format TSV files            |
 
 
@@ -75,3 +73,4 @@ If it doesn't exist, this directory should be created for you.
 | `--use-input-person-ids`  | `N`     | Use input person IDs (`Y`) or replace with new integers (`N`) |
 | `--last-used-ids-file`    | None    | Path to a file tracking last used IDs (tab-separated format) |
 | `--log-file-threshold`    | `0`     | Change output limit for log files |
+| `--person-file`           | automatically detected | CSV file where the first column contains person IDs |
