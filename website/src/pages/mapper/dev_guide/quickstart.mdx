@@ -44,6 +44,7 @@ To set this up, at the `app/workers` directory, add a folder named `Secrets`. In
 }
 ```
 
+
 ### Superuser Credentials setup
 A superuser needs to be created to access the Django admin dashboard and Carrot frontend.
 
@@ -72,11 +73,50 @@ To do that, superuser credentials need adding as environment variables by doing 
 
 At the `root` directory, run to command below to start the application stack using Docker compose.
 
-```bash
-docker compose up -d
-```
+<div>
+  <Tabs items={['MinIO' ]}>
+    <Tabs.Tab label="MinIO">
+      <div>
 
-This runs the database (`db`), Azurite emulator (`Azurite`), Azure functions (`workers`) and will build Carrot's backend (`api`) and frontend (`frontend`). This process will be on the background and take some time, but you can always check it through Docker Desktop app.
+        ```bash
+        STORAGE_TYPE=minio docker compose --profile minio up -d
+        ```
+
+        Since, we decided to use **MinIO as a storage**, Carrot will automatically create the necessary resources which are mentioned below:
+        
+        - **BLOB CONTAINERS** = [ `scan-reports`, `data-dictionaries`, `rules-exports` ]
+        - **QUEUES** = [`rules-local`, `rules-exports-local`, `uploadreports-local` ]
+
+        ---
+
+      **[Optional]** - You can **check the created MinIO resources** by following the steps below:  
+
+        1. Access the MinIO Console at http://localhost:9001
+
+        2. Login to the MinIO Admin page using the following credentials below:
+
+        ```
+        Username : minioadmin
+
+        Password : minioadmin
+        ```
+
+          3. You will be presented with the MinIO Console. You can check the created buckets by clicking on the `Buckets` tab.
+      </div>
+    </Tabs.Tab>
+  </Tabs>
+</div>
+---
+
+**After running the `docker-compose`, Carrot runs the following containers below:**
+
+- Database (`db`)
+- Azurite emulator (`Azurite`)
+- MinIO  (`minio`) if `STORAGE_TYPE` is `minio`
+- Azure functions (`workers`)
+- After that, it will build Carrot's backend (`api`) and frontend (`frontend`). 
+
+This process will be on the background and take some time, but you can always check it through Docker Desktop app.
 
 When all of containers, except `omop-lite`, are up and running successfully, Carrot's frontend and backend can be accessed through `http://localhost:3000/` and `http://localhost:8000/admin/` respectively.
 
@@ -104,33 +144,6 @@ Create some first instances in Carrot app by logging to Django Admin panel `http
 2. Once logged in, you will be presented with the Django Admin panel.
 3. Following this order, fill out the required information to create new instance of `Data Partner`, `Dataset` and `Project`.
 
-### Azure local storage setup
-
-You need to set up an Azurite local storage for local development of Carrot
-
-To do this, with the `workers` container in Docker Desktop is running, open `MS Azure Storage Explorer`, and create the following `queues` (under the tab `Storage Accounts - Emulator - Queues`) and `blob containers` (under the tab `Storage Accounts - Emulator - Blob Containers`).
-
-<Tabs items={['Queues', 'Blob Containers']}>
-  <Tabs.Tab>
-
-```
-rules-local
-rules-exports-local
-uploadreports-local
-```
-
-  </Tabs.Tab>
-  <Tabs.Tab>
-
-```
-scan-reports
-data-dictionaries
-rules-exports
-```
-
-  </Tabs.Tab>
-</Tabs>
-
 ### Check-in
 
 You should now be able to access Carrot by logging in at `http://localhost:3000/` using your admin credentials created at step 4.
@@ -146,9 +159,17 @@ Try using Carrot by steps in the [user quickstart](/mapper/user_guide/quickstart
 Since now on, to run Carrot locally, you can just run
 
 ```bash
-docker compose up -d
+STORAGE_TYPE=minio docker compose --profile minio up -d
 ```
 
 and access `http://localhost:3000/`.
+
+- To stop the application, run:
+
+```bash
+STORAGE_TYPE=minio docker compose --profile minio down
+```
+
+**Note**: If you re-run the Carrot-Mapper app, it wiil check if the resources are already created. If they are, it will skip the creation process.
 
 **What next?** Explore and try using Carrot with [user quickstart](/mapper/user_guide/quickstart).
