@@ -1,4 +1,4 @@
 export default {
   quickstart: "Quickstart",
-  deployment: "Deployment",
+  // deployment: "Deployment",
 };
