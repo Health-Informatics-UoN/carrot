@@ -126,6 +126,13 @@ Carrot can be configured using environment variables which can be different depe
         `SUPERUSER_DEFAULT_EMAIL` is defaulted to `user@carrot`.
       </Td>
     </Tr>
+        <Tr>
+      <Td><Mandatory>`STORAGE_TYPE`</Mandatory></Td>
+        <Td>
+        The type of storage to use and the options are `Azure` and `MinIO`. This variable is required to let Carrot know which storage
+        type to use. Use `azure` for Azure Storage and deployment in Azure. 
+      </Td>
+    </Tr>
   </tbody>
 </Table>
 
@@ -135,6 +142,8 @@ Carrot can be configured using environment variables which can be different depe
   <Tabs.Tab>
 
 Below is the setting example for Carrot Backend or `api` service which is one part of Compose Stack used for local development.
+
+**Note:** The `STORAGE_TYPE` environment variable is set to `azure` as default. 
 
 ```yaml
 api:
@@ -165,6 +174,11 @@ api:
     - SUPERUSER_DEFAULT_USERNAME=admin-local
     - SUPERUSER_DEFAULT_PASSWORD=admin-password
     - SUPERUSER_DEFAULT_EMAIL=admin@carrot
+    - STORAGE_TYPE=${STORAGE_TYPE:-azure}
+    # MinIO Configurations (Automatically uses if STORAGE_TYPE is set to minio)
+    - MINIO_ENDPOINT=minio:9000
+    - MINIO_ACCESS_KEY=minioadmin
+    - MINIO_SECRET_KEY=minioadmin 
   volumes:
     - ./app/api:/api
   depends_on:
@@ -173,6 +187,8 @@ api:
 ```
 
 This service is built based on the Dockerfile inside `app/api/` folder and exposed on port `8000:8000`. It will start after the `omop-lite` service ran and did its jobs successfully. When running, it also uses the mounted code in the `api` folder so the changes will be reflected without restarting the stack.
+
+Additionally, the `STORAGE_TYPE` environment variable will make the carrot to create the necessary resources (Queue & Container or Buckets) automatically.
 
   </Tabs.Tab>
 
@@ -284,7 +300,13 @@ Below is just an example of variables that need adding to the Azure environment.
     "name": "SUPERUSER_DEFAULT_EMAIL",
     "value": "<admin@carrot>",
     "slotSetting": false
-  }
+  },
+  {
+    "name": "STORAGE_TYPE",
+    "value": "<storage-type>",
+    "slotSetting": false
+  },
+  
 
 
 ]
@@ -528,6 +550,13 @@ Coming soon
       </Td>
       <Td>The keys to connect Workers and Azure storage.</Td>
     </Tr>
+      <Tr>
+      <Td><Mandatory>`STORAGE_TYPE`</Mandatory></Td>
+        <Td>
+        The type of storage to use and the options are `Azure` and `MinIO`. This variable is required to let Carrot know which storage
+        type to use. Use `azure` for Azure Storage and deployment in Azure. 
+      </Td>
+    </Tr>
   </tbody>
 </Table>
 
@@ -537,6 +566,8 @@ Coming soon
   <Tabs.Tab>
 
 Below is the setting example for Carrot's Azure functions or `workers` service which is one part of Compose Stack used for local development.
+
+**Note:** The `STORAGE_TYPE` environment variable is set to `azure` as default. 
 
 ```yaml
 workers:
@@ -564,6 +595,11 @@ workers:
     - DB_NAME=postgres
     - DB_USER=postgres
     - DB_PASSWORD=postgres
+    - STORAGE_TYPE=${STORAGE_TYPE:-azure}
+    # MinIO Configurations (Automatically uses if STORAGE_TYPE is set to minio)
+    - MINIO_ENDPOINT=minio:9000
+    - MINIO_ACCESS_KEY=minioadmin
+    - MINIO_SECRET_KEY=minioadmin 
   volumes:
     - ./app/workers:/home/site/wwwroot
     - ./app/shared:/shared
@@ -676,9 +712,11 @@ For local development, the former can be created by [omop-lite](https://github.c
 
 ### Azurite
 
-Carrot uses Azurite as queues and blobs storage for Azure functions.
+Carrot uses Azurite as queues and blobs storage for Azure functions. 
 
-This storage requires pre-made `Queues` and `Blob Containers` with purposes below:
+**Note**: Azurite is only required and utilized for local development. 
+
+Since we already setup the `STORAGE_TYPE` as `azure`, Carrot will **automatically create the necessary resources such as `Queue` & `Containers` for you** (see below).
 
 <Tabs items={['Queues', 'Blob Containers']}>
   <Tabs.Tab>
@@ -688,8 +726,6 @@ Queue for Rules actions triggers, e.g., `rules-queue`
 Queue for Mapping rules exports, e.g., `rules-exports-queue`
 Queue for Scan reports uploads, e.g., `upload-reports-queue`
 ```
-
-Note: Queues names should match with `RULES_QUEUE_NAME` `RULES_FILE_QUEUE_NAME` `WORKERS_UPLOAD_NAME` in `Azure functions`.
 
   </Tabs.Tab>
   <Tabs.Tab>
@@ -763,3 +799,55 @@ Coming soon
 
   </Tabs.Tab>
 </Tabs>
+
+### MinIO
+
+**Carrot also supports MinIO as a storage option (optional).**
+
+The minio service is optional and requires the minio profile to activate.
+
+```yaml
+minio:
+  profiles: ["minio"]  # Optional: Only starts with --profile minio
+  image: minio/minio
+    container_name: minio
+    restart: always
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000" 
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: "minioadmin" # Only applicable for local development
+      MINIO_ROOT_PASSWORD: "minioadmin" # Only applicable for local development
+      MINIO_BROWSER: "on"
+      MINIO_DOMAIN: "minio"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ...
+```
+
+Since, we already setup the `STORAGE_TYPE` as `minio`, carrot will **automatically create the necessary resources such as `Buckets` and `Blob Queues` for you** (see below).
+
+- **BUCKETS** = [ `scan-reports`, `data-dictionaries`, `rules-exports` ]
+
+- **QUEUES** = [ `rules-local`, `rules-exports-local`, `uploadreports-local` ]
+
+
+**Examples**
+
+- **Local Development**
+
+    Below is the setting example for Carrot Backend or `api` service which is one part of Compose Stack used for local development.
+
+    **Note:** The carrot will automatically uses the `STORAGE_TYPE` as `minio` and the configurations will be setup dynamically during runtime.
+
+    To run the stack in local development.
+
+    ```bash
+    STORAGE_TYPE=minio docker-compose --profile minio up
+    ```
