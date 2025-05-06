@@ -144,6 +144,34 @@ Create some first instances in Carrot app by logging to Django Admin panel `http
 2. Once logged in, you will be presented with the Django Admin panel.
 3. Following this order, fill out the required information to create new instance of `Data Partner`, `Dataset` and `Project`.
 
+
+### Azure local storage setup
+
+You need to set up an Azurite local storage for local development of Carrot
+
+To do this, with the `workers` container in Docker Desktop is running, open `MS Azure Storage Explorer`, and create the following `queues` (under the tab `Storage Accounts - Emulator - Queues`) and `blob containers` (under the tab `Storage Accounts - Emulator - Blob Containers`).
+
+<Tabs items={['Queues', 'Blob Containers']}>
+  <Tabs.Tab>
+
+```
+rules-queue
+rules-exports-queue
+upload-reports-queue
+```
+
+  </Tabs.Tab>
+  <Tabs.Tab>
+
+```
+scan-reports
+data-dictionaries
+rules-exports
+```
+
+  </Tabs.Tab>
+</Tabs>
+
 ### Check-in
 
 You should now be able to access Carrot by logging in at `http://localhost:3000/` using your admin credentials created at step 4.

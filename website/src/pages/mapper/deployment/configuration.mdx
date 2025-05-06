@@ -163,12 +163,12 @@ api:
     - DB_USER=postgres
     - DB_PASSWORD=postgres
     - DEBUG=True
-    - WORKERS_UPLOAD_NAME=uploadreports-local
+    - WORKERS_UPLOAD_NAME=upload-reports-queue
     - SECRET_KEY=secret
     - WORKERS_URL=http://workers:80
     - WORKERS_RULES_NAME=RulesOrchestrator
     - WORKERS_RULES_KEY=rules_key
-    - WORKERS_RULES_EXPORT_NAME=rules-exports-local
+    - WORKERS_RULES_EXPORT_NAME=rules-exports-queue
     - STORAGE_CONN_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;
     - SIGNING_KEY=secret
     - SUPERUSER_DEFAULT_USERNAME=admin-local
@@ -585,9 +585,9 @@ workers:
     - FUNCTIONS_WORKER_RUNTIME=python
     - STORAGE_CONN_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;
     - APP_URL=http://api:8000/
-    - WORKERS_UPLOAD_NAME=uploadreports-local
-    - RULES_QUEUE_NAME=rules-local
-    - RULES_FILE_QUEUE_NAME=rules-exports-local
+    - WORKERS_UPLOAD_NAME=upload-reports-queue
+    - RULES_QUEUE_NAME=rules-queue
+    - RULES_FILE_QUEUE_NAME=rules-exports-queue
     - WEBSITE_HOSTNAME=localhost:7071
     - DB_ENGINE=django.db.backends.postgresql
     - DB_HOST=db
@@ -722,9 +722,9 @@ Since we already setup the `STORAGE_TYPE` as `azure`, Carrot will **automaticall
   <Tabs.Tab>
 
 ```
-Queue for Rules actions triggers, e.g., `rules`
-Queue for Mapping rules exports, e.g., `rules-exports`
-Queue for Scan reports uploads, e.g., `uploadreports`
+Queue for Rules actions triggers, e.g., `rules-queue`
+Queue for Mapping rules exports, e.g., `rules-exports-queue`
+Queue for Scan reports uploads, e.g., `upload-reports-queue`
 ```
 
   </Tabs.Tab>
