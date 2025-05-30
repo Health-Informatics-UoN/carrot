@@ -11,6 +11,29 @@ Start by cloning [the Carrot Mapper repository](https://github.com/Health-Inform
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - Vocabularies downloaded from [Athena](https://athena.ohdsi.org/). The guide for downloading can be found [here](https://github.com/OHDSI/Vocabulary-v5.0/wiki/General-Structure,-Download-and-Use).
 
+<Callout type="info">
+  For a quick start, we don't recommend downloading and importing all of the available vocabularies on Athena, which will make the Carrot installation slower. Instead, the list below suggests **minimum required vocabularies** for Carrot's quick start. 
+</Callout>
+
+**Minimum Required Vocabularies**
+  <div>
+    For downloading the minimum required vocabularies, you can use the following:
+    <div>
+      - SNOMED CT
+      - RxNorm
+      - RxNorm Extension
+      - LOINC
+      - ICD10
+      - ICD10CM
+      - Gender
+      - Ethnicity
+      - OMOP Extension
+      - NHS Ethnic Category
+      - OPCS4
+      - UK BioBank
+    </div>
+  </div>
+
 ## Getting Started
 
 Below are steps to make Carrot up and running locally.
@@ -142,34 +165,6 @@ Create some first instances in Carrot app by logging to Django Admin panel `http
 1. You can **log in to the Admin Panel** using the [superuser credentials](#superuser-credentials-setup) you configured earlier.
 2. Once logged in, you will be presented with the Django Admin panel.
 3. Following this order, fill out the required information to create new instance of `Data Partner`, `Dataset` and `Project`.
-
-
-### Azure local storage setup
-
-You need to set up an Azurite local storage for local development of Carrot
-
-To do this, with the `workers` container in Docker Desktop is running, open `MS Azure Storage Explorer`, and create the following `queues` (under the tab `Storage Accounts - Emulator - Queues`) and `blob containers` (under the tab `Storage Accounts - Emulator - Blob Containers`).
-
-<Tabs items={['Queues', 'Blob Containers']}>
-  <Tabs.Tab>
-
-```
-rules-queue
-rules-exports-queue
-upload-reports-queue
-```
-
-  </Tabs.Tab>
-  <Tabs.Tab>
-
-```
-scan-reports
-data-dictionaries
-rules-exports
-```
-
-  </Tabs.Tab>
-</Tabs>
 
 ### Check-in
 
