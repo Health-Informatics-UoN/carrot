@@ -24,21 +24,23 @@ services:
       DB_NAME: postgres
       SCHEMA_NAME: omop
       DATA_DIR: vocabs
+      SYNTHETIC: true
 
   frontend:
-    image: ghcr.io/health-informatics-uon/carrot/frontend:3.0.7
+    image: ghcr.io/health-informatics-uon/carrot/frontend:${RELEASE_VERSION}
     command: node server.js
     ports:
       - 3000:3000
     environment:
       BACKEND_URL: http://api:8000
       BACKEND_ORIGIN: localhost:8000
-      NEXT_SERVER_ACTION_BODY_SIZE_LIMIT: 15728640
       NEXTAUTH_URL: http://localhost:3000/
       NEXTAUTH_SECRET: verycomplexsecretkey
       NEXTAUTH_BACKEND_URL: http://api:8000/api/
       NODE_ENV: development
       WATCHPACK_POLLING: true
+      BODY_SIZE_LIMIT: 20971520
+      NEXT_PUBLIC_ENABLE_REUSE_TRIGGER_OPTION: true
     volumes:
       - /app/node_modules
       - /app/.next
@@ -47,7 +49,7 @@ services:
         condition: service_healthy
 
   api:
-    image: ghcr.io/health-informatics-uon/carrot/backend:3.0.7
+    image: ghcr.io/health-informatics-uon/carrot/backend:${RELEASE_VERSION}
     ports:
       - 8000:8000
     environment:
@@ -108,7 +110,7 @@ services:
       retries: 5
 
   airflow-webserver:
-    image: ghcr.io/health-informatics-uon/carrot/airflow-webserver:latest
+    image: ghcr.io/health-informatics-uon/carrot/airflow-webserver:${RELEASE_VERSION}
     depends_on:
       db:
         condition: service_started
@@ -134,7 +136,7 @@ services:
       - "8080:8080"
 
   scheduler:
-    image: ghcr.io/health-informatics-uon/carrot/airflow-scheduler:latest
+    image: ghcr.io/health-informatics-uon/carrot/airflow-scheduler:${RELEASE_VERSION}
     depends_on:
       api:
         condition: service_healthy
