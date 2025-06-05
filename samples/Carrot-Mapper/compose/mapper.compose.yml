@@ -38,7 +38,6 @@ services:
       NEXTAUTH_SECRET: verycomplexsecretkey
       NEXTAUTH_BACKEND_URL: http://api:8000/api/
       NODE_ENV: development
-      WATCHPACK_POLLING: true
       BODY_SIZE_LIMIT: 20971520
       NEXT_PUBLIC_ENABLE_REUSE_TRIGGER_OPTION: true
     volumes:
