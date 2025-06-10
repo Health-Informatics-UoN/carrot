@@ -15,6 +15,7 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
     AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "False"
     AIRFLOW__WEBSERVER__WEB_SERVER_PORT: 8080
+    AIRFLOW__WEBSERVER__SECRET_KEY: secret
     AIRFLOW__API__AUTH_BACKEND: airflow.api.auth.backend.basic_auth
     AIRFLOW_CONN_POSTGRES_DB_CONN: postgresql+psycopg2://postgres:postgres@db:5432/postgres
     STORAGE_TYPE: minio
