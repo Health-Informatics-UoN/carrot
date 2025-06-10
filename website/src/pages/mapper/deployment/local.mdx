@@ -52,7 +52,7 @@ SYNTHETIC: false
 
 To run Carrot, you need to specify the release version of the Carrot Mapper application you want to deploy. You can find the list of available versions in the [container registry](https://github.com/orgs/Health-Informatics-UoN/packages?repo_name=carrot-mapper).
 
-At the directory containing the `mapper.compose.yml` file, run the command with the release version specified:
+At the directory containing the `mapper.compose.yml` file, run the command with the release version, for example `3.0.7`, specified:
 
 ```bash copy
 RELEASE_VERSION=<release-version> docker compose up -d
@@ -86,7 +86,7 @@ Try using Carrot by steps in the [user quickstart](/mapper/user_guide/quickstart
 
 When deploying Carrot Mapper, follow these best practices to ensure stability and consistency:
 
-- Use Tagged Versions: We tag each container image with a version number upon release. Always deploy a specific tagged version rather than latest to avoid unintended updates.
+- Use Tagged Versions: We tag each container image with a version number upon release, for example `3.0.7`. Always deploy a specific tagged version rather than latest to avoid unintended updates.
 - Check Available Versions: You can find a list of available version tags in the [container registry](https://github.com/orgs/Health-Informatics-UoN/packages?repo_name=carrot-mapper).
 - Environment Configuration: Ensure your deployment environment (for example database connections, API endpoints) is correctly configured via environment variables.
 - Monitor and Log: Use logging and monitoring tools to track service health and quickly diagnose issues.
