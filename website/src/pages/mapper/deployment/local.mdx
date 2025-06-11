@@ -1,0 +1,92 @@
+import { Callout } from "nextra/components";
+import { Steps } from "nextra/components";
+
+# Deploy Carrot Mapper
+
+This page will guide you through getting Carrot Mapper deployed in a Virtual Machine (VM) or locally on your machine.
+
+<Callout emoji="🥕">
+  We provide Carrot Mapper's [container
+  registry](https://github.com/orgs/Health-Informatics-UoN/packages?repo_name=carrot-mapper)
+  for ease of deployment.
+</Callout>
+
+## Prerequisites
+
+- A VM with these apps installed
+  - [Docker](https://knowledgebase.aridhia.io/workspaces/analysing-data/virtual-machines/installing-software-on-virtual-machines/installing-docker-on-your-virtual-machine) and [Docker Compose](https://docs.docker.com/compose/install/)
+  - [wget](https://phoenixnap.com/kb/wget-command-with-examples#:~:text=wget%20is%20a%20free%20GNU,this%20tutorial%20uses%20Ubuntu%2022.04)
+
+## Deployment Steps
+
+<Steps>
+
+### Get the example Compose file
+
+Download the [sample Carrot Mapper Compose](https://raw.githubusercontent.com/Health-Informatics-UoN/carrot/refs/heads/main/samples/Carrot-Mapper/compose/mapper.compose.yml) file by running the command:
+
+```bash copy
+wget https://raw.githubusercontent.com/Health-Informatics-UoN/carrot/refs/heads/main/samples/Carrot-Mapper/compose/mapper.compose.yml
+```
+
+### Environment configuration
+
+For your convenience, the compose file is already configured with enough environment variables to run Carrot Mapper. For the reference, please see the [Configuration section](/mapper/deployment/configuration).
+
+### OMOP CDM configuration
+
+Before getting Carrot Mapper running, you need to configure the OMOP CDM in its database.
+
+By default, Carrot Mapper uses a synthetic OMOP CDM database which will be then loaded into the database thanks to the `omop-lite` service. If you want to use your own vocabularies in the OMOP CDM, you need to:
+
+- Set the `SYNTHETIC` environment variable of the `omop-lite` service to `false` in the `mapper.compose.yml` file.
+
+```yaml copy
+SYNTHETIC: false
+```
+
+- Create a folder named `vocabs` in the same directory as the `mapper.compose.yml` file.
+- Download the desired vocabularies from [Athena](https://athena.ohdsi.org/) and place them in the `vocabs` folder.
+
+## Running Carrot Mapper
+
+To run Carrot, you need to specify the release version of the Carrot Mapper application you want to deploy. You can find the list of available versions in the [container registry](https://github.com/orgs/Health-Informatics-UoN/packages?repo_name=carrot-mapper).
+
+At the directory containing the `mapper.compose.yml` file, run the command with the release version, for example `3.0.7`, specified:
+
+```bash copy
+RELEASE_VERSION=<release-version> docker compose up -d
+```
+
+The command will pull and build the following services:
+
+- Frontend: `frontend`
+- Backend: `api`
+- Database: `db`
+- Minio: `minio`
+- Airflow Webserver: `airflow-webserver`
+- Airflow Scheduler: `scheduler`
+- OMOP Lite: `omop-lite` - This service will load the vocabularies into the database depending on how you configured it in the last step. After the vocabularies are loaded, `api` service will be started, then `frontend`, `airflow-webserver` and `scheduler`.
+
+After the services are up and running successfully, you can access the Carrot Mapper frontend at `http://localhost:3000` and the backend at `http://localhost:8000`. Default admin credentials are `admin` and `admin`.
+
+Please follow mentioned in step 5 of dev's quickstart to [create first instances](/mapper/dev_guide/quickstart#first-instances-creation) of Carrot Mapper.
+
+You can also access the Airflow webserver at `http://localhost:8080` to monitor the DAGs running. Default admin credentials are `admin` and `admin`.
+
+Try using Carrot by steps in the [user quickstart](/mapper/user_guide/quickstart) to see if Carrot is running correctly. If you can successfully upload a new scan report, create mapping rules, and finally can export the Mapping rules JSON. That's a sign that you have successfully install and run Carrot locally.
+
+<Callout emoji="🎉">
+  Congratulations on your first Carrot Mapper deployment!
+</Callout>
+
+</Steps>
+
+## Best Practices
+
+When deploying Carrot Mapper, follow these best practices to ensure stability and consistency:
+
+- Use Tagged Versions: We tag each container image with a version number upon release, for example `3.0.7`. Always deploy a specific tagged version rather than latest to avoid unintended updates.
+- Check Available Versions: You can find a list of available version tags in the [container registry](https://github.com/orgs/Health-Informatics-UoN/packages?repo_name=carrot-mapper).
+- Environment Configuration: Ensure your deployment environment (for example database connections, API endpoints) is correctly configured via environment variables.
+- Monitor and Log: Use logging and monitoring tools to track service health and quickly diagnose issues.
