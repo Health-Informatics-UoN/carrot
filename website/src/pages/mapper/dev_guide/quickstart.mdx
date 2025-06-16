@@ -46,7 +46,7 @@ You need a pre-seeded OMOP CDM database inside the database of Carrot.
 
 To do this, add a folder named `vocabs` in the `root` directory of Carrot, then place there vocabulary files downloaded from Athena.
 
-Thanks to [OMOP Lite](https://github.com/andyrae/omop-lite/pkgs/container/omop-lite) container, OMOP schema will be created and vocabularies will be loaded to Carrot's database, when the app's stack is running.
+Thanks to [OMOP Lite](https://github.com/Health-Informatics-UoN/omop-lite) container, OMOP schema will be created and vocabularies will be loaded to Carrot's database, when the app's stack is running.
 
 ### Authentication setup for Azure functions
 
@@ -54,7 +54,7 @@ For local development, an authentication will be required when `api` container s
 
 To set this up, at the `app/workers` directory, add a folder named `Secrets`. Inside this folder, add a new file named `rulestrigger.json` with the following content:
 
-```json
+```json copy
 {
   "keys": [
     {
@@ -70,20 +70,24 @@ To set this up, at the `app/workers` directory, add a folder named `Secrets`. In
 ### Superuser Credentials setup
 A superuser needs to be created to access the Django admin dashboard and Carrot frontend.
 
-To do that, superuser credentials need adding as environment variables by doing the following steps:
+By default, the superuser credentials are:
+
+```
+Username: admin
+Password: admin
+```
+
+You can change those by doing the following steps:
 
     - Locate the `docker-compose.yml` file in the `root` directory of Carrot.
-    - Add the following variables to  the `environment` section of the `api` service:
+    - Change the following variables of the `api` service with your desired credentials:
 
       ```yaml
-      environment:
         - SUPERUSER_DEFAULT_USERNAME=<superuser_username>
         - SUPERUSER_DEFAULT_PASSWORD=<superuser_password>
-        - SUPERUSER_DEFAULT_EMAIL=<superuser_email> // Defaulted to `user@carrot`
-        - ...other variables
+        - SUPERUSER_DEFAULT_EMAIL=<superuser_email>
       ```
 
-    - Replace `superuser_username`, `superuser_email`, and `superuser_password` with your desired credentials.
     - After the [Warm up](#warm-up) step is done, a superuser will be created automatically with the credentials you chose above.
 
 
@@ -95,48 +99,17 @@ To do that, superuser credentials need adding as environment variables by doing 
 
 At the `root` directory, run to command below to start the application stack using Docker compose.
 
-<div>
-  <Tabs items={['MinIO' ]}>
-    <Tabs.Tab label="MinIO">
-      <div>
-
-        ```bash
-        STORAGE_TYPE=minio docker compose --profile minio up -d
-        ```
-
-        Since, we decided to use **MinIO as a storage**, Carrot will automatically create the necessary resources which are mentioned below:
-        
-        - **BLOB CONTAINERS** = [ `scan-reports`, `data-dictionaries`, `rules-exports` ]
-        - **QUEUES** = [`rules-local`, `rules-exports-local`, `uploadreports-local` ]
-
-        ---
-
-      **[Optional]** - You can **check the created MinIO resources** by following the steps below:  
-
-        1. Access the MinIO Console at http://localhost:9001
-
-        2. Login to the MinIO Admin page using the following credentials below:
-
-        ```
-        Username : minioadmin
-
-        Password : minioadmin
-        ```
-
-          3. You will be presented with the MinIO Console. You can check the created buckets by clicking on the `Buckets` tab.
-      </div>
-    </Tabs.Tab>
-  </Tabs>
-</div>
----
+```bash copy
+docker compose --profile main up -d
+```
 
 **After running the `docker-compose`, Carrot runs the following containers below:**
 
 - Database (`db`)
-- Azurite emulator (`Azurite`)
-- MinIO  (`minio`) if `STORAGE_TYPE` is `minio`
-- Azure functions (`workers`)
-- After that, it will build Carrot's backend (`api`) and frontend (`frontend`). 
+- MinIO  (`minio`) (default admin credentials are: `Username : minioadmin` and `Password : minioadmin`)
+- Carrot's backend (`api`) 
+- Airflow services (`airflow-webserver` and `scheduler`)
+- Carrot's frontend (`frontend`).
 
 This process will be on the background and take some time, but you can always check it through Docker Desktop app.
 
@@ -168,7 +141,7 @@ Create some first instances in Carrot app by logging to Django Admin panel `http
 
 ### Check-in
 
-You should now be able to access Carrot by logging in at `http://localhost:3000/` using your admin credentials created at step 4.
+You should now be able to access Carrot by logging in at `http://localhost:3000/` using your admin credentials created at step 3.
 
 After log in, you will be presented with `Projects` page.
 
@@ -180,18 +153,24 @@ Try using Carrot by steps in the [user quickstart](/mapper/user_guide/quickstart
 
 Since now on, to run Carrot locally, you can just run
 
-```bash
-STORAGE_TYPE=minio docker compose --profile minio up -d
+```bash copy
+docker compose --profile main up -d
 ```
 
 and access `http://localhost:3000/`.
 
-- To stop the application, run:
+To stop the application, run:
 
-```bash
-STORAGE_TYPE=minio docker compose --profile minio down
+```bash copy
+docker compose --profile main down
 ```
+_Optional:_ There is another services (Azure-related) can be used in Carrot. To active these services, run the command below instead to at step 4 - [Warm up](#warm-up) 
 
-**Note**: If you re-run the Carrot-Mapper app, it wiil check if the resources are already created. If they are, it will skip the creation process.
+```bash copy
+STORAGE_TYPE=azure WORKER_SERVICE_TYPE=azure docker compose --profile azure up -d
+```
+<Callout type='warning'>
+**Note:** Changing the mode of starting the compose stack is not recommended, because this may cause the conflicts in storage.
+</Callout>
 
 **What next?** Explore and try using Carrot with [user quickstart](/mapper/user_guide/quickstart).
