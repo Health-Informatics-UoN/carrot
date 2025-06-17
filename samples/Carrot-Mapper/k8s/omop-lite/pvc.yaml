@@ -1,0 +1,12 @@
+# # PersistentVolumeClaim for OMOP vocabs
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: omop-vocabs-pvc
+#   namespace: carrot-mapper
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 5Gi

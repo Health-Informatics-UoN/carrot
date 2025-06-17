@@ -1,0 +1,20 @@
+# ConfigMap for db configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-config
+  namespace: carrot-mapper
+data:
+  POSTGRES_DB: "postgres"
+  POSTGRES_USER: "postgres"
+
+---
+# Secret for sensitive data
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secrets
+  namespace: carrot-mapper
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: "postgres"

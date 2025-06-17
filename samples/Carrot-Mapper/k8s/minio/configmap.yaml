@@ -1,0 +1,21 @@
+# ConfigMap for minio configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: minio-config
+  namespace: carrot-mapper
+data:
+  MINIO_ROOT_USER: "minioadmin"
+  MINIO_BROWSER: "on"
+  MINIO_DOMAIN: "minio.carrot-mapper.svc.cluster.local"
+
+---
+# Secret for sensitive data
+apiVersion: v1
+kind: Secret
+metadata:
+  name: minio-secrets
+  namespace: carrot-mapper
+type: Opaque
+stringData:
+  MINIO_ROOT_PASSWORD: "minioadmin"

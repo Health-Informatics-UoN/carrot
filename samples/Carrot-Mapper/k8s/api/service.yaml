@@ -1,0 +1,42 @@
+# API Service - For other pods to interact with the API
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+  namespace: carrot-mapper
+  labels:
+    app: api
+    component: backend
+    service-type: api
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: api
+  selector:
+    app: api
+    component: backend
+
+---
+# Django Admin Console Service - For admin access
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-admin-service
+  namespace: carrot-mapper
+  labels:
+    app: api
+    component: backend
+    service-type: admin
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: console
+  selector:
+    app: api
+    component: backend
