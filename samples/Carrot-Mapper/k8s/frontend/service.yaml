@@ -1,0 +1,17 @@
+# Frontend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: carrot-mapper
+  labels:
+    app: frontend
+    component: frontend
+spec:
+  selector:
+    app: frontend
+  ports:
+    - port: 3000
+      targetPort: 3000
+      name: http
+  type: LoadBalancer

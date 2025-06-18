@@ -1,0 +1,34 @@
+# ConfigMap for shared configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: airflow-config
+  namespace: carrot-mapper
+data:
+  AIRFLOW__CORE__EXECUTOR: "LocalExecutor"
+  AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+  AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "False"
+  AIRFLOW__WEBSERVER__WEB_SERVER_PORT: "8080"
+  STORAGE_TYPE: "minio"
+  AIRFLOW__API__AUTH_BACKEND: "airflow.api.auth.backend.basic_auth"
+  AIRFLOW_VAR_MINIO_ENDPOINT: "http://minio-service:9000"
+  AIRFLOW_VAR_MINIO_ACCESS_KEY: "minioadmin"
+  AIRFLOW__DATABASE__SQL_ALCHEMY_SCHEMA: "airflow"
+  AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER: "s3://airflow-logs"
+  AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID: "minio_conn"
+  AIRFLOW__LOGGING__REMOTE_LOGGING: "True"
+
+---
+# Secret for sensitive data
+apiVersion: v1
+kind: Secret
+metadata:
+  name: airflow-secrets
+  namespace: carrot-mapper
+type: Opaque
+stringData:
+  AIRFLOW_ADMIN_PASSWORD: "admin"
+  AIRFLOW_VAR_MINIO_SECRET_KEY: "minioadmin"
+  AIRFLOW__WEBSERVER__SECRET_KEY: "secret"
+  AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://postgres:postgres@postgres-service:5432/postgres?options=-csearch_path%3Dairflow"
+  AIRFLOW_CONN_POSTGRES_DB_CONN: "postgresql+psycopg2://postgres:postgres@postgres-service:5432/postgres"

@@ -1,0 +1,80 @@
+# API Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: carrot-mapper
+  labels:
+    app: api
+    component: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+        component: backend
+    spec:
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:14
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h postgres-service -p 5432 -U postgres; do
+                echo "Waiting for postgres..."
+                sleep 2
+              done
+        - name: wait-for-minio
+          image: curlimages/curl:latest
+          command:
+            - sh
+            - -c
+            - |
+              until curl -f http://minio-service:9000/minio/health/live; do
+                echo "Waiting for minio..."
+                sleep 2
+              done
+      containers:
+        - name: api
+          image: ghcr.io/health-informatics-uon/carrot/backend:3.1.0
+          ports:
+            - containerPort: 8000
+              name: api
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: ALLOWED_HOSTS
+              value: '["localhost","127.0.0.1","api-service","$(POD_IP)"]'
+          envFrom:
+            - configMapRef:
+                name: api-config
+            - secretRef:
+                name: api-secrets
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5

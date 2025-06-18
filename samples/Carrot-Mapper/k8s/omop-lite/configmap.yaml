@@ -1,0 +1,10 @@
+# ConfigMap for shared configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: omop-lite-config
+  namespace: carrot-mapper
+data:
+  SCHEMA_NAME: "omop"
+  DATA_DIR: "vocabs"
+  SYNTHETIC: "true"
