@@ -1,29 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: minio-console
-  namespace: carrot-mapper
-spec:
-  type: LoadBalancer
-  ports:
-    - port: 9001
-      targetPort: 9001
-      name: console
-  selector:
-    app: minio
-
----
-apiVersion: v1
-kind: Service
-metadata:
   name: minio-service
   namespace: carrot-mapper
 spec:
-  type: ClusterIP
-  clusterIP: None
-  ports:
-    - port: 9000
-      targetPort: 9000
-      name: api
   selector:
     app: minio
+  ports:
+    - name: api
+      port: 9000
+      targetPort: 9000
+    - name: console
+      port: 9001
+      targetPort: 9001
+  type: ClusterIP
