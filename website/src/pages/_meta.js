@@ -1,5 +1,13 @@
 export default {
-  documentation: "Carrot Documentation",
+  documentation: {
+    title: "Carrot Documentation",
+    theme: {
+      breadcrumb: false,
+      timestamp: false,
+      pagination: false,
+    },
+    description: "Carrot Documentation",
+  },
   standards: "Data Standards",
   mapper: "Carrot Mapper",
   transform: "Carrot Transform",
