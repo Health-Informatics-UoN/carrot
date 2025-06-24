@@ -1,0 +1,71 @@
+# Airflow Scheduler Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-scheduler
+  namespace: carrot-mapper
+  labels:
+    app: airflow-scheduler
+    component: airflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airflow-scheduler
+  template:
+    metadata:
+      labels:
+        app: airflow-scheduler
+        component: airflow
+    spec:
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:14
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h postgres-service -p 5432 -U postgres; do
+                echo "Waiting for postgres..."
+                sleep 2
+              done
+        - name: wait-for-minio
+          image: curlimages/curl:latest
+          command:
+            - sh
+            - -c
+            - |
+              until curl -f http://minio-service:9000/minio/health/live; do
+                echo "Waiting for minio..."
+                sleep 2
+              done
+        - name: wait-for-api
+          image: curlimages/curl:latest
+          command:
+            - sh
+            - -c
+            - |
+              until curl -f http://api-service:8000/health; do
+                echo "Waiting for API..."
+                sleep 5
+              done
+      containers:
+        - name: airflow-scheduler
+          image: ghcr.io/health-informatics-uon/carrot/airflow-scheduler:3.1.0
+          env:
+            - name: AIRFLOW__CORE__EXECUTE_TASKS_NEW_PYTHON_INTERPRETER
+              value: "True"
+            - name: AIRFLOW_DEBUG_MODE
+              value: "True"
+          envFrom:
+            - configMapRef:
+                name: airflow-config
+            - secretRef:
+                name: airflow-secrets
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"

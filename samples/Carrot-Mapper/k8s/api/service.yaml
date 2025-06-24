@@ -1,0 +1,19 @@
+# API Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+  namespace: carrot-mapper
+  labels:
+    app: api
+    component: backend
+    service-type: api
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8000
+      targetPort: 8000
+      name: api
+  selector:
+    app: api
+    component: backend
