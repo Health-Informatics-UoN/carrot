@@ -1,5 +1,5 @@
 export default {
   user_guide: "User Guide",
   deployment: "Deployment",
-  dev_guide: "Developer Guide",
+  dev_guide: "Developers",
 };

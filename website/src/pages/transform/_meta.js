@@ -1,4 +1,5 @@
 export default {
   quickstart: "Quickstart",
-  development: "Development Notes",
+  expected_output: "Expected Output",
+  development: "Developers",
 };
