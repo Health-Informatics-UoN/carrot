@@ -1,0 +1,314 @@
+import { Callout } from "nextra/components";
+import HighlightedText from '@/components/HighlightedText';
+
+
+## Stage 1: Data Pre-processing
+
+### Select Data
+
+<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px" }}>
+  
+  <div style={{ flex: "1" }}>
+    It is necessary to understand the context of each dataset to allow a representative conversion to be performed.
+
+    1. **Meet with Data Owner**
+    <div style={{ marginTop: "0px" }}>
+      - Discuss their dataset(s) and specific requirements.<br/>
+      - Understand what each dataset represents (so you understand their context and perspectives).<br/>
+      - Explain the data engineering process (so they understand your perspective and what Health Informatics can offer).
+    </div>
+
+    2. **Choose Data Set(s)**
+    <div style={{ marginTop: "0px" }}>
+      - Discuss with the data owner which dataset(s) they would like converted.
+    </div>
+  
+
+    3. **Select data and conversion goals:**
+    <div style={{ marginTop: "0px" }}>
+      - The aim is ‘Data Discoverability’.
+      - Define conversion goals, i.e., what is to be converted for discoverability.
+      - Select data attributes to be converted – not all data attributes are necessary for discoverability, a minimal set of data attributes may just be necessary.
+    </div>
+
+    4. **Define Working processes**
+    <div style={{ marginTop: "0px" }}>
+    - Understand where each dataset is located.
+
+    - Understand what the security arrangements are.
+
+    - Understand access rights to the dataset.
+
+    - Define communication and feedback mechanisms and frequency thereof – these can be emails, weekly meetings, etc.
+    </div>
+
+</div>
+
+  <div style={{ flex: "0.5", textAlign: "right" }}>
+    <figure style={{ display: "inline-block", textAlign: "center" }}>
+      <img 
+        src="/docs/Carrot-SOP/3.png" 
+        alt="Selecting Data during Data Pre-processing" 
+        width="200"
+        height="250"
+        style={{ 
+          maxWidth: "100%", 
+          height: "auto", 
+          border: "1px solid #ddd", 
+          padding: "5px" 
+        }} 
+      />
+      <figcaption style={{ marginTop: "8px", marginRight: "50px", fontStyle: "italic", color: "#666" }}>
+        Figure 3: Selecting 
+        Data during Data Pre-processing
+      </figcaption>
+    </figure>
+  </div>
+
+</div>
+
+
+
+
+
+### Data Anonymisation
+
+<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px" }}>
+  <div style={{ flex: "1" }}>
+
+  The anonymisation of data is paramount, it is critical that the following steps are carefully followed.
+
+
+<Callout type="warning">
+  It is the responsibility of the Data Owner to de-identify datasets before they are supplied for OMOP conversion.
+</Callout>
+
+
+
+  1. **Define Data Anonymisation**
+  <div style={{ marginTop: "0px" }}>
+  - Identify the Personally identifiable information (PII) / Personal Data: data attributes (**[see PII definition and description](#pii-section)**).
+  - Locate and highlight the Direct-Identifier data.
+  - Locate and highlight the Pseudo-Identifier data.
+  - Discuss with Data Owner which Pseudo-Identifier data should be removed (**[see PII definition and description](#pii-section)**) – Date of Birth must be removed!
+  </div>
+
+
+  2. **Anonymise dataset**
+  <div style={{ marginTop: "0px" }}>
+  - It is the responsibility of the Data Owner to de-identify datasets!
+  - <HighlightedText>Direct identifier data ‘must be removed’</HighlightedText> from each dataset – remove the row data from the columns, do not delete the columns.
+  - <HighlightedText>Remove agreed Pseudo-Identifier data</HighlightedText> – again, remove the row data, do not delete the columns.
+      
+      - **<HighlightedText>Date of Birth</HighlightedText> <u>must be removed!</u>**
+  </div>
+  </div>
+
+  <div style={{ flex: "0.5", textAlign: "center" }}>
+  <figure style={{ display: "inline-block", textAlign: "center", margin: "0 auto" }}>
+    <img 
+      src="/docs/Carrot-SOP/4.png" 
+      alt="Data Anonymisation during data pre-processing" 
+      width="200"
+      height="250"
+      style={{ 
+        maxWidth: "100%", 
+        height: "auto", 
+        border: "1px solid #ddd", 
+        padding: "5px" 
+      }} 
+    />
+    <figcaption style={{ marginTop: "8px", marginRight: "70px", fontStyle: "italic", color: "#666" }}>
+      Figure 4: Data Anonymisation
+      during Data Pre-processing
+    </figcaption>
+  </figure>
+</div>
+
+
+</div>
+
+<div id="pii-section">
+  ### Personally Identifiable Information (PII) / Personal Data
+
+  This means any informaton relating to an identified or identifiable natural person (data subject); an identifiable natural person is one who can be identified, **directly or indirectly**, in particular by reference to an identifier such as a name, an identification number, location data, an online identifier or to one or more factors specific to the physical, physiological, genetic, mental, economic, cultural or social identity of that natural person [Information Commissioner's Office](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/personal-information-what-is-it/what-is-personal-data/what-is-personal-data/).
+
+  <figure style={{ textAlign: "center", margin: "15px auto" }}>
+    <img 
+      src="/docs/Carrot-SOP/5.png" 
+      alt="Example of Direct and Indirect Identifiers" 
+      width="500" 
+      style={{ display: "block", margin: "0 auto" }} 
+    />
+    <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+      Figure 5: Example of Direct and Indirect Identifiers
+    </figcaption>
+  </figure>
+
+
+  PII refers to data that can be used to identify, locate, or contact individuals or establishments, or reveal the characteristics or other details about them. PII might consist of direct identifiers, such as the name, social security number or other information that is unique to an individual. Indirect identifiers include uncommon race, ethnicity, extreme age, unusual occupation and other details [CDC](https://www.cdc.gov/nchs/training/confidentiality/training/page581.html).
+
+  #### Direct Identifiers
+
+  - ‘Direct identifiers are variables that point explicitly to particular individuals or units’ [University of Tennessee](https://research.utk.edu/research-integrity/human-research-protection-program/for-researchers/guidance-2/understanding-identifiable-data/).
+
+  - ‘Information that explicitly identifies a person’ [Devaux](https://medium.com/statice/data-privacy-and-protection-techniques-db42576d8b3f#:~:text=Direct%20identifiers%20are%20information%20that,data%20to%20identify%20a%20person.).
+
+  Direct identifier data must be removed from datasets, as follows:
+
+  <figure style={{ textAlign: "center", margin: "15px auto" }}>
+    <img 
+      src="/docs/Carrot-SOP/Direct-Identifier.png" 
+      alt="Example of Direct Identifiers" 
+      width="500" 
+      style={{ display: "block", margin: "0 auto" }} 
+    />
+    <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+      Figure 6: Example of Removing Direct Identifiers.
+    </figcaption>
+  </figure>
+
+
+
+  #### Indirect / Quasi-Identifiers
+
+  - ‘A quasi-identifier (also called a semi-key) is a subset of attributes which uniquely identifies most entities in the real world or tuples in a table’ [Motwani and Xu, 2007](https://userpages.cs.umbc.edu/kunliu1/p3dm08/proceedings/2.pdf).
+
+  - ‘Information that can be combined with additional data to identify a person’ [Devaux, 2020](https://medium.com/statice/data-privacy-and-protection-techniques-db42576d8b3f#:~:text=Direct%20identifiers%20are%20information%20that,data%20to%20identify%20a%20person.).
+
+  The majority of quasi-identifier data must be removed, as follows:
+
+  <figure style={{ textAlign: "center", margin: "15px auto" }}>
+    <img 
+      src="/docs/Carrot-SOP/Indirect-Identifier.png" 
+      alt="Example of Removing Indirect Identifiers" 
+      width="400" 
+      style={{ display: "block", margin: "0 auto" }} 
+    />
+    <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+      Figure 7: Example of Removing Indirect Identifiers.
+    </figcaption>
+  </figure>
+
+
+</div>
+
+
+### Refactor Data
+
+<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px" }}>
+  <div style={{ flex: "1" }}>
+
+  <div style={{ marginTop: "0px" }}>
+  The anonymisation of data is paramount, it is critical that the following steps are carefully followed.
+  </div>
+  <div style={{ marginTop: "0px" }}>
+  <Callout type="warning">
+    It is the responsibility of the Data Owner to de-identify datasets before they are supplied for OMOP conversion.
+  </Callout>
+  </div>
+
+  1. **Organise Data Tables**
+  <div style={{ marginTop: "0px" }}>
+  - Create a demographics table, consisting of:
+      - Identifier
+      - Date of Birth 
+      - Sex at Birth 
+      - Ethnicity
+  <div>
+  - The rest of the data can then be arranged as deemed fit by the data owner and / or the data team, each table must include:
+      - 1 x identifying column per table.
+      - 1 x date event per table.
+  </div>
+  </div>
+
+
+  2. **Create Dataset Extract**
+  <div style={{ marginTop: "0px" }}>
+  - First, check the [Data Standards](https://carrot.ac.uk/standards) page for exact requirements.
+
+  - Extract the data from the data source – this can be done in 2 ways:
+      - export tables to CSV files (1 per table);
+      - create a view within the database.
+
+  - Prepare a data dictionary for mapping. 
+  </div>
+  </div>
+
+  <div style={{ flex: "0.5", textAlign: "right" }}>
+    <figure style={{ display: "inline-block", textAlign: "center", margin: "0 auto" }}>
+      <img 
+        src="/docs/Carrot-SOP/6.png" 
+        alt="Refactoring the data in data preprocessing section" 
+        width="200"
+        height="250"
+        style={{ 
+          maxWidth: "100%", 
+          height: "auto", 
+          border: "1px solid #ddd", 
+          padding: "5px" 
+        }} 
+      />
+      <figcaption style={{ marginTop: "8px", marginRight: "70px", fontStyle: "italic", color: "#666" }}>
+        Figure 8: Refactoring the 
+        Data in Data Preprocessing.
+      </figcaption>
+    </figure>
+  </div>
+
+</div>
+
+
+### Review
+
+<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px" }}>
+  <div style={{ flex: "1" }}>
+
+  <div>
+  It is essential that all data extracts are reviewed prior to Stage 2.
+  </div>
+
+  <div style={{ marginTop: "0px" }}>
+  1. **Review Dataset Extract**
+  <div style={{ marginTop: "0px" }}>
+  - Check the agreed data attributes chosen in Stage 1 are selected.
+  - Check that the dataset has been anonymised as per Stage 2.
+  - Check the demographics table exists and contains these 4 data attributes:
+
+      - Identifier
+      - Date of Birth
+      - Sex
+      - Ethnicity
+
+  - Check that there is a date event to map to per dataset table and that it conforms to [Carrot Standards](https://carrot.ac.uk/standards).
+  - Check that there is a date event to map to per dataset table.
+
+  - <HighlightedText>CHECK WHETHER THE DATA DICTIONARY FOLLOWS OMOP DATA STANDARDS. </HighlightedText>
+
+  </div>
+  </div>
+
+  </div>
+
+  <div style={{ flex: "0.5", textAlign: "right" }}>
+    <figure style={{ display: "inline-block", textAlign: "center", margin: "0 auto" }}>
+      <img 
+        src="/docs/Carrot-SOP/7.png" 
+        alt="Reviewing in data preprocessing section" 
+        width="200"
+        height="250"
+        style={{ 
+          maxWidth: "100%", 
+          height: "auto", 
+          border: "1px solid #ddd", 
+          padding: "5px" 
+        }} 
+      />
+      <figcaption style={{ marginTop: "8px", marginRight: "70px", fontStyle: "italic", color: "#666" }}>
+        Figure 9: Reviewing 
+        in Data Preprocessing.
+      </figcaption>
+    </figure>
+  </div>
+
+</div>
