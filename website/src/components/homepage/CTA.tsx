@@ -16,7 +16,7 @@ export default function CallToAction() {
           <div className="flex gap-2 lg:flex-row flex-col">
             <a
               href={
-                "https://github.com/Health-Informatics-UoN/Carrot-Mapper/discussions"
+                "https://github.com/Health-Informatics-UoN/carrot/discussions"
               }
               target="_blank"
             >
