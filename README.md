@@ -9,7 +9,7 @@
 <div align="center">
   <strong>
   <h2>Streamlined Data Mapping to OMOP</h2><br />
-  <a href="https://carrot.ac.uk/">Carrot</a> is an application stack for mapping and transforming health data to the OMOP common data model, in a secure way enabling collaboration and reusability.<br />
+  <a href="https://carrot.ac.uk/">Carrot</a> is a toolset for mapping and transforming health data to the OMOP common data model, in a secure way enabling collaboration and reusability.<br />
   </strong>
 </div>
 
@@ -44,7 +44,7 @@
 [![Carrot Transform Docs][docs-badge]][carrot-Transform-docs]
 [![Carrot Transform Roadmap][roadmap-badge]][carrot-roadmap]
 
-[Carrot Transform](https://github.com/Health-Informatics-UoN/carrot-transform) executes the conversion of the data to the OMOP CDM.
+[Carrot Transform](https://github.com/Health-Informatics-UoN/carrot-transform) executes the conversion of the data to the OMOP CDM, using the mapping rules generated with Carrot Mapper.
 
 ---
 
