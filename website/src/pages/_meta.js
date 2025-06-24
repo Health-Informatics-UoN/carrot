@@ -11,5 +11,5 @@ export default {
   standards: "Data Standards",
   mapper: "Carrot Mapper",
   transform: "Carrot Transform",
-  carrot_etl_guide: "Carrot ETL Guide",
+  carrot_etl_guide: "Carrot Guide",
 };

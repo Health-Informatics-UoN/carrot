@@ -6,13 +6,18 @@ Carrot is a toolset for helping data custodians transform their health dataset t
 
 Carrot consists of two tools: [Carrot Mapper](mapper) for generating mapping rules, and [Carrot Transform](transform) for transforming the data using those rules.
 
-The Carrot model separates the mapping and transforming of data, enabling OMOP expertise to contribute to mapping data outside of a data partners local environment. 
+The Carrot toolset is open source under an MIT License and available on [Github](https://github.com/Health-Informatics-UoN/carrot), 
+we also use [Github discussions](https://github.com/Health-Informatics-UoN/carrot/discussions), have monthly [Community Meetings](https://github.com/Health-Informatics-UoN/carrot/discussions/45), and a [public roadmap](https://github.com/orgs/Health-Informatics-UoN/projects/13/views/19).
+
+The Carrot toolset separates the mapping and transforming of data, enabling OMOP expertise to contribute to mapping data outside of a data partners local environment. 
 This approach enables wider collaboration and sharing of mapping rules, in a safe and secure way.
 
-At a glance, the diagram below shows the functions of Carrot Mapper (steps 3-5) and Carrot Transform (step 7) in the process of transforming data to OMOP CDM.
+Carrot is interopable with other tools in the OHDSI ecosystem, and uses [OHDSI WhiteRabbit](https://www.ohdsi.org/analytic-tools/whiterabbit-for-etl-design/) as the recommended metadata profiling tool. 
 
-![](/docs/Carrot_Workflow.png)
+At a glance, the diagram below shows the functions of Carrot Mapper (steps 3-5) and Carrot Transform (step 6) in the process of transforming data to OMOP CDM.
 
 <Callout>
   The Carrot tools depend on a set of [data standards](standards).
 </Callout>
+
+![](/docs/Carrot_Workflow.png)
