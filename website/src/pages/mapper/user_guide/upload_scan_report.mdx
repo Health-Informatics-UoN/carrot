@@ -3,7 +3,7 @@ import { Callout } from "nextra/components";
 # Overview of process
 
 A Scan Report is the basic unit representing a single data source.
-In order to create a new Scan Report in the Carrot-Mapper system,
+In order to create a new Scan Report in Carrot Mapper system,
 one must upload a _Scan Report Form_ to the system. Once uploaded,
 an ingestion process reads this file and populates the system with
 its contents. The documentation below explains this process and the
@@ -54,13 +54,12 @@ inherit that same access to the _Scan Report_ automatically.
 Choose a Scan Report in the "WhiteRabbit ScanReport" field, and
 optionally choose a dictionary file in the "Data Dictionary" field.
 The formats of these two files are as described below. Then click
-the "Submit" button to begin the upload process. This will launch an
-instance of the [UploadQueue](/mapper/dev_guide/azure_functions/uploadqueue).
+the "Submit" button to begin the upload process.
 
 ## The Scan Report file format
 
 The Scan Report File should be in the format as output by the
-White Rabbit tool. Broadly, this is an Excel .xlsx file with the
+WhiteRabbit tool. Broadly, this is an Excel .xlsx file with the
 following non-exhaustive format. At upload, a series of checks are
 run upon the file to ensure it meets certain standards before it
 is further processed, and an error message is presented if these
@@ -126,5 +125,4 @@ Single sheet associated to a single table:
 
 {/* TODO: The below link is broken */}
 The optionally-supplied Data Dictionary file must be in .csv format, and
-with the format as defined at
-[the CO-CONNECT data standards page](https://co-connect.ac.uk/co-connect-data-files-and-meta-data-standardisation/)
+with the format as defined by the [data standards](/standards).

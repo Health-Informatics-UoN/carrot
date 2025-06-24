@@ -1,0 +1,160 @@
+import { Callout } from "nextra/components";
+import HighlightedText from '@/components/HighlightedText';
+
+
+## Stage 2: Metadata Profiling
+
+<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px" }}>
+  <div style={{ flex: "1" }}>
+
+  <div>
+  The understand a dataset’s metadata the [WhiteRabbit](https://github.com/OHDSI/WhiteRabbit) statistical profiling tool from [OHDSI](https://www.ohdsi.org/analytic-tools/whiterabbit-for-etl-design/) is used. **This tool has been vetted by <u>UoN Information Security</u> and Compliance team and <u>passed the UoN DPIA process</u>**.
+  </div>
+
+  A full [User Guide and Introduction to WhiteRabbit](https://ohdsi.github.io/WhiteRabbit/WhiteRabbit.html) is here:
+
+  - https://ohdsi.github.io/WhiteRabbit/WhiteRabbit.html
+  - https://github.com/OHDSI/WhiteRabbit
+
+
+  ### Profile Data
+  <div style={{ marginTop: "0px" }}>
+  **1. Setup WhiteRabbit**
+
+      - Open the WhiteRabbit tool.
+
+  Metadata extraction for csv files:
+  - Locations screen:
+      - Enter **‘Working Folder’** location (see image below).
+      - Click **‘Test Connection’** to ensure that it is working.
+      - Then go to the **‘Scan’** tab Screen.
+  </div>
+
+  </div>
+
+  <div style={{ flex: "0.5", textAlign: "right" }}>
+    <figure style={{ display: "inline-block", textAlign: "center", margin: "0 auto" }}>
+      <img 
+        src="/docs/Carrot-SOP/8.png" 
+        alt="Profiling data in metadata profiling section" 
+        width="200"
+        height="250"
+        style={{ 
+          maxWidth: "100%", 
+          height: "auto", 
+          border: "1px solid #ddd", 
+          padding: "5px" 
+        }} 
+      />
+      <figcaption style={{ marginTop: "8px", marginRight: "70px", fontStyle: "italic", color: "#666" }}>
+        Figure 10: Profiling Data in Metadata Profiling. 
+      </figcaption>
+    </figure>
+  </div>
+
+
+</div>
+
+<div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "10px", marginRight: "10px" }}>
+  <figure style={{ textAlign: "center", margin: "0 auto" }}>
+    <img 
+      src="/docs/Carrot-SOP/9.png" 
+      alt="Example of WhiteRabbit 'location' screen option" 
+      width="700" 
+      style={{ display: "block", margin: "0 auto" }} 
+    />
+    <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+      Figure 11: Example of WhiteRabbit 'Location' Screen Option
+    </figcaption>
+  </figure>
+</div>
+
+
+
+**1.1 Setup WhiteRabbit (Second Part)**
+<div style={{ marginTop: "0px" }}>
+- Scan Screen:
+    - Click on the ‘Scan’ tab.
+    - Click ‘Add’, to add the required dataset .csv files. 
+    - The **‘Min Cell Count’ is set to 5 by default**, this can be altered according to the data owner’s requirements.
+    - Press ‘Scan Tables’ to run WhiteRabbit.
+    - This will produce a ‘Scan Report’ for the dataset metadata within the Working Directory.
+- **For Databases**
+
+    - Please refer to the [WhiteRabbit User Guide](https://ohdsi.github.io/WhiteRabbit/WhiteRabbit.html), for setting up the tool to scan a database.
+</div>
+
+<div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "10px", marginRight: "10px" }}>
+  <figure style={{ textAlign: "center", margin: "0 auto" }}>
+    <img 
+      src="/docs/Carrot-SOP/11.png" 
+      alt="Example of WhiteRabbit's 'Scan' screen option." 
+      width="700" 
+      style={{ display: "block", margin: "0 auto" }} 
+    />
+    <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+      Figure 12: Example of WhiteRabbit's 'Scan' Screen Option
+    </figcaption>
+  </figure>
+</div>
+
+
+
+
+<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "20px" }}>
+  <div style={{ flex: "1" }}>
+    
+  ### Checking Scan Report
+
+  #### Examine Scan Report
+  - Open the WhiteRabbit Scan Report Excel file from the Working Directory.
+  - Check:
+      - A sheet has been created for each `.csv` file added to WhiteRabbit.
+      - Check the name of each sheet tab and ensure it is the same as the `.csv` file name it represents. 
+      - Check **Field Overview** sheet results are correct.
+
+  #### Check Anonymisation
+  - Check all Direct Identifier data values are not present within the Scan Report.
+  - Check all Indirect Identifier data values are not present within the Scan Report.
+
+  See [Personally Identifiable Information](#pii-section) for **Direct and Indirect Identifier** information.
+
+  </div>
+
+  <div style={{ flex: "0.5", textAlign: "right", alignSelf: "flex-start", marginTop: "40px" }}>
+    <figure style={{ display: "inline-block", textAlign: "center", margin: "0 auto" }}>
+      <img 
+        src="/docs/Carrot-SOP/12.png" 
+        alt="Checking Scan report in metadata profiling" 
+        width="200"
+        height="250"
+        style={{ 
+          maxWidth: "100%", 
+          height: "auto", 
+          border: "1px solid #ddd", 
+          padding: "5px" 
+        }} 
+      />
+      <figcaption style={{ marginTop: "8px", marginRight: "60px", fontStyle: "italic", color: "#666" }}>
+        Figure 13: Checking Scan 
+        Report in Metadata Profiling.
+      </figcaption>
+    </figure>
+  </div>
+
+</div>
+
+<div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "10px", marginRight: "10px" }}>
+  <figure style={{ textAlign: "center", margin: "0 auto" }}>
+    <img 
+      src="/docs/Carrot-SOP/13.png" 
+      alt="Example of WhiteRabbit Scan Report - Aspects to Check" 
+      width="700" 
+      style={{ display: "block", margin: "0 auto" }} 
+    />
+    <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+      Figure 14: Example of WhiteRabbit Scan Report - Aspects to Check.
+    </figcaption>
+  </figure>
+</div>
+

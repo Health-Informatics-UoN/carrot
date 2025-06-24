@@ -1,7 +1,15 @@
 export default {
-  documentation: "Carrot Docs",
-  mapper: "Carrot Mapper",
-  transform: "Carrot Transform [WIP]",
+  documentation: {
+    title: "Carrot Documentation",
+    theme: {
+      breadcrumb: false,
+      timestamp: false,
+      pagination: false,
+    },
+    description: "Carrot Documentation",
+  },
   standards: "Data Standards",
-  carrot_etl_guide: "Carrot ETL Guide",
+  mapper: "Carrot Mapper",
+  transform: "Carrot Transform",
+  carrot_etl_guide: "Carrot Guide",
 };
