@@ -15,3 +15,4 @@ spec:
       name: {{ .Values.service.name }}
   selector:
     {{- include "api.selectorLabels" . | nindent 4 }}
+    component: backend
