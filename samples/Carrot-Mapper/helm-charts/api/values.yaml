@@ -1,0 +1,177 @@
+# Namespace configuration
+namespace: carrot-mapper-k8s
+
+# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 1
+
+# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+image:
+  repository: ghcr.io/health-informatics-uon/carrot/backend
+  # This sets the pull policy for images.
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "3.2.0"
+
+# This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+# This is to override the chart name.
+nameOverride: ""
+fullnameOverride: ""
+
+# This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# This is for setting Kubernetes Annotations to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+podAnnotations: {}
+# This is for setting Kubernetes Labels to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+podLabels:
+  component: backend
+
+podSecurityContext:
+  {}
+  # fsGroup: 2000
+
+securityContext:
+  {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
+service:
+  # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  type: LoadBalancer
+  # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+  port: 8000
+  targetPort: 8000
+  name: api
+
+# This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
+ingress:
+  enabled: false
+  className: ""
+  annotations:
+    {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+# Resource limits and requests
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "2Gi"
+    cpu: "1000m"
+
+# This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 60
+  periodSeconds: 30
+  timeoutSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+
+# This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# Init containers configuration
+initContainers:
+  waitForPostgres:
+    enabled: true
+    image: postgres:14
+    host: postgres-service
+    port: 5432
+    user: postgres
+
+  waitForMinio:
+    enabled: true
+    image: curlimages/curl:latest
+    url: http://minio-service:9000/minio/health/live
+
+# Environment variables from ConfigMap
+config:
+  DB_ENGINE: "django.db.backends.postgresql"
+  DB_HOST: "postgres-service"
+  DB_PORT: "5432"
+  DB_NAME: "postgres"
+  DB_USER: "postgres"
+  STORAGE_TYPE: "minio"
+  MINIO_ENDPOINT: "minio-service:9000"
+  MINIO_ACCESS_KEY: "minioadmin"
+  FRONTEND_URL: "http://frontend-service:3000"
+  DEBUG: "True"
+  WORKER_SERVICE_TYPE: "airflow"
+  AIRFLOW_BASE_URL: "http://airflow-webserver-service:8080/api/v1/"
+  AIRFLOW_AUTO_MAPPING_DAG_ID: "auto_mapping"
+  AIRFLOW_SCAN_REPORT_PROCESSING_DAG_ID: "scan_report_processing"
+  AIRFLOW_RULES_EXPORT_DAG_ID: "rules_export"
+  AIRFLOW_ADMIN_USERNAME: "admin"
+  DATA_UPLOAD_MAX_MEMORY_SIZE: "10485760"
+  SUPERUSER_DEFAULT_EMAIL: "admin@carrot.com"
+  SUPERUSER_DEFAULT_USERNAME: "admin"
+
+# Secret environment variables
+secrets:
+  DB_PASSWORD: "postgres"
+  SECRET_KEY: "secret"
+  SIGNING_KEY: "secret"
+  MINIO_SECRET_KEY: "minioadmin"
+  AIRFLOW_ADMIN_PASSWORD: "admin"
+  SUPERUSER_DEFAULT_PASSWORD: "admin"
+
+# Additional volumes on the output Deployment definition.
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

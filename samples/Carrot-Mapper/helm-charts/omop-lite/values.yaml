@@ -1,0 +1,55 @@
+namespace: carrot-mapper-k8s
+
+# Container image configuration
+image:
+  repository: ghcr.io/health-informatics-uon/omop-lite
+  pullPolicy: IfNotPresent
+  tag: ""
+
+nameOverride: ""
+fullnameOverride: ""
+
+# Job configuration
+job:
+  restartPolicy: OnFailure
+  activeDeadlineSeconds: 3600 # 1 hour
+  backoffLimit: 3
+
+# Init containers configuration
+initContainers:
+  enabled: true
+  postgres:
+    image: postgres:14
+
+# Dependencies on other services
+dependencies:
+  postgres:
+    host: postgres-service
+    port: 5432
+    user: postgres
+    password: postgres
+    name: postgres
+
+# OMOP Lite application configuration
+config:
+  schemaName: "omop"
+  dataDir: "vocabs"
+  synthetic: "true"
+
+# Resource allocation
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  requests:
+    cpu: 250m
+    memory: 512Mi
+
+# Volume configuration for vocabulary files
+volumes:
+  enabled: false # Set to true if volumes are enabled
+
+# Volume mounts configuration
+volumeMounts:
+  enabled: false # Set to true if volumes are enabled
+

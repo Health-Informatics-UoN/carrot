@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "api.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "api.labels" . | nindent 4 }}
+    component: backend
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "api.labels" . | nindent 8 }}
+        component: backend
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "api.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        {{- if .Values.initContainers.waitForPostgres.enabled }}
+        - name: wait-for-postgres
+          image: {{ .Values.initContainers.waitForPostgres.image }}
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h {{ .Values.initContainers.waitForPostgres.host }} -p {{ .Values.initContainers.waitForPostgres.port }} -U {{ .Values.initContainers.waitForPostgres.user }}; do
+                echo "Waiting for postgres..."
+                sleep 2
+              done
+        {{- end }}
+        {{- if .Values.initContainers.waitForMinio.enabled }}
+        - name: wait-for-minio
+          image: {{ .Values.initContainers.waitForMinio.image }}
+          command:
+            - sh
+            - -c
+            - |
+              until curl -f {{ .Values.initContainers.waitForMinio.url }}; do
+                echo "Waiting for minio..."
+                sleep 2
+              done
+        {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+              name: {{ .Values.service.name }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: ALLOWED_HOSTS
+              value: '["localhost","127.0.0.1","{{ include "api.fullname" . }}-service","$(POD_IP)"]'
+          envFrom:
+            - configMapRef:
+                name: {{ include "api.fullname" . }}-config
+            - secretRef:
+                name: {{ include "api.fullname" . }}-secrets
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

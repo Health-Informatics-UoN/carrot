@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "db.fullname" . }}-config
+  namespace: {{ .Values.namespace }}
+data:
+  POSTGRES_DB: {{ .Values.auth.POSTGRES_DB }}
+  POSTGRES_USER: {{ .Values.auth.POSTGRES_USER }}
+
+---
+# Secret for sensitive data
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "db.fullname" . }}-secrets
+  namespace: {{ .Values.namespace }}
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: {{ .Values.auth.POSTGRES_PASSWORD }}

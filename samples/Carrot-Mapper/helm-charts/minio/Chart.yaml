@@ -1,0 +1,19 @@
+apiVersion: v2
+name: minio
+description: A Helm chart for MinIO object storage in carrot-mapper
+
+type: application
+icon: https://raw.githubusercontent.com/Health-Informatics-UoN/carrot-status/refs/heads/master/assets/logo.svg
+
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates, including the app version.
+# Versions are expected to follow Semantic Versioning (https://semver.org/)
+version: 0.1.0
+
+# This is the version number of the application being deployed. This version number should be
+# incremented each time you make changes to the application. Versions are expected to follow
+# Semantic Versioning (https://semver.org/)
+appVersion: "0.1.0"
+
+maintainers:
+  - name: carrot-mapper-team
