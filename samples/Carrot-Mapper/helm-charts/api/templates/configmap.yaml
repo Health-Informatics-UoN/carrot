@@ -5,7 +5,9 @@ metadata:
   namespace: {{ .Values.namespace }}
   labels:
     {{- include "api.labels" . | nindent 4 }}
-    component: backend
+    {{- with .Values.podLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 data:
   {{- range $key, $value := .Values.config }}
   {{ $key }}: {{ $value | quote }}
@@ -19,7 +21,9 @@ metadata:
   namespace: {{ .Values.namespace }}
   labels:
     {{- include "api.labels" . | nindent 4 }}
-    component: backend
+    {{- with .Values.podLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 type: Opaque
 stringData:
   {{- range $key, $value := .Values.secrets }}
