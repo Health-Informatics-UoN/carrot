@@ -11,7 +11,6 @@ metadata:
 spec:
   {{- if .Values.webserver.autoscaling.enabled }}
   replicas: {{ .Values.webserver.autoscaling.minReplicas }}
-  {{- else }}
   {{- end }}
   selector:
     matchLabels:
@@ -67,9 +66,9 @@ spec:
               containerPort: {{ .Values.service.targetPort }}
           env:
             - name: AIRFLOW_ADMIN_USERNAME
-              value: {{ .Values.webserver.env.AIRFLOW_ADMIN_USERNAME }}
+              value: "{{ .Values.webserver.env.AIRFLOW_ADMIN_USERNAME }}"
             - name: AIRFLOW_ADMIN_PASSWORD
-              value: {{ .Values.webserver.env.AIRFLOW_ADMIN_PASSWORD }}
+              value: "{{ .Values.webserver.env.AIRFLOW_ADMIN_PASSWORD }}"
           envFrom:
             - configMapRef:
                 name: {{ include "airflow.fullname" . }}-config
