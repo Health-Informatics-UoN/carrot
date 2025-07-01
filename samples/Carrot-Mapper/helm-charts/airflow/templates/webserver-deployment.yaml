@@ -1,0 +1,90 @@
+# Airflow Scheduler Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.webserver.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- with .Values.webserver.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.webserver.autoscaling.enabled }}
+  replicas: {{ .Values.webserver.autoscaling.minReplicas }}
+  {{- else }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ .Values.webserver.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.webserver.name }}
+        component: {{ .Values.webserver.labels.component }}
+    spec:
+      initContainers:
+        {{- if .Values.initContainers.waitForPostgres.enabled }}
+        - name: wait-for-postgres
+          image: {{ .Values.initContainers.waitForPostgres.image }}
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h {{ .Values.initContainers.waitForPostgres.host }} -p {{ .Values.initContainers.waitForPostgres.port }} -U {{ .Values.initContainers.waitForPostgres.user }}; do
+                echo "Waiting for postgres..."
+                sleep 2
+              done
+        {{- end }}
+        {{- if .Values.initContainers.waitForMinio.enabled }}
+        - name: wait-for-minio
+          image: curlimages/curl:latest
+          command:
+            - sh
+            - -c
+            - |
+              until curl -f {{ .Values.initContainers.waitForMinio.serviceUrl }}; do
+                echo "Waiting for minio..."
+                sleep 2
+              done
+        {{- end }}
+        {{- if .Values.initContainers.waitForApi.enabled }}
+        - name: wait-for-api
+          image: curlimages/curl:latest
+          command:
+            - sh
+            - -c
+            - |
+              until curl -f {{ .Values.initContainers.waitForApi.serviceUrl }}; do
+                echo "Waiting for API..."
+                sleep 5
+              done
+        {{- end }}
+      containers:
+        - name: airflow-webserver
+          image: {{ .Values.webserver.image.repository }}:{{ .Values.webserver.image.tag }}
+          ports:
+            - name: {{ .Values.service.name }}
+              containerPort: {{ .Values.service.targetPort }}
+          env:
+            - name: AIRFLOW_ADMIN_USERNAME
+              value: {{ .Values.webserver.env.AIRFLOW_ADMIN_USERNAME }}
+            - name: AIRFLOW_ADMIN_PASSWORD
+              value: {{ .Values.webserver.env.AIRFLOW_ADMIN_PASSWORD }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "airflow.fullname" . }}-config
+            - secretRef:
+                name: {{ include "airflow.fullname" . }}-secrets
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+

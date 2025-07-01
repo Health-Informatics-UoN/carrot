@@ -1,0 +1,78 @@
+# Airflow Scheduler Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.scheduler.name }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- with .Values.scheduler.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.scheduler.autoscaling.enabled }}
+  replicas: {{ .Values.scheduler.autoscaling.minReplicas }}
+  {{- else }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ .Values.scheduler.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.scheduler.name }}
+        component: {{ .Values.scheduler.labels.component }}
+    spec:
+      initContainers:
+        {{- if .Values.initContainers.waitForPostgres.enabled }}
+        - name: wait-for-postgres
+          image: {{ .Values.initContainers.waitForPostgres.image }}
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h {{ .Values.initContainers.waitForPostgres.host }} -p {{ .Values.initContainers.waitForPostgres.port }} -U {{ .Values.initContainers.waitForPostgres.user }}; do
+                echo "Waiting for postgres..."
+                sleep 2
+              done
+        {{- end }}
+        {{- if .Values.initContainers.waitForMinio.enabled }}
+        - name: wait-for-minio
+          image: curlimages/curl:latest
+          command:
+            - sh
+            - -c
+            - |
+              until curl -f {{ .Values.initContainers.waitForMinio.serviceUrl }}; do
+                echo "Waiting for minio..."
+                sleep 2
+              done
+        {{- end }}
+        {{- if .Values.initContainers.waitForApi.enabled }}
+        - name: wait-for-api
+          image: curlimages/curl:latest
+          command:
+            - sh
+            - -c
+            - |
+              until curl -f {{ .Values.initContainers.waitForApi.serviceUrl }}; do
+                echo "Waiting for API..."
+                sleep 5
+              done
+        {{- end }}
+      containers:
+        - name: airflow-scheduler
+          image: ghcr.io/health-informatics-uon/carrot/airflow-scheduler:3.1.0
+          env:
+            - name: AIRFLOW__CORE__EXECUTE_TASKS_NEW_PYTHON_INTERPRETER
+              value: {{ .Values.scheduler.env.AIRFLOW__CORE__EXECUTE_TASKS_NEW_PYTHON_INTERPRETER }}
+            - name: AIRFLOW_DEBUG_MODE
+              value: {{ .Values.scheduler.env.AIRFLOW_DEBUG_MODE }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "airflow.fullname" . }}-config
+            - secretRef:
+                name: {{ include "airflow.fullname" . }}-secrets
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}

@@ -1,0 +1,27 @@
+# ConfigMap for shared configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "airflow.fullname" . }}-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "airflow.labels" . | nindent 4 }}
+data:
+  {{- range $key, $value := .Values.config }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }} 
+
+---
+# Secret for sensitive data
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "airflow.fullname" . }}-secrets
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "airflow.labels" . | nindent 4 }}
+type: Opaque
+stringData:
+  {{- range $key, $value := .Values.secrets }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }} 
