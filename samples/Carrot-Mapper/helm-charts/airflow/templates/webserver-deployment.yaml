@@ -14,11 +14,11 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      app: {{ .Values.webserver.name }}
+      app: {{ .Values.webserver.labels.app }}
   template:
     metadata:
       labels:
-        app: {{ .Values.webserver.name }}
+        app: {{ .Values.webserver.labels.app }}
         component: {{ .Values.webserver.labels.component }}
     spec:
       initContainers:

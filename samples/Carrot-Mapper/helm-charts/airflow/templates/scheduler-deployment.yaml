@@ -14,11 +14,11 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      app: {{ .Values.scheduler.name }}
+      app: {{ .Values.scheduler.labels.app }}
   template:
     metadata:
       labels:
-        app: {{ .Values.scheduler.name }}
+        app: {{ .Values.scheduler.labels.app }}
         component: {{ .Values.scheduler.labels.component }}
     spec:
       initContainers:
@@ -60,7 +60,7 @@ spec:
         {{- end }}
       containers:
         - name: airflow-scheduler
-          image: ghcr.io/health-informatics-uon/carrot/airflow-scheduler:3.1.0
+          image: {{ .Values.scheduler.image.repository }}:{{ .Values.scheduler.image.tag }}
           env:
             - name: AIRFLOW__CORE__EXECUTE_TASKS_NEW_PYTHON_INTERPRETER
               value: "{{ .Values.scheduler.env.AIRFLOW__CORE__EXECUTE_TASKS_NEW_PYTHON_INTERPRETER }}"

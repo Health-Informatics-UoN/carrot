@@ -5,7 +5,8 @@ scheduler:
   replicaCount: 1
   name: airflow-scheduler
   labels:
-    component: airflow-scheduler
+    component: airflow
+    app: airflow-scheduler
   image:
     repository: ghcr.io/health-informatics-uon/carrot/airflow-scheduler
     tag: "3.2.0"
@@ -23,7 +24,8 @@ webserver:
   replicaCount: 1
   name: airflow-webserver
   labels:
-    component: airflow-webserver
+    component: airflow
+    app: airflow-webserver
   image:
     repository: ghcr.io/health-informatics-uon/carrot/airflow-webserver
     tag: "3.2.0"
