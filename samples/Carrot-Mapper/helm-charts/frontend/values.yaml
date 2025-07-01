@@ -1,9 +1,6 @@
 # Global settings
 namespace: carrot-mapper-k8s
 
-# This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
-replicaCount: 1
-
 # This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
   repository: ghcr.io/health-informatics-uon/carrot/frontend
@@ -22,7 +19,7 @@ initContainers:
     image: curlimages/curl:latest
     serviceUrl: "http://api-service:8000/health"
   waitForAirflow:
-    enabled: false
+    enabled: true
     image: curlimages/curl:latest
     serviceUrl: "http://airflow-webserver-service:8080/health"
 
