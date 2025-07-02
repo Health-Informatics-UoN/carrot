@@ -54,3 +54,7 @@ api:
     MINIO_SECRET_KEY: "minioadmin"
     AIRFLOW_ADMIN_PASSWORD: "admin"
     SUPERUSER_DEFAULT_PASSWORD: "admin"
+
+frontend:
+  service:
+    type: LoadBalancer
