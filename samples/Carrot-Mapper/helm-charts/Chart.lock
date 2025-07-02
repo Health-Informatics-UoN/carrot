@@ -1,0 +1,21 @@
+dependencies:
+- name: db
+  repository: file://db
+  version: 0.1.0
+- name: minio
+  repository: file://minio
+  version: 0.1.0
+- name: omop-lite
+  repository: file://omop-lite
+  version: 0.1.0
+- name: api
+  repository: file://api
+  version: 0.1.0
+- name: frontend
+  repository: file://frontend
+  version: 0.1.0
+- name: airflow
+  repository: file://airflow
+  version: 0.1.0
+digest: sha256:23e8523279a1fb62821da67559eaf727bc96991b6eefbd1cc7ece76a41e44985
+generated: "2025-07-02T10:32:28.471912+01:00"

@@ -1,0 +1,31 @@
+# Global values for the carrot-mapper umbrella chart
+global:
+  namespace: carrot-mapper-k8s
+
+# Override values for individual charts
+minio:
+  namespace: carrot-mapper-k8s
+  replicaCount: 1
+
+db:
+  namespace: carrot-mapper-k8s
+  replicaCount: 1
+
+api:
+  namespace: carrot-mapper-k8s
+  replicaCount: 1
+
+airflow:
+  namespace: carrot-mapper-k8s
+  webserver:
+    replicas: 1
+  scheduler:
+    replicas: 1
+
+frontend:
+  namespace: carrot-mapper-k8s
+  replicaCount: 1
+
+omop-lite:
+  namespace: carrot-mapper-k8s
+  replicaCount: 1

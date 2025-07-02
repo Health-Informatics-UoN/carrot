@@ -1,0 +1,25 @@
+apiVersion: v2
+name: carrot-mapper-k8s
+description: An umbrella chart for deploying the entire Carrot Mapper stack
+version: 0.1.0
+appVersion: "1.0"
+type: application
+dependencies:
+  - name: db
+    version: "*"
+    repository: "file://db"
+  - name: minio
+    version: "*"
+    repository: "file://minio"
+  - name: omop-lite
+    version: "*"
+    repository: "file://omop-lite"
+  - name: api
+    version: "*"
+    repository: "file://api"
+  - name: frontend
+    version: "*"
+    repository: "file://frontend"
+  - name: airflow
+    version: "*"
+    repository: "file://airflow"
