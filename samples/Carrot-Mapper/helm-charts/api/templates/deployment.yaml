@@ -61,7 +61,7 @@ spec:
                 fieldRef:
                   fieldPath: status.podIP
             - name: ALLOWED_HOSTS
-              value: '["localhost","127.0.0.1","{{ include "api.fullname" . }}-service","$(POD_IP)"]'
+              value: '["localhost","127.0.0.1","{{ .Values.service.name }}-service","$(POD_IP)"]'
           envFrom:
             - configMapRef:
                 name: {{ include "api.fullname" . }}-config

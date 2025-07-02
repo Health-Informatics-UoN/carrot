@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "api.fullname" . }}-service
+  name: {{ .Values.service.name }}-service
   namespace: {{ .Values.namespace }}
   labels:
     {{- include "api.labels" . | nindent 4 }}
