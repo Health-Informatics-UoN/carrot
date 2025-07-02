@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "api.fullname" . }}
-  namespace: {{ .Values.namespace }}
   labels:
     {{- include "api.labels" . | nindent 4 }}
     {{- with .Values.podLabels }}

@@ -1,21 +1,21 @@
 dependencies:
-- name: db
-  repository: file://db
-  version: 0.1.0
 - name: minio
-  repository: file://minio
-  version: 0.1.0
+  repository: https://charts.bitnami.com/bitnami
+  version: 17.0.9
 - name: omop-lite
   repository: file://omop-lite
   version: 0.1.0
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 16.7.15
 - name: api
   repository: file://api
-  version: 0.1.0
-- name: frontend
-  repository: file://frontend
   version: 0.1.0
 - name: airflow
   repository: file://airflow
   version: 0.1.0
-digest: sha256:23e8523279a1fb62821da67559eaf727bc96991b6eefbd1cc7ece76a41e44985
-generated: "2025-07-02T10:32:28.471912+01:00"
+- name: frontend
+  repository: file://frontend
+  version: 0.1.0
+digest: sha256:249623156633b5f9d74b57f5d1b8130bda448d06d66056d911ac8a9104ca76ab
+generated: "2025-07-02T15:41:41.117414+01:00"

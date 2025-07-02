@@ -3,7 +3,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.webserver.name }}
-  namespace: {{ .Values.namespace }}
   labels:
     {{- with .Values.webserver.labels }}
     {{- toYaml . | nindent 4 }}

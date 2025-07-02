@@ -4,28 +4,53 @@ global:
 
 # Override values for individual charts
 minio:
-  namespace: carrot-mapper-k8s
-  replicaCount: 1
-
-db:
-  namespace: carrot-mapper-k8s
-  replicaCount: 1
-
-api:
-  namespace: carrot-mapper-k8s
-  replicaCount: 1
-
-airflow:
-  namespace: carrot-mapper-k8s
-  webserver:
-    replicas: 1
-  scheduler:
-    replicas: 1
-
-frontend:
-  namespace: carrot-mapper-k8s
-  replicaCount: 1
+  fullnameOverride: minio-service
+  auth:
+    usePasswordFiles: false
+    rootUser: "minioadmin"
+    rootPassword: "minioadmin"
 
 omop-lite:
-  namespace: carrot-mapper-k8s
-  replicaCount: 1
+  dependencies:
+    postgres:
+      host: postgres-service
+      port: 5432
+      user: postgres
+      password: postgres
+      name: postgres
+
+postgresql:
+  fullnameOverride: postgres-service
+  auth:
+    username: postgres
+    password: postgres
+    database: postgres
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+  service:
+    ports:
+      postgresql: 5432
+
+api:
+  config:
+    DB_HOST: "postgres-service"
+    DB_PORT: "5432"
+    DB_NAME: "postgres"
+    DB_USER: "postgres"
+    MINIO_ENDPOINT: "minio-service:9000"
+    MINIO_ACCESS_KEY: "minioadmin"
+    FRONTEND_URL: "http://frontend-service:3000"
+    DEBUG: "True"
+    AIRFLOW_BASE_URL: "http://airflow-webserver-service:8080/api/v1/"
+    AIRFLOW_ADMIN_USERNAME: "admin"
+    DATA_UPLOAD_MAX_MEMORY_SIZE: "10485760"
+    SUPERUSER_DEFAULT_USERNAME: "admin"
+  secrets:
+    DB_PASSWORD: "postgres"
+    SECRET_KEY: "secret"
+    SIGNING_KEY: "secret"
+    MINIO_SECRET_KEY: "minioadmin"
+    AIRFLOW_ADMIN_PASSWORD: "admin"
+    SUPERUSER_DEFAULT_PASSWORD: "admin"

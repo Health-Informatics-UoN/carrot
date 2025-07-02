@@ -1,6 +1,3 @@
-# Global settings
-namespace: carrot-mapper-k8s
-
 scheduler:
   replicaCount: 1
   name: airflow-scheduler
