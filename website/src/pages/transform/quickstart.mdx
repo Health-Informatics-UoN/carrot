@@ -51,7 +51,7 @@ If it doesn't exist, this directory should be created for you.
 |--------------------|------------------------------------------------|
 | `--input-dir`      | Directory containing input files               |
 | `--rules-file`     | JSON file with mapping rules                   |
-| `--person-file`    | CSV file where the first column contains person IDs |
+| `--person-file`    | CSV file where the first column contains person IDs. This is used as a registry for all valid person IDs. Person IDs not found in this registry will be omitted from all OMOP tables. This file can also be used as an input file, if it has additional data, and is located in the input directory. |
 | `--output-dir`     | Directory for OMOP-format TSV files            |
 
 
