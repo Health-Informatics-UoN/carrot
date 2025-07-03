@@ -19,26 +19,24 @@ spec:
         component: initialization
     spec:
       restartPolicy: {{ .Values.job.restartPolicy }}
-      {{- if .Values.initContainers.enabled }}
       initContainers:
         - name: wait-for-postgres
-          image: {{ .Values.initContainers.postgres.image }}
+          image: postgres:14
           command:
             - sh
             - -c
             - |
-              until pg_isready -h {{ .Values.dependencies.postgres.host }} -p {{ .Values.dependencies.postgres.port }} -U {{ .Values.dependencies.postgres.user }}; do
+              until pg_isready -h postgres-service -p 5432 -U {{ .Values.dependencies.postgres.user }}; do
                 echo "Waiting for postgres..."
                 sleep 2
               done
-      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: DB_HOST
-              value: {{ .Values.dependencies.postgres.host }}
+              value: postgres-service
             - name: DB_PASSWORD
               value: {{ .Values.dependencies.postgres.password }}
             - name: DB_NAME

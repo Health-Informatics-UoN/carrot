@@ -2,36 +2,73 @@
 global:
   namespace: carrot-mapper-k8s
 
-# Override values for individual charts
+# Settings for minio
 minio:
+  # Override the fullname to match the short service name which is fixed in the deployment.
+  # This value shouldn't be changed.
   fullnameOverride: minio-service
   auth:
+    # Use password files to avoid storing the password in the values.yaml file.
     usePasswordFiles: false
     rootUser: "minioadmin"
     rootPassword: "minioadmin"
+  # Enable persistence to avoid losing data when the pod is restarted.
+  persistence:
+    enabled: true
+    size: 8Gi
 
-omop-lite:
-  dependencies:
-    postgres:
-      host: postgres-service
-      port: 5432
-      user: postgres
-      password: postgres
-      name: postgres
-
+# Settings for postgresql
 postgresql:
+  # Override the fullname to match the short service name which is fixed in the deployment.
+  # This value shouldn't be changed.
   fullnameOverride: postgres-service
+  # Setting the auth for db. Port 5432 is the default port for postgresql.
   auth:
     username: postgres
     password: postgres
     database: postgres
+  # Enable persistence to avoid losing data when the pod is restarted.
   primary:
     persistence:
       enabled: true
       size: 10Gi
-  service:
-    ports:
-      postgresql: 5432
+
+# Settings for omop-lite
+omop-lite:
+  image:
+    repository: ghcr.io/health-informatics-uon/omop-lite
+    pullPolicy: IfNotPresent
+    tag: ""
+  # Job configuration
+  job:
+    restartPolicy: OnFailure
+    activeDeadlineSeconds: 3600 # 1 hour
+    backoffLimit: 3
+  dependencies:
+    # Below should be the same as the postgresql auth values above.
+    postgres:
+      user: postgres
+      password: postgres
+      name: postgres
+  # OMOP Lite application configuration
+  config:
+    schemaName: "omop"
+    dataDir: "vocabs"
+    synthetic: "true"
+  # Resource allocation
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+  # Volume configuration for vocabulary files
+  volumes:
+    enabled: false # Set to true if volumes are enabled
+  # Volume mounts configuration
+  volumeMounts:
+    enabled: false # Set to true if volumes are enabled
 
 api:
   config:

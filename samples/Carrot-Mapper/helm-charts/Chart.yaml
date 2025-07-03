@@ -5,15 +5,16 @@ version: 0.1.0
 appVersion: "1.0"
 type: application
 dependencies:
+  # External dependencies in the order they are deployed
   - name: minio
     version: "17.0.9"
+    repository: "https://charts.bitnami.com/bitnami"
+  - name: postgresql
+    version: "16.7.15"
     repository: "https://charts.bitnami.com/bitnami"
   - name: omop-lite
     version: "*"
     repository: "file://omop-lite"
-  - name: postgresql
-    version: "16.7.15"
-    repository: "https://charts.bitnami.com/bitnami"
   - name: api
     version: "*"
     repository: "file://api"
