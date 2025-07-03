@@ -77,12 +77,6 @@ api:
     pullPolicy: IfNotPresent
     tag: "3.2.0"
 
-  service:
-    type: LoadBalancer
-
-  ingress:
-    enabled: false
-
   # Resource limits and requests
   resources:
     requests:
@@ -143,12 +137,6 @@ airflow:
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://postgres:postgres@postgres-service:5432/postgres?options=-csearch_path%3Dairflow"
     AIRFLOW_CONN_POSTGRES_DB_CONN: "postgresql+psycopg2://postgres:postgres@postgres-service:5432/postgres"
 
-  service:
-    type: LoadBalancer
-
-  ingress:
-    enabled: false
-
   # Resource configuration
   resources:
     requests:
@@ -159,5 +147,20 @@ airflow:
       cpu: "500m"
 
 frontend:
-  service:
-    type: LoadBalancer
+  image:
+    repository: ghcr.io/health-informatics-uon/carrot/frontend
+    pullPolicy: IfNotPresent
+    tag: "3.2.0"
+
+  # Configuration data
+  config:
+    NEXT_PUBLIC_ENABLE_REUSE_TRIGGER_OPTION: "true"
+    NEXT_PUBLIC_ENABLE_AI_RECOMMENDATION: "true"
+    NEXT_PUBLIC_RECOMMENDATION_SERVICE_NAME: "unison"
+    RECOMMENDATION_SERVICE: "unison"
+    UNISON_API_KEY: "unison-api-key"
+
+  ingress:
+    use: false
+    certManager: false
+    host: "localhost"

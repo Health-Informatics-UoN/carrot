@@ -4,9 +4,7 @@ metadata:
   name: {{ include "frontend.fullname" . }}
   labels:
     {{- include "frontend.labels" . | nindent 4 }}
-    {{- with .Values.podLabels }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
+    component: frontend
 spec:
   {{- if .Values.autoscaling.enabled }}
   replicas: {{ .Values.autoscaling.minReplicas }}
@@ -18,35 +16,29 @@ spec:
     metadata:
       labels:
         {{- include "frontend.labels" . | nindent 8 }}
-        {{- with .Values.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        component: frontend
     spec:
       initContainers:
-        {{- if .Values.initContainers.waitForApi.enabled }}
         - name: wait-for-api
-          image: {{ .Values.initContainers.waitForApi.image }}
+          image: curlimages/curl:latest
           command:
             - sh
             - -c
             - |
-              until curl -f {{ .Values.initContainers.waitForApi.serviceUrl }}; do
+              until curl -f http://api-service:8000/health; do
                 echo "Waiting for API..."
                 sleep 5
               done
-        {{- end }}
-        {{- if .Values.initContainers.waitForAirflow.enabled }}
         - name: wait-for-airflow
-          image: {{ .Values.initContainers.waitForAirflow.image }}
+          image: curlimages/curl:latest
           command:
             - sh
             - -c
             - |
-              until curl -f {{ .Values.initContainers.waitForAirflow.serviceUrl }}; do
+              until curl -f http://airflow-webserver-service:8080/health; do
                 echo "Waiting for Airflow..."
                 sleep 5
               done
-        {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"

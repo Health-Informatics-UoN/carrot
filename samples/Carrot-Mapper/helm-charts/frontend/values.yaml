@@ -1,24 +1,7 @@
-# This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
 image:
   repository: ghcr.io/health-informatics-uon/carrot/frontend
-  # This sets the pull policy for images.
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
   tag: "3.2.0"
-
-podLabels:
-  component: frontend
-
-# Init containers configuration
-initContainers:
-  waitForApi:
-    enabled: true
-    image: curlimages/curl:latest
-    serviceUrl: "http://api-service:8000/health"
-  waitForAirflow:
-    enabled: true
-    image: curlimages/curl:latest
-    serviceUrl: "http://airflow-webserver-service:8080/health"
 
 # Configuration data
 config:
@@ -39,11 +22,7 @@ config:
 secrets:
   NEXTAUTH_SECRET: "verycomplexsecretkey"
 
-# This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
 service:
-  # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
-  type: LoadBalancer
-  # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
   port: 3000
   targetPort: 3000
   name: frontend
