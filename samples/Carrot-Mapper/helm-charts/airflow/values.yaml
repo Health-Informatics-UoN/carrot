@@ -1,16 +1,13 @@
 scheduler:
   replicaCount: 1
   name: airflow-scheduler
-  labels:
-    component: airflow
-    app: airflow-scheduler
   image:
     repository: ghcr.io/health-informatics-uon/carrot/airflow-scheduler
     tag: "3.2.0"
   env:
     AIRFLOW__CORE__EXECUTE_TASKS_NEW_PYTHON_INTERPRETER: "True"
     AIRFLOW_DEBUG_MODE: "False"
-  # This section is for setting up autoscaling more information can be found here: https://kubernetes.io/docs/concepts/workloads/autoscaling/
+  # TODO: setup autoscaling
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -20,42 +17,22 @@ scheduler:
 webserver:
   replicaCount: 1
   name: airflow-webserver
-  labels:
-    component: airflow
-    app: airflow-webserver
   image:
     repository: ghcr.io/health-informatics-uon/carrot/airflow-webserver
     tag: "3.2.0"
   env:
     AIRFLOW_ADMIN_USERNAME: "admin"
     AIRFLOW_ADMIN_PASSWORD: "admin"
+  # TODO: setup autoscaling
   autoscaling:
     enabled: false
     minReplicas: 1
     maxReplicas: 100
     targetCPUUtilizationPercentage: 80
 
-# Init containers configuration
-initContainers:
-  waitForApi:
-    enabled: true
-    image: curlimages/curl:latest
-    serviceUrl: "http://api-service:8000/health"
-  waitForMinio:
-    enabled: true
-    image: curlimages/curl:latest
-    serviceUrl: "http://minio-service:9000/minio/health/live"
-  waitForPostgres:
-    enabled: true
-    host: postgres-service
-    port: 5432
-    user: postgres
-    password: postgres
-    name: postgres
-    image: postgres:14
-
 # Configuration data
 config:
+  AIRFLOW_POSTGRES_USER: "postgres"
   AIRFLOW__CORE__EXECUTOR: "LocalExecutor"
   AIRFLOW__CORE__LOAD_EXAMPLES: "false"
   AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "False"
@@ -76,16 +53,12 @@ secrets:
   AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://postgres:postgres@postgres-service:5432/postgres?options=-csearch_path%3Dairflow"
   AIRFLOW_CONN_POSTGRES_DB_CONN: "postgresql+psycopg2://postgres:postgres@postgres-service:5432/postgres"
 
-# This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
 service:
-  # This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
   type: LoadBalancer
-  # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
   port: 8080
   targetPort: 8080
   name: http
 
-# This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
   enabled: false
 

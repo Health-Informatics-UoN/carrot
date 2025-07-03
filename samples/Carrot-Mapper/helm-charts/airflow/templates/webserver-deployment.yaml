@@ -4,59 +4,52 @@ kind: Deployment
 metadata:
   name: {{ .Values.webserver.name }}
   labels:
-    {{- with .Values.webserver.labels }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
+    component: airflow
+    app: airflow-webserver
 spec:
   {{- if .Values.webserver.autoscaling.enabled }}
   replicas: {{ .Values.webserver.autoscaling.minReplicas }}
   {{- end }}
   selector:
     matchLabels:
-      app: {{ .Values.webserver.labels.app }}
+      app: airflow-webserver
   template:
     metadata:
       labels:
-        app: {{ .Values.webserver.labels.app }}
-        component: {{ .Values.webserver.labels.component }}
+        app: airflow-webserver
+        component: airflow
     spec:
       initContainers:
-        {{- if .Values.initContainers.waitForPostgres.enabled }}
         - name: wait-for-postgres
-          image: {{ .Values.initContainers.waitForPostgres.image }}
+          image: postgres:14
           command:
             - sh
             - -c
             - |
-              until pg_isready -h {{ .Values.initContainers.waitForPostgres.host }} -p {{ .Values.initContainers.waitForPostgres.port }} -U {{ .Values.initContainers.waitForPostgres.user }}; do
+              until pg_isready -h postgres-service -p 5432 -U {{ .Values.config.AIRFLOW_POSTGRES_USER }}; do
                 echo "Waiting for postgres..."
                 sleep 2
               done
-        {{- end }}
-        {{- if .Values.initContainers.waitForMinio.enabled }}
         - name: wait-for-minio
           image: curlimages/curl:latest
           command:
             - sh
             - -c
             - |
-              until curl -f {{ .Values.initContainers.waitForMinio.serviceUrl }}; do
+              until curl -f http://minio-service:9000/minio/health/live; do
                 echo "Waiting for minio..."
                 sleep 2
               done
-        {{- end }}
-        {{- if .Values.initContainers.waitForApi.enabled }}
         - name: wait-for-api
           image: curlimages/curl:latest
           command:
             - sh
             - -c
             - |
-              until curl -f {{ .Values.initContainers.waitForApi.serviceUrl }}; do
+              until curl -f http://api-service:8000/health; do
                 echo "Waiting for API..."
                 sleep 5
               done
-        {{- end }}
       containers:
         - name: airflow-webserver
           image: {{ .Values.webserver.image.repository }}:{{ .Values.webserver.image.tag }}

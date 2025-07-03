@@ -70,6 +70,7 @@ omop-lite:
   volumeMounts:
     enabled: false # Set to true if volumes are enabled
 
+# Settings for api
 api:
   image:
     repository: ghcr.io/health-informatics-uon/carrot/backend
@@ -78,9 +79,6 @@ api:
 
   service:
     type: LoadBalancer
-    port: 8000
-    targetPort: 8000
-    name: api
 
   ingress:
     enabled: false
@@ -102,8 +100,6 @@ api:
     DB_NAME: "postgres"
     DB_USER: "postgres"
     MINIO_ACCESS_KEY: "minioadmin"
-    DEBUG: "True"
-    WORKER_SERVICE_TYPE: "airflow"
     AIRFLOW_ADMIN_USERNAME: "admin"
     DATA_UPLOAD_MAX_MEMORY_SIZE: "10485760"
     SUPERUSER_DEFAULT_USERNAME: "admin"
@@ -116,6 +112,51 @@ api:
     MINIO_SECRET_KEY: "minioadmin"
     AIRFLOW_ADMIN_PASSWORD: "admin"
     SUPERUSER_DEFAULT_PASSWORD: "admin"
+
+airflow:
+  scheduler:
+    name: airflow-scheduler
+    image:
+      repository: ghcr.io/health-informatics-uon/carrot/airflow-scheduler
+      tag: "3.2.0"
+    env:
+      AIRFLOW_DEBUG_MODE: "False"
+
+  webserver:
+    name: airflow-webserver
+    image:
+      repository: ghcr.io/health-informatics-uon/carrot/airflow-webserver
+      tag: "3.2.0"
+    env:
+      AIRFLOW_ADMIN_USERNAME: "admin"
+      AIRFLOW_ADMIN_PASSWORD: "admin"
+
+  # Configuration data
+  config:
+    AIRFLOW_POSTGRES_USER: "postgres"
+    AIRFLOW_VAR_MINIO_ACCESS_KEY: "minioadmin"
+
+  # Secret data
+  secrets:
+    AIRFLOW_VAR_MINIO_SECRET_KEY: "minioadmin"
+    AIRFLOW__WEBSERVER__SECRET_KEY: "secret"
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://postgres:postgres@postgres-service:5432/postgres?options=-csearch_path%3Dairflow"
+    AIRFLOW_CONN_POSTGRES_DB_CONN: "postgresql+psycopg2://postgres:postgres@postgres-service:5432/postgres"
+
+  service:
+    type: LoadBalancer
+
+  ingress:
+    enabled: false
+
+  # Resource configuration
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
 
 frontend:
   service:

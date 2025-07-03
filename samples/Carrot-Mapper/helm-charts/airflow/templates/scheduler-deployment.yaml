@@ -4,59 +4,53 @@ kind: Deployment
 metadata:
   name: {{ .Values.scheduler.name }}
   labels:
-    {{- with .Values.scheduler.labels }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
+    component: airflow
+    app: airflow-scheduler
+
 spec:
   {{- if .Values.scheduler.autoscaling.enabled }}
   replicas: {{ .Values.scheduler.autoscaling.minReplicas }}
   {{- end }}
   selector:
     matchLabels:
-      app: {{ .Values.scheduler.labels.app }}
+      app: airflow-scheduler
   template:
     metadata:
       labels:
-        app: {{ .Values.scheduler.labels.app }}
-        component: {{ .Values.scheduler.labels.component }}
+        app: airflow-scheduler
+        component: airflow
     spec:
       initContainers:
-        {{- if .Values.initContainers.waitForPostgres.enabled }}
         - name: wait-for-postgres
-          image: {{ .Values.initContainers.waitForPostgres.image }}
+          image: postgres:14
           command:
             - sh
             - -c
             - |
-              until pg_isready -h {{ .Values.initContainers.waitForPostgres.host }} -p {{ .Values.initContainers.waitForPostgres.port }} -U {{ .Values.initContainers.waitForPostgres.user }}; do
+              until pg_isready -h postgres-service -p 5432 -U {{ .Values.config.AIRFLOW_POSTGRES_USER }}; do
                 echo "Waiting for postgres..."
                 sleep 2
               done
-        {{- end }}
-        {{- if .Values.initContainers.waitForMinio.enabled }}
         - name: wait-for-minio
           image: curlimages/curl:latest
           command:
             - sh
             - -c
             - |
-              until curl -f {{ .Values.initContainers.waitForMinio.serviceUrl }}; do
+              until curl -f http://minio-service:9000/minio/health/live; do
                 echo "Waiting for minio..."
                 sleep 2
               done
-        {{- end }}
-        {{- if .Values.initContainers.waitForApi.enabled }}
         - name: wait-for-api
           image: curlimages/curl:latest
           command:
             - sh
             - -c
             - |
-              until curl -f {{ .Values.initContainers.waitForApi.serviceUrl }}; do
+              until curl -f http://api-service:8000/health; do
                 echo "Waiting for API..."
                 sleep 5
               done
-        {{- end }}
       containers:
         - name: airflow-scheduler
           image: {{ .Values.scheduler.image.repository }}:{{ .Values.scheduler.image.tag }}
