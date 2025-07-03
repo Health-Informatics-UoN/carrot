@@ -4,9 +4,7 @@ metadata:
   name: {{ include "api.fullname" . }}
   labels:
     {{- include "api.labels" . | nindent 4 }}
-    {{- with .Values.podLabels }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
+    component: backend
 spec:
   {{- if .Values.autoscaling.enabled }}
   replicas: {{ .Values.autoscaling.minReplicas }}
@@ -18,35 +16,29 @@ spec:
     metadata:
       labels:
         {{- include "api.labels" . | nindent 8 }}
-        {{- with .Values.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        component: backend
     spec:
       initContainers:
-        {{- if .Values.initContainers.waitForPostgres.enabled }}
         - name: wait-for-postgres
-          image: {{ .Values.initContainers.waitForPostgres.image }}
+          image: postgres:14
           command:
             - sh
             - -c
             - |
-              until pg_isready -h {{ .Values.initContainers.waitForPostgres.host }} -p {{ .Values.initContainers.waitForPostgres.port }} -U {{ .Values.initContainers.waitForPostgres.user }}; do
+              until pg_isready -h postgres-service -p 5432 -U {{ .Values.config.DB_USER }}; do
                 echo "Waiting for postgres..."
                 sleep 2
               done
-        {{- end }}
-        {{- if .Values.initContainers.waitForMinio.enabled }}
         - name: wait-for-minio
-          image: {{ .Values.initContainers.waitForMinio.image }}
+          image: curlimages/curl:latest
           command:
             - sh
             - -c
             - |
-              until curl -f {{ .Values.initContainers.waitForMinio.url }}; do
+              until curl -f http://minio-service:9000/minio/health/live; do
                 echo "Waiting for minio..."
                 sleep 2
               done
-        {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
