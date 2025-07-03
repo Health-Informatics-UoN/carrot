@@ -20,11 +20,6 @@ initContainers:
     image: curlimages/curl:latest
     serviceUrl: "http://airflow-webserver-service:8080/health"
 
-# Application command
-command:
-  - node
-  - server.js
-
 # Configuration data
 config:
   BACKEND_URL: "http://api-service:8000"
@@ -55,7 +50,9 @@ service:
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
-  enabled: false
+  use: false
+  certManager: false
+  host: "localhost"
 
 # Resource configuration
 resources:
