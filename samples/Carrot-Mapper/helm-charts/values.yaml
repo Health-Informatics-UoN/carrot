@@ -36,8 +36,6 @@ postgresql:
 # Settings for omop-lite
 omop-lite:
   image:
-    repository: ghcr.io/health-informatics-uon/omop-lite
-    pullPolicy: IfNotPresent
     tag: ""
   # Job configuration
   job:
@@ -73,8 +71,6 @@ omop-lite:
 # Settings for api
 api:
   image:
-    repository: ghcr.io/health-informatics-uon/carrot/backend
-    pullPolicy: IfNotPresent
     tag: "3.2.0"
 
   # Resource limits and requests
@@ -111,7 +107,6 @@ airflow:
   scheduler:
     name: airflow-scheduler
     image:
-      repository: ghcr.io/health-informatics-uon/carrot/airflow-scheduler
       tag: "3.2.0"
     env:
       AIRFLOW_DEBUG_MODE: "False"
@@ -119,7 +114,6 @@ airflow:
   webserver:
     name: airflow-webserver
     image:
-      repository: ghcr.io/health-informatics-uon/carrot/airflow-webserver
       tag: "3.2.0"
     env:
       AIRFLOW_ADMIN_USERNAME: "admin"
@@ -148,8 +142,6 @@ airflow:
 
 frontend:
   image:
-    repository: ghcr.io/health-informatics-uon/carrot/frontend
-    pullPolicy: IfNotPresent
     tag: "3.2.0"
 
   # Configuration data

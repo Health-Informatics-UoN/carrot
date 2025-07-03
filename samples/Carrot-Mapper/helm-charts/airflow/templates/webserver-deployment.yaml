@@ -52,7 +52,7 @@ spec:
               done
       containers:
         - name: airflow-webserver
-          image: {{ .Values.webserver.image.repository }}:{{ .Values.webserver.image.tag }}
+          image: ghcr.io/health-informatics-uon/carrot/airflow-webserver:{{ .Values.webserver.image.tag }}
           ports:
             - name: {{ .Values.service.name }}
               containerPort: {{ .Values.service.targetPort }}

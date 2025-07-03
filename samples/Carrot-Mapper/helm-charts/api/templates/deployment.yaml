@@ -41,8 +41,8 @@ spec:
               done
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "ghcr.io/health-informatics-uon/carrot/backend:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: {{ .Values.service.port }}
               name: {{ .Values.service.name }}

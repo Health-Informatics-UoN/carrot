@@ -2,7 +2,6 @@ scheduler:
   replicaCount: 1
   name: airflow-scheduler
   image:
-    repository: ghcr.io/health-informatics-uon/carrot/airflow-scheduler
     tag: "3.2.0"
   env:
     AIRFLOW__CORE__EXECUTE_TASKS_NEW_PYTHON_INTERPRETER: "True"
@@ -18,7 +17,6 @@ webserver:
   replicaCount: 1
   name: airflow-webserver
   image:
-    repository: ghcr.io/health-informatics-uon/carrot/airflow-webserver
     tag: "3.2.0"
   env:
     AIRFLOW_ADMIN_USERNAME: "admin"

@@ -1,6 +1,4 @@
 image:
-  repository: ghcr.io/health-informatics-uon/omop-lite
-  pullPolicy: IfNotPresent
   tag: ""
 
 # Job configuration
