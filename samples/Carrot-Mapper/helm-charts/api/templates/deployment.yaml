@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "api.fullname" . }}
+  labels:
+    {{- include "api.labels" . | nindent 4 }}
+    component: backend
+spec:
+  {{- if .Values.autoscaling.enabled }}
+  replicas: {{ .Values.autoscaling.minReplicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "api.labels" . | nindent 8 }}
+        component: backend
+    spec:
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:14
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h postgres-service -p 5432 -U {{ .Values.config.DB_USER }}; do
+                echo "Waiting for postgres..."
+                sleep 2
+              done
+        - name: wait-for-minio
+          image: curlimages/curl:latest
+          command:
+            - sh
+            - -c
+            - |
+              until curl -f http://minio-service:9000/minio/health/live; do
+                echo "Waiting for minio..."
+                sleep 2
+              done
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "ghcr.io/health-informatics-uon/carrot/backend:{{ .Values.image.tag | default .Values.global.appVersion }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ .Values.service.port }}
+              name: {{ .Values.service.name }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: ALLOWED_HOSTS
+              value: '["localhost","127.0.0.1","{{ .Values.service.name }}-service","$(POD_IP)"]'
+          envFrom:
+            - configMapRef:
+                name: {{ include "api.fullname" . }}-config
+            - secretRef:
+                name: {{ include "api.fullname" . }}-secrets
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
