@@ -4,7 +4,7 @@ global:
   # Please create a namespace with this name in your cluster before deploying the chart.
   namespace: carrot-mapper
   # This will set the image's tag for FE, BE and Airflow apps at the same time.
-  # User can change the tag separately in the image.tag field for each app below.
+  # User can change the tag separately in the image.tag field for each app below (not recommended).
   appVersion: "3.2.0"
 
 # ==============================================================================
@@ -91,7 +91,7 @@ omop-lite:
 # ==============================================================================
 api:
   image:
-    # This will override the global.appVersion for the api app.
+    # This will override the global.appVersion for the api app. (not recommended)
     tag: ""
 
   service:
@@ -172,7 +172,7 @@ api:
 # ==============================================================================
 airflow:
   image:
-    # This will override the global.appVersion for the airflow app.
+    # This will override the global.appVersion for the airflow app. (not recommended)
     tag: ""
 
   scheduler:
@@ -275,7 +275,7 @@ airflow:
 # ==============================================================================
 frontend:
   image:
-    # This will override the global.appVersion for the frontend app.
+    # This will override the global.appVersion for the frontend app. (not recommended)
     tag: ""
 
   # Configuration data
