@@ -12,4 +12,5 @@ spec:
       targetPort: {{ .Values.service.targetPort }}
       name: {{ .Values.service.name }}
   selector:
-    app: {{ .Values.webserver.name }}
+    app: airflow
+    component: airflow-webserver
