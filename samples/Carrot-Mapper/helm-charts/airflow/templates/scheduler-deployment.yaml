@@ -4,8 +4,8 @@ kind: Deployment
 metadata:
   name: {{ .Values.scheduler.name }}
   labels:
-    component: airflow
-    app: airflow-scheduler
+    component: airflow-scheduler
+    app: airflow
 
 spec:
   {{- if .Values.scheduler.autoscaling.enabled }}
@@ -13,12 +13,12 @@ spec:
   {{- end }}
   selector:
     matchLabels:
-      app: airflow-scheduler
+      app: airflow
   template:
     metadata:
       labels:
-        app: airflow-scheduler
-        component: airflow
+        app: airflow
+        component: airflow-scheduler
     spec:
       initContainers:
         - name: wait-for-postgres
@@ -53,7 +53,7 @@ spec:
               done
       containers:
         - name: airflow-scheduler
-          image: ghcr.io/health-informatics-uon/carrot/airflow-scheduler:{{ .Values.scheduler.image.tag }}
+          image: "ghcr.io/health-informatics-uon/carrot/airflow-scheduler:{{ .Values.image.tag | default .Values.global.appVersion }}"
           env:
             - name: AIRFLOW__CORE__EXECUTE_TASKS_NEW_PYTHON_INTERPRETER
               value: "{{ .Values.scheduler.env.AIRFLOW__CORE__EXECUTE_TASKS_NEW_PYTHON_INTERPRETER }}"

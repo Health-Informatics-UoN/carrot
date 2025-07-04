@@ -32,7 +32,7 @@ spec:
               done
       containers:
         - name: {{ .Chart.Name }}
-          image: "ghcr.io/health-informatics-uon/omop-lite:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "ghcr.io/health-informatics-uon/omop-lite:{{ .Values.image.tag | default "latest" }}"
           imagePullPolicy: IfNotPresent
           env:
             - name: DB_HOST

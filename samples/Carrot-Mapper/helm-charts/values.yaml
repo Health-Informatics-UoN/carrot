@@ -1,6 +1,9 @@
 # Global values for the carrot-mapper umbrella chart
 global:
   namespace: carrot-mapper-k8s
+  # This will set the image's tag for FE, BE and Airflow apps at the same time.
+  # User can change the tag separately in the image.tag field for each app below.
+  appVersion: "3.2.0"
 
 # ==============================================================================
 # -- MINIO --
@@ -42,7 +45,8 @@ postgresql:
 # ==============================================================================
 omop-lite:
   image:
-    tag: ""
+    # This is the image tag for omop-lite app. Default is latest.
+    tag: "v0.1.0"
 
   # Job configuration
   job:
@@ -85,7 +89,8 @@ omop-lite:
 # ==============================================================================
 api:
   image:
-    tag: "3.2.0"
+    # This will override the global.appVersion for the api app.
+    tag: ""
 
   service:
     type: LoadBalancer
@@ -164,11 +169,13 @@ api:
 # -- AIRFLOW --
 # ==============================================================================
 airflow:
+  image:
+    # This will override the global.appVersion for the airflow app.
+    tag: ""
+
   scheduler:
     replicaCount: 1
     name: airflow-scheduler
-    image:
-      tag: "3.2.0"
     env:
       AIRFLOW__CORE__EXECUTE_TASKS_NEW_PYTHON_INTERPRETER: "True"
       AIRFLOW_DEBUG_MODE: "False"
@@ -182,8 +189,6 @@ airflow:
   webserver:
     replicaCount: 1
     name: airflow-webserver
-    image:
-      tag: "3.2.0"
     env:
       AIRFLOW_ADMIN_USERNAME: "admin"
       AIRFLOW_ADMIN_PASSWORD: "admin"
@@ -255,7 +260,8 @@ airflow:
 # ==============================================================================
 frontend:
   image:
-    tag: "3.2.0"
+    # This will override the global.appVersion for the frontend app.
+    tag: ""
 
   # Configuration data
   config:
