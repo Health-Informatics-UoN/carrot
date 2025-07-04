@@ -1,7 +1,8 @@
 apiVersion: v2
-name: carrot-mapper-k8s
+name: carrot-mapper
 description: An umbrella chart for deploying the entire Carrot Mapper stack
 version: 0.1.0
+#  Shouldn't use this value. Use global.appVersion in values.yaml instead.
 appVersion: "1.0"
 type: application
 dependencies:

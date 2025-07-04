@@ -1,6 +1,8 @@
 # Global values for the carrot-mapper umbrella chart
 global:
-  namespace: carrot-mapper-k8s
+  # This will set the namespace for the entire chart.
+  # Please create a namespace with this name in your cluster before deploying the chart.
+  namespace: carrot-mapper
   # This will set the image's tag for FE, BE and Airflow apps at the same time.
   # User can change the tag separately in the image.tag field for each app below.
   appVersion: "3.2.0"
@@ -241,19 +243,32 @@ airflow:
       cpu: "500m"
 
   # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-  livenessProbe:
-    httpGet:
-      path: /health
-      port: 8080
-    initialDelaySeconds: 60
-    periodSeconds: 30
-
-  readinessProbe:
+  startupProbe:
     httpGet:
       path: /health
       port: 8080
     initialDelaySeconds: 30
     periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 30
+
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8080
+    initialDelaySeconds: 90
+    periodSeconds: 30
+    timeoutSeconds: 10
+    failureThreshold: 3
+
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 8080
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
 
 # ==============================================================================
 # -- FRONTEND --
