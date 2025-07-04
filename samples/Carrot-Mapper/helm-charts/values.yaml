@@ -2,7 +2,9 @@
 global:
   namespace: carrot-mapper-k8s
 
-# Settings for minio
+# ==============================================================================
+# -- MINIO --
+# ==============================================================================
 minio:
   # Override the fullname to match the short service name which is fixed in the deployment.
   # This value shouldn't be changed.
@@ -17,7 +19,9 @@ minio:
     enabled: true
     size: 8Gi
 
-# Settings for postgresql
+# ==============================================================================
+# -- POSTGRES --
+# ==============================================================================
 postgresql:
   # Override the fullname to match the short service name which is fixed in the deployment.
   # This value shouldn't be changed.
@@ -33,26 +37,32 @@ postgresql:
       enabled: true
       size: 10Gi
 
-# Settings for omop-lite
+# ==============================================================================
+# -- OMOP LITE --
+# ==============================================================================
 omop-lite:
   image:
     tag: ""
+
   # Job configuration
   job:
     restartPolicy: OnFailure
     activeDeadlineSeconds: 3600 # 1 hour
     backoffLimit: 3
+
+  # Dependencies on other services
   dependencies:
-    # Below should be the same as the postgresql auth values above.
     postgres:
       user: postgres
       password: postgres
       name: postgres
+
   # OMOP Lite application configuration
   config:
     schemaName: "omop"
     dataDir: "vocabs"
     synthetic: "true"
+
   # Resource allocation
   resources:
     limits:
@@ -61,17 +71,30 @@ omop-lite:
     requests:
       cpu: 250m
       memory: 512Mi
+
   # Volume configuration for vocabulary files
   volumes:
     enabled: false # Set to true if volumes are enabled
+
   # Volume mounts configuration
   volumeMounts:
     enabled: false # Set to true if volumes are enabled
 
-# Settings for api
+# ==============================================================================
+# -- API --
+# ==============================================================================
 api:
   image:
     tag: "3.2.0"
+
+  service:
+    type: LoadBalancer
+    port: 8000
+    targetPort: 8000
+    name: api
+
+  ingress:
+    enabled: false
 
   # Resource limits and requests
   resources:
@@ -82,6 +105,30 @@ api:
       memory: "2Gi"
       cpu: "1000m"
 
+  # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    timeoutSeconds: 10
+
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+
+  # TODO: setup autoscaling
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+
   # Environment variables for the api service
   config:
     DB_ENGINE: "django.db.backends.postgresql"
@@ -89,9 +136,19 @@ api:
     DB_PORT: "5432"
     DB_NAME: "postgres"
     DB_USER: "postgres"
+    STORAGE_TYPE: "minio"
+    MINIO_ENDPOINT: "minio-service:9000"
     MINIO_ACCESS_KEY: "minioadmin"
+    FRONTEND_URL: "http://frontend-service:3000"
+    DEBUG: "True"
+    WORKER_SERVICE_TYPE: "airflow"
+    AIRFLOW_BASE_URL: "http://airflow-webserver-service:8080/api/v1/"
+    AIRFLOW_AUTO_MAPPING_DAG_ID: "auto_mapping"
+    AIRFLOW_SCAN_REPORT_PROCESSING_DAG_ID: "scan_report_processing"
+    AIRFLOW_RULES_EXPORT_DAG_ID: "rules_export"
     AIRFLOW_ADMIN_USERNAME: "admin"
     DATA_UPLOAD_MAX_MEMORY_SIZE: "10485760"
+    SUPERUSER_DEFAULT_EMAIL: "admin@carrot.com"
     SUPERUSER_DEFAULT_USERNAME: "admin"
 
   # Secret environment variables
@@ -103,26 +160,55 @@ api:
     AIRFLOW_ADMIN_PASSWORD: "admin"
     SUPERUSER_DEFAULT_PASSWORD: "admin"
 
+# ==============================================================================
+# -- AIRFLOW --
+# ==============================================================================
 airflow:
   scheduler:
+    replicaCount: 1
     name: airflow-scheduler
     image:
       tag: "3.2.0"
     env:
+      AIRFLOW__CORE__EXECUTE_TASKS_NEW_PYTHON_INTERPRETER: "True"
       AIRFLOW_DEBUG_MODE: "False"
+    # TODO: setup autoscaling
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
 
   webserver:
+    replicaCount: 1
     name: airflow-webserver
     image:
       tag: "3.2.0"
     env:
       AIRFLOW_ADMIN_USERNAME: "admin"
       AIRFLOW_ADMIN_PASSWORD: "admin"
+    # TODO: setup autoscaling
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
 
   # Configuration data
   config:
     AIRFLOW_POSTGRES_USER: "postgres"
+    AIRFLOW__CORE__EXECUTOR: "LocalExecutor"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "False"
+    AIRFLOW__WEBSERVER__WEB_SERVER_PORT: "8080"
+    STORAGE_TYPE: "minio"
+    AIRFLOW__API__AUTH_BACKEND: "airflow.api.auth.backend.basic_auth"
+    AIRFLOW_VAR_MINIO_ENDPOINT: "http://minio-service:9000"
     AIRFLOW_VAR_MINIO_ACCESS_KEY: "minioadmin"
+    AIRFLOW__DATABASE__SQL_ALCHEMY_SCHEMA: "airflow"
+    AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER: "s3://airflow-logs"
+    AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID: "minio_conn"
+    AIRFLOW__LOGGING__REMOTE_LOGGING: "True"
 
   # Secret data
   secrets:
@@ -130,6 +216,15 @@ airflow:
     AIRFLOW__WEBSERVER__SECRET_KEY: "secret"
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: "postgresql+psycopg2://postgres:postgres@postgres-service:5432/postgres?options=-csearch_path%3Dairflow"
     AIRFLOW_CONN_POSTGRES_DB_CONN: "postgresql+psycopg2://postgres:postgres@postgres-service:5432/postgres"
+
+  service:
+    type: LoadBalancer
+    port: 8080
+    targetPort: 8080
+    name: http
+
+  ingress:
+    enabled: false
 
   # Resource configuration
   resources:
@@ -140,19 +235,84 @@ airflow:
       memory: "1Gi"
       cpu: "500m"
 
+  # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8080
+    initialDelaySeconds: 60
+    periodSeconds: 30
+
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 8080
+    initialDelaySeconds: 30
+    periodSeconds: 10
+
+# ==============================================================================
+# -- FRONTEND --
+# ==============================================================================
 frontend:
   image:
     tag: "3.2.0"
 
   # Configuration data
   config:
+    BACKEND_URL: "http://api-service:8000"
+    BACKEND_ORIGIN: "api-service:8000"
+    NEXTAUTH_URL: "http://localhost:3000/"
+    NEXTAUTH_BACKEND_URL: "http://api-service:8000/api/"
+    BODY_SIZE_LIMIT: "20971520"
     NEXT_PUBLIC_ENABLE_REUSE_TRIGGER_OPTION: "true"
     NEXT_PUBLIC_ENABLE_AI_RECOMMENDATION: "true"
     NEXT_PUBLIC_RECOMMENDATION_SERVICE_NAME: "unison"
     RECOMMENDATION_SERVICE: "unison"
     UNISON_API_KEY: "unison-api-key"
+    UNISON_BASE_URL: "https://api.hyperunison.com/api/public/suggester/generate"
 
+  # Secret data
+  secrets:
+    NEXTAUTH_SECRET: "verycomplexsecretkey"
+
+  service:
+    port: 3000
+    targetPort: 3000
+    name: frontend
+
+  # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
   ingress:
     use: false
     certManager: false
     host: "localhost"
+
+  # Resource configuration
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+  # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 30
+    periodSeconds: 30
+
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 10
+    periodSeconds: 10
+
+  # TODO: setup autoscaling in the template
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
