@@ -39,3 +39,4 @@ jspm_packages
 .env
 .DS_Store
 website/out/
+vocabs

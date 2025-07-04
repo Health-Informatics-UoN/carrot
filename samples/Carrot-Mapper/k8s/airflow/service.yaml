@@ -1,0 +1,17 @@
+# Airflow Webserver Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: airflow-webserver-service
+  namespace: carrot-mapper
+  labels:
+    app: airflow-webserver
+    component: airflow
+spec:
+  selector:
+    app: airflow-webserver
+  ports:
+    - port: 8080
+      targetPort: 8080
+      name: http
+  type: LoadBalancer

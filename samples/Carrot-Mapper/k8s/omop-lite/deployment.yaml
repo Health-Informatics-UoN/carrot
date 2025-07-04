@@ -1,0 +1,57 @@
+# OMOP Lite Job (runs once to completion)
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: omop-lite-init
+  namespace: carrot-mapper
+  labels:
+    app: omop-lite
+    component: initialization
+spec:
+  template:
+    metadata:
+      labels:
+        app: omop-lite
+        component: initialization
+    spec:
+      restartPolicy: OnFailure
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:14
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h postgres-service -p 5432 -U postgres; do
+                echo "Waiting for postgres..."
+                sleep 2
+              done
+      containers:
+        - name: omop-lite
+          image: ghcr.io/health-informatics-uon/omop-lite
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: DB_HOST
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: api-secrets
+                  key: DB_PASSWORD
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: api-config
+                  key: DB_NAME
+          envFrom:
+            - configMapRef:
+                name: omop-lite-config
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
