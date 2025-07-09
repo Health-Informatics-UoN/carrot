@@ -17,6 +17,7 @@ The CSV files must fulfil the following:
 - One or more CSV files that contain event data, such as questionnaire responses or clinical events/measurements. 
 - As a minimum each CSV file must have a column that contains the anonymised ID for the individual (matching an entry in the CSV file above), the date of a particular event (one per file) and one or more columns that capture the data relevant to that date. 
 - You can have as many CSV files as needed, but each CSV file must only contain information effective on the specified event date.
+- Where there are multiple mappings to the same output (i.e., the same OMOP table and field), all source headers for this mapping must be identical.
 - All measurements in the metric system.
 - All dates and datetimes in the ISO-8601 format: YYYY-MM-DD HH:MM:SS.ffffff
 - All numbers without any digit grouping symbols (e.g. 1000, not 1,000).
