@@ -2,29 +2,29 @@ import { Callout } from "nextra/components";
 
 # Kubernetes Deployment
 
-Carrot Mapper is deployable on Kubernetes.. 
+Carrot Mapper can be deployed on Kubernetes using manifests or Helm charts. 
 
 ## Kubernetes Manifests
 
-Sample Kubernetes manifests files are available for Carrot Mapper in our [Github](https://github.com/Health-Informatics-UoN/carrot/tree/main/samples/Carrot-Mapper/k8s).
+Sample Kubernetes manifest files for Carrot Mapper are available in our [GitHub repository](https://github.com/Health-Informatics-UoN/carrot/tree/main/samples/Carrot-Mapper/k8s).
 
 ## Helm Charts
 
-We publish Helm Charts for Carrot as [releases](https://github.com/Health-Informatics-UoN/carrot/pkgs/container/charts%2Fcarrot-mapper), you can also find the source code in our [Github](https://github.com/Health-Informatics-UoN/carrot/tree/main/charts/carrot-mapper).
+We publish Helm charts for Carrot Mapper as [OCI releases](https://github.com/Health-Informatics-UoN/carrot/pkgs/container/charts%2Fcarrot-mapper). The source for these charts is available in our [GitHub repository](https://github.com/Health-Informatics-UoN/carrot/tree/main/charts/carrot-mapper).
 
-To install these charts using Helm, run:
+To install the chart using Helm, run:
 
 ```bash copy
 helm install carrot-mapper oci://ghcr.io/health-informatics-uon/charts/carrot-mapper --version 0.1.0
 ```
 
 <Callout emoji="🥕">
-    This is our first version of Helm charts, and we'll soon be publishing further guidance on configuration using `values.yaml` to customise your install.
+    This is our first version of the Helm chart. We’ll soon publish more detailed guidance on using `values.yaml` to customise your installation.
 </Callout>
 
-You can then port-forward the `carrot-mapper-frontend` pod to gain access locally.
+Once installed, you can port-forward the `carrot-mapper-frontend` pod to access it locally.
 
-As Carrot Mapper has a dependency on an OMOP CDM existing in a database, the helm install will create one and populate it with a small sample of the vocabularies data.
-For full functionality, you would currently need to remake this OMOP CDM in the database with a set of Vocabularies downloaded from Athena as outlined in the [requirements](requirements).
+Because Carrot Mapper depends on an existing OMOP CDM in your database, the Helm install will create one and populate it with a small sample of vocabulary data.
+For full functionality, you’ll currently need to rebuild this OMOP CDM in your database using a complete set of vocabularies downloaded from Athena, as described in the [requirements](requirements).
 
-We're working on making the process smoother, and enabling a user to populate the OMOP CDM with complete Vocabularies during the install process.
+We’re actively working to make this process smoother and to support populating the OMOP CDM with complete vocabularies during installation, and the ability to update the Vocabularies. 
