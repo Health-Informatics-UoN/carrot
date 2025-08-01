@@ -46,7 +46,7 @@ const config = {
       },
       colors: {
         background: {
-          DEFAULT: "#F98109",
+          DEFAULT: "#ffffff",
           dark: "#000000",
         },
         carrot: {
