@@ -299,25 +299,12 @@ Navigate to `Environment variables` section under `Settings` of your Frontend we
 
 ### Airflow Scheduler app
 
-Navigate to `Environment variables` section under `Settings` of your Function app, then add the variables below:
+Navigate to `Environment variables` section under `Settings` of your Airflow Scheduler app, then add the variables as outlined in the [configuration](/mapper/deployment/configuration#airflow-webserver-and-scheduler).
 
-<Table>
-  <thead>
-    <Tr>
-      <Th>Key</Th>
-      <Th>Description</Th>
-    </Tr>
-  </thead>
-  <tbody>
-    <Tr>
-      <Td>`SECRET_KEY`</Td>
-      <Td>
-        Same value with `SECRET_KEY` in Backend app. It is recommended to put
-        this in the Key Vault.
-      </Td>
-    </Tr>
-  </tbody>
-</Table>
+
+### Airflow Webserver app
+
+Navigate to `Environment variables` section under `Settings` of your Airflow Webserver app, then add the variables as outlined in the [configuration](/mapper/deployment/configuration#airflow-webserver-and-scheduler).
 
 ### Key vault
 
