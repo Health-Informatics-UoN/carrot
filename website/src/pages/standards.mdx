@@ -12,16 +12,16 @@ This may require some restructuring of the dataset.
 The CSV files must fulfil the following:
 
 - One CSV file that represents the demographic data of individuals. 
-- This should contain the anonymised ID for the individual (following the CO-CONNECT specification), Sex and Date of Birth (obfuscated as required) as a minimum, and Ethnicity where possible. 
+- This should contain the anonymised ID for the individual, Sex, and Date of Birth (obfuscated as required) as a minimum, and Ethnicity where possible. 
 - In cases of multiple demographic records per individual, please include only the most recent record in the demographics file.
 - One or more CSV files that contain event data, such as questionnaire responses or clinical events/measurements. 
 - As a minimum each CSV file must have a column that contains the anonymised ID for the individual (matching an entry in the CSV file above), the date of a particular event (one per file) and one or more columns that capture the data relevant to that date. 
 - You can have as many CSV files as needed, but each CSV file must only contain information effective on the specified event date.
 - Where there are multiple mappings to the same output (i.e., the same OMOP table and field), all source headers for this mapping must be identical.
 - All measurements in the metric system.
-- All dates and datetimes in the ISO-8601 format: YYYY-MM-DD HH:MM:SS.ffffff
-- All numbers without any digit grouping symbols (e.g. 1000, not 1,000).
-- All decimal numbers rounded to two decimal places after the decimal symbol “.”.
+- All dates and datetimes in the ISO-8601 format: `YYYY-MM-DD HH:MM:SS`
+- All numbers without any digit grouping symbols (e.g. `1000`, not `1,000`).
+- All decimal numbers rounded to two decimal places after the decimal symbol `.`.
 - All CSV files encoded with UTF-8 and Unix/Linux line ending.
 - All CSV file names limited to 30 characters.
 
