@@ -47,18 +47,28 @@ If it doesn't exist, this directory should be created for you.
 ## Arguments
 ### Required Arguments
 
-| Flag               | Description                                    |
-|--------------------|------------------------------------------------|
-| `--input-dir`      | Directory containing input files               |
-| `--rules-file`     | JSON file with mapping rules                   |
-| `--person-file`    | CSV file where the first column contains person IDs. This is used as a registry for all valid person IDs. Person IDs not found in this registry will be omitted from all OMOP tables. This file can also be used as an input file, if it has additional data, and is located in the input directory. |
-| `--output-dir`     | Directory for OMOP-format TSV files            |
+| Flag              | Description                                      |
+|-------------------|--------------------------------------------------|
+| `--input-dir`     | Directory containing input files                 |
+| `--rules-file`    | JSON file defining mapping rules                 |
+| `--person-file`   | CSV file (or table name) with person IDs and DOB |
+| `--output-dir`    | Directory to write OMOP-format TSV files         |
+
+#### Person ID File
+
+Carrot Transform uses a single Person ID file (or table), which must be specified using `--person-file`.
+
+- The first column must contain person IDs (these will be anonymized).
+- A column named `"date"` must hold each person's date of birth.
+- Person IDs not found in this file will be excluded from all OMOP tables.
+- This file must also reside in the same directory as the other input files (when using CSV mode).
+- This file can itself be an input to transformation rules.
 
 
 ### OMOP Configuration (Choose One Approach)
-| Approach          | Required Arguments |
-|------------------|--------------------|
-| **Specify Files** | `--omop-ddl-file` (DDL statements for OMOP tables) and `--omop-config-file` (override JSON config) |
+| Approach            | Required Arguments |
+|---------------------|--------------------|
+| **Specify Files**   | `--omop-ddl-file` (DDL statements for OMOP tables) and `--omop-config-file` (override JSON config) |
 | **Specify Version** | `--omop-version` (e.g., `5.3`, which will automatically find `carrottransform/config/omop.json` and `carrottransform/config/OMOPCDM_postgresql_XX_ddl.sql`) |
 
 
@@ -70,3 +80,22 @@ If it doesn't exist, this directory should be created for you.
 | `--use-input-person-ids`  | `N`     | Use input person IDs (`Y`) or replace with new integers (`N`) |
 | `--last-used-ids-file`    | None    | Path to a file tracking last used IDs (tab-separated format) |
 | `--log-file-threshold`    | `0`     | Change output limit for log files |
+| `--alchemy-input` | SQLAlchemy connection string for database input  |
+
+#### SQLAlchemy Input (Experimental)
+
+Instead of reading `.csv` files, Carrot Transform can read directly from a database using SQLAlchemy.
+
+- Provide a connection string via `--alchemy-input`.
+- All input tables must match the format expected by Carrot Transform.
+- The `--rules-file` must still point to a local file on disk.
+- The `--person-file` will be interpreted as a **table name**, not a file path.
+
+Examples:
+
+- `--person-file C:/foo/bar/all_the_people.csv` will run:  
+  `SELECT * FROM all_the_people;`
+  
+- `--person-file demographics_makeup.csv` will run:  
+  `SELECT * FROM demographics_makeup;`
+
