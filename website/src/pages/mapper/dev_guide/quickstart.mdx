@@ -48,25 +48,6 @@ To do this, add a folder named `vocabs` in the `root` directory of Carrot, then 
 
 Thanks to [OMOP Lite](https://github.com/Health-Informatics-UoN/omop-lite) container, OMOP schema will be created and vocabularies will be loaded to Carrot's database, when the app's stack is running.
 
-### Authentication setup for Azure functions
-
-For local development, an authentication will be required when `api` container sends requests to `workers` container,.
-
-To set this up, at the `app/workers` directory, add a folder named `Secrets`. Inside this folder, add a new file named `rulestrigger.json` with the following content:
-
-```json copy
-{
-  "keys": [
-    {
-      "name": "default",
-      "value": "rules_key",
-      "encrypted": false
-    }
-  ]
-}
-```
-
-
 ### Superuser Credentials setup
 A superuser needs to be created to access the Django admin dashboard and Carrot frontend.
 
@@ -164,10 +145,10 @@ To stop the application, run:
 ```bash copy
 docker compose --profile main down
 ```
-_Optional:_ There is another services (Azure-related) can be used in Carrot. To active these services, run the command below instead to at step 4 - [Warm up](#warm-up) 
+_Optional:_ There is another service, which is Azurite storage, that can be used in Carrot Mapper. To activate this service, run the command below instead to at step 4 - [Warm up](#warm-up) 
 
 ```bash copy
-STORAGE_TYPE=azure WORKER_SERVICE_TYPE=azure docker compose --profile azure up -d
+STORAGE_TYPE=azure docker compose --profile azure up -d
 ```
 <Callout type='warning'>
 **Note:** Changing the mode of starting the compose stack is not recommended, because this may cause the conflicts in storage.
