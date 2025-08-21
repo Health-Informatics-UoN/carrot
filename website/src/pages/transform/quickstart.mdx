@@ -21,18 +21,18 @@ For example, you can get the version number with:
 carrot-transform -v
 ```
 
-There are many mandatory and optional arguments for carrot transform. In the quick start, we will demonstrate the mandatory arguments on a test case (taken from carrot-CDM) included in the repository.
+There are many mandatory and optional arguments for Carrot Transform. In the quick start, we will demonstrate the mandatory arguments on a test case (taken from carrot-CDM) included in the repository.
 Enter the following (as one command):
 
 ### Basic Example
 To process a test dataset included in the repository, run:
 ```bash
 carrot-transform run mapstream \
-  --input-dir @carrot/examples/test/inputs \
+ --input-dir @carrot/examples/test/inputs \
   --rules-file @carrot/examples/test/rules/rules_14June2021.json \
-  --person-file @carrot/examples/test/inputs/Demographics.csv \
+ --person-file @carrot/examples/test/inputs/Demographics.csv \
   --output-dir carrottransform/examples/test/test_output \
-  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.3_ddl.sql \
+ --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.3_ddl.sql \
   --omop-config-file @carrot/config/omop.json
 ```
 The '@carrot' is an alias to the folder containing the carrot-transform module, which can be used with either installation method. When using your own files, use your file path, and omit this.
@@ -45,28 +45,37 @@ If it doesn't exist, this directory should be created for you.
 
 
 ## Arguments
+
+All of the program arguments can be specified as command-line parameters.
+Some of the arguments can be passed through environment variables - potentially useful for containerised usage.
+The following tables describe the parameters available, the command line flag for them, any environment variable and any default values.
+
 ### Required Arguments
 
-| Flag               | Description                                    |
-|--------------------|------------------------------------------------|
-| `--input-dir`      | Directory containing input files               |
-| `--rules-file`     | JSON file with mapping rules                   |
-| `--person-file`    | CSV file where the first column contains person IDs. This is used as a registry for all valid person IDs. Person IDs not found in this registry will be omitted from all OMOP tables. This file can also be used as an input file, if it has additional data, and is located in the input directory. |
-| `--output-dir`     | Directory for OMOP-format TSV files            |
+| Command Line Flag | Environment Variable | Description |
+|-------------------|----------------------|-------------|
+| `--input-dir`     | `INPUT_DIR`          | Directory containing input files |
+| `--rules-file`    | `RULES_FILE`         | JSON file with mapping rules |
+| `--person-file`   | `PERSON_FILE`        | CSV file where the first column contains person IDs. This is used as a registry for all valid person IDs. Person IDs not found in this registry will be omitted from all OMOP tables. This file can also be used as an input file if it has additional data and is located in the input directory. |
+| `--output-dir`    | `OUTPUT_DIR`         | Directory for OMOP-format TSV files |
 
 
 ### OMOP Configuration (Choose One Approach)
-| Approach          | Required Arguments |
-|------------------|--------------------|
-| **Specify Files** | `--omop-ddl-file` (DDL statements for OMOP tables) and `--omop-config-file` (override JSON config) |
-| **Specify Version** | `--omop-version` (e.g., `5.3`, which will automatically find `carrottransform/config/omop.json` and `carrottransform/config/OMOPCDM_postgresql_XX_ddl.sql`) |
+
+| Approach            | Command Line Flag    | Environment Variable | Description |
+|---------------------|----------------------|----------------------|-------------|
+| **Specify Files**   | `--omop-ddl-file`    | `OMOP_DDL_FILE`      | (DDL statements for OMOP tables) |
+|                     | `--omop-config-file` | `OMOP_CONFIG_FILE`   | (override JSON config) |
+| **Specify Version** | `--omop-version`     |                      | (e.g., `5.3`, which will automatically find `carrottransform/config/omop.json` and `carrottransform/config/OMOPCDM_postgresql_XX_ddl.sql`) |
 
 
 ### Optional Arguments
-| Flag                      | Default | Description |
-|---------------------------|---------|-------------|
-| `--write-mode`            | `w`     | Set to `w` (overwrite) or `a` (append) for output files |
-| `--saved-person-id-file`  | None    | Path to a file to save and share `person_id` state |
-| `--use-input-person-ids`  | `N`     | Use input person IDs (`Y`) or replace with new integers (`N`) |
-| `--last-used-ids-file`    | None    | Path to a file tracking last used IDs (tab-separated format) |
-| `--log-file-threshold`    | `0`     | Change output limit for log files |
+
+| Command Line Flag        | Environment Variable | Default | Description |
+|--------------------------|----------------------|---------|-------------|
+| `--write-mode`           |                      | `w`     | Set to `w` (overwrite) or `a` (append) for output files |
+| `--saved-person-id-file` |                      | None    | Path to a file to save and share `person_id` state |
+| `--use-input-person-ids` |                      | `N`     | Use input person IDs (`Y`) or replace with new integers (`N`) |
+| `--last-used-ids-file`   |                      | None    | Path to a file tracking last used IDs (tab-separated format) |
+| `--log-file-threshold`   |                      | `0`     | Change output limit for log files |
+| `--input-db-url`         | `INPUT_DB_URL`       | None    | SQLAlchemy connection string for database input. This is an alternative to `--input-dir`, so it cannot be used with that parameter. The system still needs `--person-file` or `PERSON_FILE`, but only the name (sans extension) will be used to determine the table; i.e. `C:/my/files/patient_data.csv` will use the `patient_data` table. |
