@@ -33,7 +33,7 @@ carrot-transform run mapstream \
   --person-file @carrot/examples/test/inputs/Demographics.csv \
   --output-dir carrottransform/examples/test/test_output \
   --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.3_ddl.sql \
-  --omop-config-file @carrot/config/omop.json
+  --omop-config-file @carrot/config/config.json
 ```
 The '@carrot' is an alias to the folder containing the carrot-transform module, which can be used with either installation method. When using your own files, use your file path, and omit this.
 
@@ -69,7 +69,7 @@ Carrot Transform uses a single Person ID file (or table), which must be specifie
 | Approach            | Required Arguments |
 |---------------------|--------------------|
 | **Specify Files**   | `--omop-ddl-file` (DDL statements for OMOP tables) and `--omop-config-file` (override JSON config) |
-| **Specify Version** | `--omop-version` (e.g., `5.3`, which will automatically find `carrottransform/config/omop.json` and `carrottransform/config/OMOPCDM_postgresql_XX_ddl.sql`) |
+| **Specify Version** | `--omop-version` (e.g., `5.3`, which will automatically find `carrottransform/config/config.json` and `carrottransform/config/OMOPCDM_postgresql_XX_ddl.sql`) |
 
 
 ### Optional Arguments
