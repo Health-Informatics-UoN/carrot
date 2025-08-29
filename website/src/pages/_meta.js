@@ -12,4 +12,5 @@ export default {
   mapper: "Carrot Mapper",
   transform: "Carrot Transform",
   carrot_etl_guide: "Carrot Guide",
+  carrot_etl_workflow: "Carrot ETL End-to-End Workflow Documentation",
 };
