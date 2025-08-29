@@ -3,9 +3,31 @@ import HighlightedText from '@/components/HighlightedText';
 
 # Phase 3: Data Execution and Validation
 
+## What is Carrot Transform?
+
+**Carrot Transform** is like the **worker** that actually does the heavy lifting.
+
+Think of it this way:
+- **WhiteRabbit** (Phase 1) = Inspector who examines your data
+- **Carrot Mapper** (Phase 2) = Architect who creates the blueprint
+- **Carrot Transform** (Phase 3) = Construction crew that builds according to the blueprint
+
+**What Carrot Transform does:**
+- Takes your mapping rules from Carrot Mapper
+- Reads your original data files
+- Applies all the transformations you specified
+- Creates new files in the standard OMOP CDM format
+- Checks that everything was done correctly
+
+**Why this step is important:**
+- This is where your data actually gets converted from its current format to the standard format
+- It's like having a translator who speaks both languages fluently
+- It ensures your data follows all the OMOP CDM rules and standards
+- It creates the final output that researchers can actually use
+
 ## Overview
 
-The final phase of the Carrot ETL workflow focuses on executing the data transformation process and validating the results. This phase brings together all the work from the previous phases to actually transform your source data into OMOP CDM format and ensure data quality and compliance.
+The final phase of the Carrot ETL workflow focuses on executing the data transformation process and validating the results. This phase combines all the work from the previous phases to actually transform your source data into OMOP CDM format and check that everything worked correctly.
 
 ## Step 9: Install Carrot Transform
 
@@ -186,50 +208,51 @@ count_validation:
 
 ### Data Quality Validation
 
-<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "20px" }}>
-  <div style={{ flex: "1" }}>
-    
-    **Completeness Checks**
-    - Required field presence
-    - Data coverage analysis
-    - Missing value patterns
-    - Population completeness
-    
-    **Accuracy Checks**
-    - Data type compliance
-    - Range and constraint validation
-    - Business rule compliance
-    - Cross-field validation
-    
-    **Consistency Checks**
-    - Format consistency
-    - Naming convention compliance
-    - Value consistency
-    - Temporal consistency
-
-  </div>
-  
-  <div style={{ flex: "0.4", textAlign: "right" }}>
-    <figure style={{ display: "inline-block", textAlign: "center" }}>
-      <img 
-        src="/docs/truncating_columns.png" 
-        alt="Data Quality Validation" 
-        width="200"
-        height="150"
-        style={{ 
-          maxWidth: "100%", 
-          height: "auto", 
-          border: "1px solid #ddd", 
-          borderRadius: "8px",
-          padding: "5px" 
-        }} 
-      />
-      <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
-        Figure: Quality Validation
-      </figcaption>
-    </figure>
-  </div>
+<div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
+  <figure style={{ margin: "0" }}>
+    <img 
+      src="/docs/truncating_columns.png" 
+      alt="Data Quality Validation" 
+      width="100%"
+      height="auto"
+      style={{ 
+        maxWidth: "800px", 
+        border: "3px solid #007acc", 
+        borderRadius: "16px",
+        padding: "12px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+        backgroundColor: "#ffffff"
+      }} 
+    />
+    <figcaption style={{ 
+      marginTop: "16px", 
+      fontStyle: "italic", 
+      color: "#333",
+      fontSize: "16px",
+      fontWeight: "600"
+    }}>
+      Figure: Quality Validation
+    </figcaption>
+  </figure>
 </div>
+
+**Completeness Checks**
+- Required field presence
+- Data coverage analysis
+- Missing value patterns
+- Population completeness
+
+**Accuracy Checks**
+- Data type compliance
+- Range and constraint validation
+- Business rule compliance
+- Cross-field validation
+
+**Consistency Checks**
+- Format consistency
+- Naming convention compliance
+- Value consistency
+- Temporal consistency
 
 ### OMOP CDM Compliance Validation
 

@@ -3,9 +3,30 @@ import HighlightedText from '@/components/HighlightedText';
 
 # Phase 2: Data Transformation with Carrot Mapper
 
+## What is Carrot Mapper?
+
+**Carrot Mapper** is like a **translation service** for your data. 
+
+Think of it this way:
+- **WhiteRabbit** (Phase 1) told you what's in your data
+- **Carrot Mapper** (Phase 2) helps you create a "dictionary" that translates your data into the standard OMOP CDM format
+- **Carrot Transform** (Phase 3) uses that dictionary to actually do the translation
+
+**What Carrot Mapper does:**
+- Takes your scan report from WhiteRabbit
+- Lets you map each field in your data to the standard OMOP format
+- Creates rules for how to transform your data
+- Generates a configuration file that Carrot Transform will use
+
+**Why this step is important:**
+- Your data might call a patient "patient_id" but OMOP calls it "person_id"
+- Your dates might be in "MM/DD/YYYY" format but OMOP needs "YYYY-MM-DD"
+- Your diagnosis codes might be in one format but need to be in another
+- Carrot Mapper helps you specify all these translations
+
 ## Overview
 
-The second phase of the Carrot ETL workflow focuses on using Carrot Mapper to create data mappings and transformation rules. This phase transforms the insights gained from WhiteRabbit profiling into actionable ETL configurations that can convert your source data into OMOP CDM format.
+The second phase of the Carrot ETL workflow focuses on using Carrot Mapper to create data mappings and transformation rules. This phase uses the insights gained from WhiteRabbit profiling and turns them into ETL configurations that can convert your source data into OMOP CDM format.
 
 ## Step 4: Carrot Mapper Setup
 
@@ -16,7 +37,7 @@ The second phase of the Carrot ETL workflow focuses on using Carrot Mapper to cr
 3. Verify you have permissions to create projects
 
 <Callout type="info">
-  **Note:** Carrot Mapper is typically accessed through a web interface. Ensure you have the correct URL and access credentials before beginning this phase.
+  **Note:** Carrot Mapper is typically accessed through a web interface. Make sure you have the correct URL and access credentials before starting this phase.
 </Callout>
 
 ### 4.2 Create New Project
@@ -70,50 +91,51 @@ diagnosis_code,ICD-10 diagnosis code,STRING,CONDITION_OCCURRENCE,condition_sourc
 
 ### 6.1 Understand OMOP CDM Structure
 
+<div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
+  <figure style={{ margin: "0" }}>
+    <img 
+      src="/docs/models.png" 
+      alt="OMOP CDM Data Model" 
+      width="100%"
+      height="auto"
+      style={{ 
+        maxWidth: "800px", 
+        border: "3px solid #007acc", 
+        borderRadius: "16px",
+        padding: "12px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+        backgroundColor: "#ffffff"
+      }} 
+    />
+    <figcaption style={{ 
+      marginTop: "16px", 
+      fontStyle: "italic", 
+      color: "#333",
+      fontSize: "16px",
+      fontWeight: "600"
+    }}>
+      Figure: OMOP CDM Data Model
+    </figcaption>
+  </figure>
+</div>
+
 Familiarize yourself with key OMOP CDM tables:
 
-<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "20px" }}>
-  <div style={{ flex: "1" }}>
-    
-    **Core Clinical Tables**
-    - **PERSON**: Patient demographics and basic information
-    - **OBSERVATION_PERIOD**: Time periods of observation
-    - **VISIT_OCCURRENCE**: Healthcare visits and encounters
-    - **CONDITION_OCCURRENCE**: Diagnoses and conditions
-    - **DRUG_EXPOSURE**: Medication exposures and prescriptions
-    - **PROCEDURE_OCCURRENCE**: Medical procedures and interventions
-    - **MEASUREMENT**: Clinical measurements and lab results
-    - **OBSERVATION**: Clinical observations and assessments
-    
-    **Supporting Tables**
-    - **CONCEPT**: Standardized medical concepts
-    - **VOCABULARY**: Medical terminology vocabularies
-    - **DOMAIN**: Concept domain classifications
-    - **RELATIONSHIP**: Concept relationships and hierarchies
+**Core Clinical Tables**
+- **PERSON**: Patient demographics and basic information
+- **OBSERVATION_PERIOD**: Time periods of observation
+- **VISIT_OCCURRENCE**: Healthcare visits and encounters
+- **CONDITION_OCCURRENCE**: Diagnoses and conditions
+- **DRUG_EXPOSURE**: Medication exposures and prescriptions
+- **PROCEDURE_OCCURRENCE**: Medical procedures and interventions
+- **MEASUREMENT**: Clinical measurements and lab results
+- **OBSERVATION**: Clinical observations and assessments
 
-  </div>
-  
-  <div style={{ flex: "0.4", textAlign: "right" }}>
-    <figure style={{ display: "inline-block", textAlign: "center" }}>
-      <img 
-        src="/docs/models.png" 
-        alt="OMOP CDM Data Model" 
-        width="200"
-        height="150"
-        style={{ 
-          maxWidth: "100%", 
-          height: "auto", 
-          border: "1px solid #ddd", 
-          borderRadius: "8px",
-          padding: "5px" 
-        }} 
-      />
-      <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
-        Figure: OMOP CDM Model
-      </figcaption>
-    </figure>
-  </div>
-</div>
+**Supporting Tables**
+- **CONCEPT**: Standardized medical concepts
+- **VOCABULARY**: Medical terminology vocabularies
+- **DOMAIN**: Concept domain classifications
+- **RELATIONSHIP**: Concept relationships and hierarchies
 
 ### 6.2 Create Field Mappings
 
@@ -383,7 +405,7 @@ error_handling:
 
 ## Next Steps
 
-After completing the data mapping configuration in Carrot Mapper, you'll have a comprehensive ETL configuration ready for execution. The next phase focuses on [Data Execution and Validation](./phase3_execution).
+After completing the data mapping configuration in Carrot Mapper, you'll have an ETL configuration ready for execution. The next phase focuses on [Data Execution and Validation](./phase3_execution).
 
 **Key Deliverables from Phase 2:**
 - ✅ Carrot Mapper project created and configured

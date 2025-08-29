@@ -3,14 +3,35 @@ import HighlightedText from '@/components/HighlightedText';
 
 # Carrot ETL End-to-End Workflow Documentation
 
+## What is ETL?
+
+**ETL** stands for **Extract, Transform, and Load** - it's the process of taking data from one place, changing it into a different format, and putting it somewhere else.
+
+Think of it like this:
+- **Extract**: You're taking data out of your hospital's computer system (like patient records, lab results, etc.)
+- **Transform**: You're converting that data into a standard format that other systems can understand
+- **Load**: You're putting the transformed data into a new system where researchers can analyze it safely
+
+## What is OMOP CDM?
+
+**OMOP CDM** (Common Data Model) is like a **universal language** for healthcare data. 
+
+Imagine you have hospitals in different countries, each speaking different languages and using different ways to record patient information. OMOP CDM is like teaching everyone to speak the same language and write things down in the same format.
+
+**Why is this important?**
+- **Researchers** can analyze data from many hospitals at once
+- **Doctors** can compare treatments across different patient groups
+- **Scientists** can discover new medical insights faster
+- **Your data** becomes more valuable and useful to the medical community
+
 ## Project Overview
-This document outlines the complete workflow for running Carrot ETL end-to-end, from initial setup through data transformation. It documents the process of using WhiteRabbit for data profiling and Carrot Mapper for OMOP CDM transformation.
+This guide walks you through the complete Carrot ETL workflow, from setup to data transformation. You'll learn how to use WhiteRabbit for data profiling and Carrot Mapper for OMOP CDM transformation.
 
 ## Workflow Overview
-The Carrot ETL workflow consists of three main phases:
-1. **Data Profiling Phase** - Using WhiteRabbit to understand source data
-2. **Transformation Phase** - Using Carrot Mapper to create and execute ETL rules
-3. **Execution Phase** - Using Carrot Transform to perform the actual data transformation
+The Carrot ETL workflow has three main phases:
+1. **Data Profiling Phase** - Using WhiteRabbit to understand your source data (like taking inventory of what you have)
+2. **Transformation Phase** - Using Carrot Mapper to create rules for converting your data (like writing a translation guide)
+3. **Execution Phase** - Using Carrot Transform to perform the actual data transformation (like doing the translation work)
 
 ## Prerequisites
 - macOS, Linux, or Windows system
@@ -19,6 +40,30 @@ The Carrot ETL workflow consists of three main phases:
 - Access to Carrot Mapper platform
 - Carrot Transform tool installed
 - Source data files (CSV, SAS, or database access)
+
+## Glossary of Terms
+
+**Data Profiling**: The process of examining your data to understand what's in it, like looking through a filing cabinet to see what documents you have.
+
+**Source Data**: Your original data files (like Excel spreadsheets, CSV files, or database tables) that contain patient information.
+
+**Scan Report**: A summary of your data created by WhiteRabbit, showing things like how many patients you have, what types of information are recorded, and how complete your data is.
+
+**Data Dictionary**: A table that describes each field in your data - what it means, what type of information it contains, and how it should be mapped to the standard format.
+
+**Mapping Rules**: Instructions that tell the system how to convert your data from its current format into the standard OMOP CDM format.
+
+**Transformation**: The actual process of changing your data from one format to another, like converting dates from "MM/DD/YYYY" to "YYYY-MM-DD".
+
+**Validation**: Checking that your transformed data meets quality standards and follows the correct format.
+
+**JVM (Java Virtual Machine)**: The software that runs WhiteRabbit. Think of it as the "engine" that powers the tool.
+
+**PyPI**: The Python Package Index - a website where you can download Python tools like Carrot Transform.
+
+**CSV (Comma-Separated Values)**: A simple file format where data is separated by commas, like: "Name,Age,City" on one line, then "John,25,London" on the next line.
+
+**SAS**: A file format used by SAS statistical software, commonly used in healthcare and research.
 
 ---
 
@@ -396,10 +441,21 @@ export EXTRA_JVM_ARGUMENTS="-Xmx2400m"
 
 ## Conclusion
 
-This workflow provides a comprehensive path from initial data profiling to successful OMOP CDM transformation using the Carrot ETL toolset. The key to success is taking each step methodically, validating results, and maintaining clear documentation throughout the process.
+This workflow gives you a clear path from data profiling to successful OMOP CDM transformation using the Carrot ETL tools. The key to success is taking each step carefully, checking your results, and keeping good records of what you've done.
 
-Remember that ETL development is iterative - don't expect perfection on the first attempt. Use the sample data provided with WhiteRabbit to practice and learn before working with your production data.
+**What You've Accomplished:**
+- **Phase 1**: You've profiled your data and understand what you're working with
+- **Phase 2**: You've created mapping rules to transform your data
+- **Phase 3**: You've executed the transformation and validated the results
+
+**Next Steps:**
+- Review your transformed data to make sure it meets your needs
+- Share your results with your team or research community
+- Consider how you might improve the process for future datasets
+- Document any lessons learned for other team members
+
+**Remember**: ETL is both an art and a science. Don't be afraid to experiment and refine your approach. The more you practice, the better you'll get at transforming healthcare data into useful research insights.
 
 ---
 
-*This documentation was created based on hands-on experience with WhiteRabbit v1.0.0 and the Carrot ETL workflow. Last updated: [Current Date]*
+*This guide was written based on real experience with WhiteRabbit v1.0.0 and the Carrot ETL workflow. Last updated: [Current Date]*

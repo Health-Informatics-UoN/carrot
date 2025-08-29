@@ -5,11 +5,13 @@ import HighlightedText from '@/components/HighlightedText';
 
 ## Overview
 
-The first phase of the Carrot ETL workflow focuses on understanding your source data using WhiteRabbit, an open-source data profiling tool. This phase is crucial for creating effective data mappings and transformation rules in the subsequent phases.
+The first phase of the Carrot ETL workflow focuses on understanding your source data using WhiteRabbit, an open-source data profiling tool. This phase helps you create good data mappings and transformation rules in the next phases.
 
 ## Step 1: Installation and Setup
 
 ### 1.1 Download WhiteRabbit
+
+**Why this matters:** WhiteRabbit is the tool that will examine your data and create a report. It's like having a thorough inspector who looks at every piece of your data and tells you exactly what you have.
 
 1. Go to [OHDSI WhiteRabbit releases](https://github.com/OHDSI/WhiteRabbit/releases/latest)
 2. Download the latest `WhiteRabbit_vX.X.X.zip` file
@@ -20,6 +22,8 @@ The first phase of the Carrot ETL workflow focuses on understanding your source 
 </Callout>
 
 ### 1.2 Verify Installation
+
+**Why this matters:** Making sure all the files are in the right place prevents errors when you try to run WhiteRabbit. It's like checking that all the pieces of a puzzle are present before you start.
 
 Check that you have the following structure:
 ```
@@ -35,6 +39,8 @@ WhiteRabbit_v1.0.0/
 ```
 
 ### 1.3 Launch WhiteRabbit
+
+**Why this matters:** This is where you'll actually start working with your data. WhiteRabbit will open a window where you can tell it what data to look at and how to analyze it.
 
 **On macOS/Linux:**
 ```bash
@@ -53,6 +59,8 @@ bin\whiteRabbit.bat
 </Callout>
 
 ### 1.4 Memory Configuration
+
+**Why this matters:** WhiteRabbit needs enough memory to analyze your data, but not so much that it crashes your computer. Think of it like making sure a car has enough fuel but not so much that it's wasteful.
 
 WhiteRabbit may not start if the memory allocated by the JVM is too big or too small. By default, this is set to 1200m.
 
@@ -78,6 +86,8 @@ export EXTRA_JVM_ARGUMENTS="-Xmx600m"
 </Callout>
 
 ### 1.5 Temporary Directory Configuration
+
+**Why this matters:** When WhiteRabbit creates reports, it needs a place to store temporary files. In shared environments, you might need to specify where these files go to avoid conflicts with other users.
 
 For multi-user environments, you may need to configure a custom temporary directory for Apache POI (used for Excel report generation).
 
@@ -161,125 +171,142 @@ WhiteRabbit supports multiple database platforms including MySQL, SQL Server, Or
 
 ### 2.3 Configure Scan Options
 
-<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "20px" }}>
-  <div style={{ flex: "1" }}>
-    
-    **Scan field values**: Check this box (recommended)
-    - Enables detailed analysis of field contents
-    - Provides value distributions and frequencies
-    - Required for fake data generation
-    
-    **Min cell count**: Set to 5 (default)
-    - Minimum frequency for values to appear in scan report
-    - Lower values provide more detail but increase report size
-    - Values appearing less than this count will not appear in the report
-    
-    **Rows per table**: Choose sampling size:
-    - 100,000 (default, good for most cases)
-    - 500,000 (for larger datasets)
-    - 1,000,000 (for very large datasets)
-    - All rows (for complete analysis)
-    
-    **Max distinct values**: Set to 1,000 (default)
-    - Maximum unique values per field to analyze
-    - Options: 100, 1,000, or 10,000
-    - Prevents memory issues with high-cardinality fields
-    
-    **Numeric stats**: Check if you want statistical analysis
-    - Provides min, max, mean, median for numeric fields
-    - Calculates standard deviation and quartiles
-    - Useful for identifying data quality issues
-
-  </div>
-  
-  <div style={{ flex: "0.4", textAlign: "right" }}>
-    <figure style={{ display: "inline-block", textAlign: "center" }}>
-      <img 
-        src="/docs/example_1.png" 
-        alt="WhiteRabbit Configuration" 
-        width="200"
-        height="150"
-        style={{ 
-          maxWidth: "100%", 
-          height: "auto", 
-          border: "1px solid #ddd", 
-          borderRadius: "8px",
-          padding: "5px" 
-        }} 
-      />
-      <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
-        Figure: WhiteRabbit Configuration
-      </figcaption>
-    </figure>
-  </div>
+<div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
+  <figure style={{ margin: "0" }}>
+    <img 
+      src="/docs/whiterabbit-config.png" 
+      alt="WhiteRabbit Configuration Interface - Scan Options" 
+      width="100%"
+      height="auto"
+      style={{ 
+        maxWidth: "800px", 
+        border: "3px solid #007acc", 
+        borderRadius: "16px",
+        padding: "12px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+        backgroundColor: "#ffffff"
+      }} 
+    />
+    <figcaption style={{ 
+      marginTop: "16px", 
+      fontStyle: "italic", 
+      color: "#333",
+      fontSize: "16px",
+      fontWeight: "600"
+    }}>
+      Figure: WhiteRabbit Configuration Interface - Configure your scan options here
+    </figcaption>
+  </figure>
 </div>
 
-**Numeric Statistics Reservoir Size:**
-When numeric statistics are enabled, you can set the reservoir size for statistical calculations:
-- Defines the number of values stored for calculation
-- If field has fewer values than reservoir size, statistics are exact
-- If field has more values, statistics are approximated from random sample
-- Average, minimum, and maximum are always true population statistics
-- Standard deviation and quartiles may be approximated
+**Scan field values**: Check this box (recommended)
+- Enables detailed analysis of field contents
+- Provides value distributions and frequencies
+- Required for fake data generation
+
+**Min cell count**: Set to 5 (default)
+- Minimum frequency for values to appear in scan report
+- Lower values provide more detail but increase report size
+- Values appearing less than this count will not appear in the report
+
+**Rows per table**: Choose sampling size:
+- 100,000 (default, good for most cases)
+- 500,000 (for larger datasets)
+- 1,000,000 (for very large datasets)
+- All rows (for complete analysis)
+
+**Max distinct values**: Set to 1,000 (default)
+- Maximum unique values per field to analyze
+- Options: 100, 1,000, or 10,000
+- Prevents memory issues with high-cardinality fields
+
+**Numeric stats**: Check if you want statistical analysis
+- Provides min, max, mean, median for numeric fields
+- Calculates standard deviation and quartiles
+- Useful for identifying data quality issues
 
 ## Step 3: Execute Data Scan
 
-### 3.1 Select Files/Tables to Scan
+### 3.1 Start the Scan Process
 
-1. **For file-based sources**: Select specific files from the working folder
-2. **For databases**: Select specific tables to scan
-3. **Start small**: Begin with 1-2 files/tables for testing
+**Why this matters:** This is where WhiteRabbit actually examines your data and creates the report you'll need for the next phase. It's like having a team of inspectors go through every file in your filing cabinet.
 
-<Callout type="info">
-  **Tip:** Start with a small subset of your data to test the configuration and understand the output format before scanning your entire dataset.
-</Callout>
+**Why this matters:** The scan report is your roadmap for the next phase. It tells you exactly what data you have, how complete it is, and what needs attention before you can transform it.
 
-### 3.2 Run the Scan
+**Expected Duration:** Scan time depends on:
+- Data file size (larger files take longer)
+- Number of fields (more fields = more analysis)
+- Computer performance (faster computers = faster scans)
+- Scan options selected (detailed scans take longer)
 
-1. Click "Scan tables" button
-2. Monitor progress in the status area
-3. Wait for completion message
-4. **Expected Result**: `ScanReport.xlsx` file created in working folder
+### 3.2 Review Scan Results
 
-### 3.3 Command Line Execution
+**Why this matters:** The scan report is your roadmap for the next phase. It tells you exactly what data you have, how complete it is, and what needs attention before you can transform it.
 
-For automation or batch processing, you can run WhiteRabbit from the command line using configuration files.
+1. **ScanReport.xlsx**: Main report file containing:
+   - Field-by-field analysis
+   - Data quality metrics
+   - Value distributions
+   - Completeness statistics
 
-**Create Configuration File:**
-```ini
-# WhiteRabbit.ini example
-[WhiteRabbit]
-workingFolder=C:\temp\whiterabbit
-sourceType=delimitedTextFiles
-delimiter=comma
-scanFieldValues=true
-minCellCount=5
-rowsPerTable=100000
-maxDistinctValues=1000
-numericStats=true
-```
+2. **Key Information to Review**:
+   - **Missing Values**: Fields with many empty cells
+   - **Data Types**: Whether fields contain text, numbers, dates, etc.
+   - **Value Ranges**: For numeric fields, what are the min/max values
+   - **Unique Values**: How many different values each field contains
 
-**Run from Command Line:**
-```bash
-# Windows
-bin\whiteRabbit.bat -ini WhiteRabbit.ini
+## Troubleshooting Common Issues
 
-# macOS/Linux
-./bin/whiteRabbit -ini WhiteRabbit.ini
-```
+### WhiteRabbit Won't Start
 
-<Callout type="info">
-  **Configuration Examples:** Sample configuration files can be found in the `iniFileExamples` folder of your WhiteRabbit installation.
-</Callout>
+**Problem:** WhiteRabbit doesn't open when you run the command.
 
-### 3.4 Review Scan Results
+**Solutions:**
+1. **Check Java Installation**: Make sure Java 8+ is installed
+   ```bash
+   java -version
+   ```
+2. **Memory Issues**: Try reducing memory allocation
+   ```bash
+   export EXTRA_JVM_ARGUMENTS="-Xmx600m"
+   ./bin/whiteRabbit
+   ```
+3. **Path Issues**: Make sure you're in the right directory
+4. **Permission Issues**: Make sure the files are executable
 
-1. Open the generated `ScanReport.xlsx` file
-2. Review the following tabs:
-   - **Field Overview**: Data types, counts, and statistics
-   - **Table Overview**: Table summaries and row counts
-   - **Individual table tabs**: Value distributions for each field
-   - **Metadata tab** (indicated by "_"): WhiteRabbit settings used
+### Scan Process Fails
+
+**Problem:** The scan starts but crashes or fails to complete.
+
+**Solutions:**
+1. **Reduce Memory Usage**: Lower the JVM memory setting
+2. **Check File Permissions**: Ensure WhiteRabbit can read your data files
+3. **File Size**: Very large files might need to be split
+4. **File Format**: Ensure your data files are in supported formats
+
+### Poor Scan Performance
+
+**Problem:** The scan is very slow or uses too much memory.
+
+**Solutions:**
+1. **Reduce Scan Options**: Uncheck "Scan field values" for faster scans
+2. **Sample Data**: Use smaller row samples (100,000 instead of all rows)
+3. **Close Other Programs**: Free up system resources
+4. **Check Disk Space**: Ensure you have enough free space
+
+### Scan Report Issues
+
+**Problem:** The scan completes but the report is incomplete or incorrect.
+
+**Solutions:**
+1. **Check Scan Options**: Make sure "Scan field values" is checked
+2. **Verify Data Files**: Ensure files weren't corrupted during scan
+3. **Re-run Scan**: Sometimes a second scan resolves issues
+4. **Check Logs**: Look for error messages in the WhiteRabbit output
+
+---
+
+**Next Steps:** Once you have your scan report, you're ready to move to Phase 2: Data Transformation with Carrot Mapper. The scan report will be your guide for creating effective data mappings.
 
 ## Understanding the Scan Report
 
@@ -495,9 +522,9 @@ export ORG_OHDSI_WHITERABBIT_POI_TMPDIR="/path/to/custom/temp/dir"
 
 ## Next Steps
 
-After completing the data profiling phase with WhiteRabbit, you'll have a comprehensive understanding of your source data structure and quality. This information will be essential for the next phase: [Data Transformation with Carrot Mapper](./phase2_mapper).
+After completing the data profiling phase with WhiteRabbit, you'll have a good understanding of your source data structure and quality. This information will help you in the next phase: [Data Transformation with Carrot Mapper](./phase2_mapper).
 
-**Key Deliverables from Phase 1:**
+**What You've Accomplished:**
 - ✅ WhiteRabbit installed and configured
 - ✅ Source data scanned and analyzed
 - ✅ ScanReport.xlsx generated and reviewed
