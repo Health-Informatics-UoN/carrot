@@ -1,0 +1,527 @@
+import { Callout } from "nextra/components";
+import HighlightedText from '@/components/HighlightedText';
+
+# Phase 3: Data Execution and Validation
+
+## Overview
+
+The final phase of the Carrot ETL workflow focuses on executing the data transformation process and validating the results. This phase brings together all the work from the previous phases to actually transform your source data into OMOP CDM format and ensure data quality and compliance.
+
+## Step 9: Install Carrot Transform
+
+### 9.1 Installation Options
+
+**Option 1: Install from PyPI (Recommended)**
+```bash
+pip install carrot-transform
+```
+
+**Option 2: Install from source**
+```bash
+git clone https://github.com/Health-Informatics-UoN/carrot-transform
+cd carrot-transform
+pip install -e .
+```
+
+<Callout type="info">
+  **Note:** The PyPI package is actively maintained and is the recommended installation method for most users.
+</Callout>
+
+### 9.2 Verify Installation
+```bash
+carrot-transform -v
+```
+
+**Expected Result:** Version number displayed, confirming successful installation.
+
+<Callout type="info">
+  **System Requirements:** Carrot Transform requires Python 3.10 or higher. For database operations, you may need additional system libraries (e.g., PostgreSQL development headers).
+</Callout>
+
+## Step 10: Execute Data Transformation
+
+### 10.1 Prepare Target Environment
+
+1. Set up target database (if not already done)
+2. Ensure OMOP CDM schema is created
+3. Verify sufficient storage space
+4. Check database permissions
+
+<Callout type="warning">
+  **Important:** Ensure your target database has sufficient capacity and performance characteristics to handle the expected data volume and transformation workload.
+</Callout>
+
+**Target Environment Checklist:**
+```yaml
+environment_requirements:
+  database:
+    type: "PostgreSQL/MySQL/SQL Server"
+    version: "Compatible with OMOP CDM"
+    storage: "Sufficient for 2-3x source data size"
+    
+  schema:
+    omop_cdm_schema: "Created and accessible"
+    required_tables: "All core tables present"
+    indexes: "Optimized for query performance"
+    
+  permissions:
+    create_tables: "ETL user has permissions"
+    insert_data: "ETL user can insert records"
+    create_indexes: "ETL user can create indexes"
+```
+
+### 10.2 Run ETL Process
+
+**Basic Command Structure:**
+```bash
+carrot-transform run mapstream \
+  --input-dir /path/to/source/data \
+  --rules-file /path/to/mapping/rules.json \
+  --person-file /path/to/person/demographics.csv \
+  --output-dir /path/to/output \
+  --omop-version 5.3
+```
+
+**Required Arguments:**
+- `--input-dir`: Directory containing your source data files
+- `--rules-file`: JSON configuration file from Carrot Mapper
+- `--person-file`: CSV file with person IDs (first column)
+- `--output-dir`: Directory for OMOP-format output files
+
+**OMOP Configuration Options:**
+- **Option 1**: Use `--omop-version 5.3` (automatically finds config files)
+- **Option 2**: Specify custom files:
+  - `--omop-ddl-file`: DDL statements for OMOP tables
+  - `--omop-config-file`: Custom OMOP configuration
+
+**Optional Arguments:**
+- `--write-mode`: Set to `w` (overwrite) or `a` (append)
+- `--use-input-person-ids`: Use `Y` to preserve original IDs or `N` to generate new ones
+- `--log-file-threshold`: Control log file output (default: 0)
+
+### 10.3 What Happens During Transformation
+
+**Transformation Process:**
+```yaml
+transformation_steps:
+  initialization:
+    - load_rules: "Parse JSON mapping rules from Carrot Mapper"
+    - validate_configuration: "Check OMOP CDM configuration"
+    - prepare_output: "Create output directory structure"
+    
+  data_processing:
+    - read_source_data: "Load source files (CSV, SAS, etc.)"
+    - apply_mappings: "Execute field-to-field transformations"
+    - apply_business_rules: "Implement complex transformation logic"
+    - generate_omop_records: "Create OMOP CDM compliant records"
+    
+  output_generation:
+    - write_omop_files: "Generate TSV files for each OMOP table"
+    - create_metadata: "Generate transformation metadata and logs"
+    - validate_output: "Check output file integrity"
+```
+
+**Output Structure:**
+```
+output_directory/
+├── PERSON.tsv
+├── OBSERVATION_PERIOD.tsv
+├── VISIT_OCCURRENCE.tsv
+├── CONDITION_OCCURRENCE.tsv
+├── DRUG_EXPOSURE.tsv
+├── PROCEDURE_OCCURRENCE.tsv
+├── MEASUREMENT.tsv
+├── OBSERVATION.tsv
+├── metadata.json
+└── transformation.log
+```
+
+### 10.4 Monitor Execution
+
+1. **Watch console output** for progress indicators
+2. **Check log files** for detailed information
+3. **Monitor system resources** (CPU, memory, disk I/O)
+4. **Wait for completion message**
+
+**Expected Console Output:**
+```
+[INFO] Starting Carrot Transform execution...
+[INFO] Loading mapping rules from: /path/to/rules.json
+[INFO] Processing input directory: /path/to/source/data
+[INFO] Found 3 source files to process
+[INFO] Processing file 1/3: demographics.csv
+[INFO] Generated 1000 PERSON records
+[INFO] Processing file 2/3: visits.csv
+[INFO] Generated 5000 VISIT_OCCURRENCE records
+[INFO] Processing file 3/3: conditions.csv
+[INFO] Generated 8000 CONDITION_OCCURRENCE records
+[INFO] Transformation completed successfully
+[INFO] Output files written to: /path/to/output
+```
+
+## Data Validation Framework
+
+### Row Count Validation
+
+**Expected vs. Actual Counts:**
+```yaml
+count_validation:
+  source_tables:
+    - table: "patient_demographics"
+      expected_rows: 10000
+      tolerance: "±5%"
+      
+  target_tables:
+    - table: "PERSON"
+      expected_rows: 10000
+      actual_rows: 10000
+      status: "PASSED"
+      
+  relationship_validation:
+    - parent_table: "PERSON"
+      child_table: "VISIT_OCCURRENCE"
+      expected_ratio: "1:many"
+      orphan_check: "No orphaned visits"
+```
+
+### Data Quality Validation
+
+<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "20px" }}>
+  <div style={{ flex: "1" }}>
+    
+    **Completeness Checks**
+    - Required field presence
+    - Data coverage analysis
+    - Missing value patterns
+    - Population completeness
+    
+    **Accuracy Checks**
+    - Data type compliance
+    - Range and constraint validation
+    - Business rule compliance
+    - Cross-field validation
+    
+    **Consistency Checks**
+    - Format consistency
+    - Naming convention compliance
+    - Value consistency
+    - Temporal consistency
+
+  </div>
+  
+  <div style={{ flex: "0.4", textAlign: "right" }}>
+    <figure style={{ display: "inline-block", textAlign: "center" }}>
+      <img 
+        src="/docs/truncating_columns.png" 
+        alt="Data Quality Validation" 
+        width="200"
+        height="150"
+        style={{ 
+          maxWidth: "100%", 
+          height: "auto", 
+          border: "1px solid #ddd", 
+          borderRadius: "8px",
+          padding: "5px" 
+        }} 
+      />
+      <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+        Figure: Quality Validation
+      </figcaption>
+    </figure>
+  </div>
+</div>
+
+### OMOP CDM Compliance Validation
+
+**Schema Compliance:**
+```yaml
+cdm_validation:
+  table_structure:
+    - required_tables: ["PERSON", "OBSERVATION_PERIOD", "VISIT_OCCURRENCE"]
+    - field_validation: "All required fields present"
+    - data_type_check: "Field types match CDM specification"
+    
+  constraint_validation:
+    - primary_keys: "Unique and not null"
+    - foreign_keys: "Referential integrity maintained"
+    - check_constraints: "Business rules enforced"
+    
+  vocabulary_compliance:
+    - standard_concepts: "Using standard medical vocabularies"
+    - concept_validation: "All concepts exist in vocabulary tables"
+    - mapping_quality: "High-confidence mappings used"
+```
+
+## Performance Monitoring and Optimization
+
+### Execution Metrics
+
+**Key Performance Indicators:**
+```yaml
+performance_metrics:
+  processing_speed:
+    - records_per_second: "Target: 1000+ records/sec"
+    - throughput: "GB/hour processed"
+    - efficiency: "Resource utilization vs. output"
+    
+  resource_usage:
+    - cpu_utilization: "Target: 70-80%"
+    - memory_usage: "Target: 80-90%"
+    - disk_io: "Monitor for bottlenecks"
+    - network_usage: "For distributed processing"
+    
+  quality_metrics:
+    - success_rate: "Target: >95%"
+    - error_rate: "Target: <5%"
+    - data_completeness: "Target: >90%"
+    - validation_pass_rate: "Target: >95%"
+```
+
+### Optimization Strategies
+
+**Performance Tuning:**
+```yaml
+optimization_strategies:
+  database_optimization:
+    - index_strategy: "Create indexes on join and filter columns"
+    - partition_strategy: "Partition large tables by date or key"
+    - compression: "Use appropriate compression for data types"
+    
+  processing_optimization:
+    - batch_size: "Optimize batch size for memory and performance"
+    - parallel_processing: "Use multiple threads/processes"
+    - caching: "Cache frequently accessed reference data"
+    
+  resource_optimization:
+    - memory_allocation: "Allocate sufficient memory for operations"
+    - connection_pooling: "Optimize database connections"
+    - timeout_settings: "Set appropriate timeouts for operations"
+```
+
+## Error Handling and Recovery
+
+### Error Classification and Handling
+
+**Error Types:**
+```yaml
+error_categories:
+  data_quality_errors:
+    - null_values: "Handle missing required data"
+    - format_errors: "Fix data format issues"
+    - constraint_violations: "Resolve business rule violations"
+    
+  system_errors:
+    - connection_failures: "Retry with exponential backoff"
+    - timeout_errors: "Increase timeout or optimize queries"
+    - resource_limitations: "Scale resources or optimize processing"
+    
+  transformation_errors:
+    - mapping_failures: "Review and fix mapping rules"
+    - vocabulary_errors: "Validate concept mappings"
+    - business_logic_errors: "Review transformation logic"
+```
+
+**Recovery Strategies:**
+```yaml
+recovery_strategies:
+  automatic_recovery:
+    - retry_mechanism: "Automatic retry with backoff"
+    - fallback_strategies: "Alternative processing paths"
+    - error_correction: "Automatic data correction where possible"
+    
+  manual_intervention:
+    - error_review: "Manual review of error logs"
+    - data_correction: "Manual data fixes"
+    - process_restart: "Restart failed processes"
+    
+  escalation_procedures:
+    - notification: "Alert appropriate teams"
+    - documentation: "Document issues and resolutions"
+    - process_improvement: "Update procedures to prevent recurrence"
+```
+
+## Quality Assurance and Testing
+
+### Testing Strategies
+
+**Testing Approaches:**
+```yaml
+testing_strategies:
+  unit_testing:
+    - individual_transformations: "Test each transformation rule"
+    - field_mappings: "Validate field-to-field mappings"
+    - business_logic: "Test business rule implementations"
+    
+  integration_testing:
+    - end_to_end_workflow: "Test complete data flow"
+    - cross_table_relationships: "Validate referential integrity"
+    - data_consistency: "Check data consistency across tables"
+    
+  user_acceptance_testing:
+    - stakeholder_review: "Business user validation"
+    - sample_data_review: "Manual review of sample records"
+    - business_rule_validation: "Verify business requirements met"
+```
+
+### Validation Tools and Techniques
+
+**Automated Validation:**
+```yaml
+validation_tools:
+  built_in_validation:
+    - schema_validation: "CDM schema compliance"
+    - constraint_validation: "Database constraint checking"
+    - business_rule_validation: "Custom rule validation"
+    
+  external_validation:
+    - cdm_validation_tools: "OHDSI validation tools"
+    - data_quality_tools: "Third-party quality assessment"
+    - performance_testing: "Load and stress testing"
+    
+  manual_validation:
+    - sample_review: "Manual review of sample data"
+    - cross_reference_checking: "Verify against source systems"
+    - business_logic_verification: "Validate business rules"
+```
+
+## Monitoring and Alerting
+
+### Real-time Monitoring
+
+**Monitoring Dashboard:**
+```yaml
+monitoring_configuration:
+  real_time_metrics:
+    - processing_status: "Active, paused, completed, failed"
+    - progress_tracking: "Percentage complete, records processed"
+    - performance_metrics: "Throughput, resource usage, error rates"
+    
+  alerting_rules:
+    - error_thresholds: "Alert when error rate > 5%"
+    - performance_degradation: "Alert when throughput < 80% of baseline"
+    - system_health: "Alert on system failures or resource exhaustion"
+    
+  notification_channels:
+    - email: "Send alerts to operations team"
+    - slack: "Post alerts to monitoring channels"
+    - pagerduty: "Escalate critical issues"
+```
+
+### Logging and Audit
+
+**Comprehensive Logging:**
+```yaml
+logging_configuration:
+  log_levels:
+    - error: "Log all errors and exceptions"
+    - warning: "Log warnings and potential issues"
+    - info: "Log processing milestones and status"
+    - debug: "Log detailed execution information"
+    
+  audit_trail:
+    - data_access: "Log all data access and modifications"
+    - transformation_history: "Track all data transformations"
+    - quality_metrics: "Record quality assessment results"
+    - compliance_checks: "Log compliance validation results"
+```
+
+## Success Criteria and Completion
+
+### Validation Success Criteria
+
+**Quality Thresholds:**
+```yaml
+success_criteria:
+  data_quality:
+    - completeness: ">90% of required fields populated"
+    - accuracy: ">95% of records pass validation rules"
+    - consistency: ">95% of cross-field validations pass"
+    
+  performance_metrics:
+    - processing_speed: "Meet or exceed performance targets"
+    - resource_efficiency: "Optimal resource utilization"
+    - scalability: "Process handles expected data volumes"
+    
+  compliance_requirements:
+    - cdm_compliance: "100% OMOP CDM schema compliance"
+    - vocabulary_standards: "Use standard medical vocabularies"
+    - business_rules: "All business requirements satisfied"
+```
+
+### Completion Checklist
+
+**Phase 3 Completion:**
+- [ ] Carrot Transform installed and verified
+- [ ] Target environment prepared and configured
+- [ ] ETL process executed successfully
+- [ ] Data transformation completed
+- [ ] Results validated against requirements
+- [ ] Data quality checks passed
+- [ ] OMOP CDM validation successful
+- [ ] Performance requirements met
+- [ ] Documentation completed
+- [ ] Stakeholder approval received
+
+## Post-Execution Activities
+
+### Documentation and Knowledge Transfer
+
+**Documentation Requirements:**
+```yaml
+documentation_deliverables:
+  technical_documentation:
+    - etl_configuration: "Complete ETL configuration details"
+    - transformation_rules: "All transformation logic documented"
+    - validation_results: "Quality assessment and validation results"
+    
+  operational_documentation:
+    - run_procedures: "Step-by-step execution procedures"
+    - monitoring_guidelines: "Monitoring and alerting procedures"
+    - troubleshooting_guides: "Common issues and solutions"
+    
+  business_documentation:
+    - data_dictionary: "Target data structure and definitions"
+    - quality_metrics: "Data quality assessment results"
+    - compliance_report: "Regulatory compliance documentation"
+```
+
+### Maintenance and Support
+
+**Ongoing Activities:**
+```yaml
+maintenance_activities:
+  regular_maintenance:
+    - performance_monitoring: "Continuous performance tracking"
+    - quality_assessment: "Regular data quality reviews"
+    - process_optimization: "Continuous improvement initiatives"
+    
+  support_activities:
+    - issue_resolution: "Address operational issues"
+    - user_support: "Support end users and stakeholders"
+    - training: "Provide training and documentation updates"
+    
+  continuous_improvement:
+    - feedback_collection: "Gather user and stakeholder feedback"
+    - process_refinement: "Refine and optimize processes"
+    - technology_updates: "Evaluate and implement new technologies"
+```
+
+## Next Steps
+
+Congratulations! You have successfully completed the Carrot ETL End-to-End Workflow. Your data has been transformed into OMOP CDM format and validated for quality and compliance.
+
+**What's Next:**
+- **Operational Use**: Begin using your transformed data for research and analysis
+- **Continuous Improvement**: Monitor performance and identify optimization opportunities
+- **Knowledge Sharing**: Share your experience with the Carrot community
+- **Advanced Features**: Explore additional Carrot capabilities and features
+
+**Additional Resources:**
+- [Troubleshooting and Best Practices](./troubleshooting)
+- [Additional Resources](./resources)
+- [Carrot Documentation](https://carrot.ac.uk/documentation)
+- [OHDSI Community](http://forums.ohdsi.org/)
+
+---
+
+*This completes the Carrot ETL End-to-End Workflow Documentation. Remember that ETL development is iterative - continue to monitor, optimize, and improve your processes based on real-world usage and feedback.*

@@ -1,0 +1,475 @@
+import { Callout } from "nextra/components";
+import HighlightedText from '@/components/HighlightedText';
+
+# Troubleshooting and Best Practices
+
+## Overview
+
+This section provides solutions to common issues you may encounter during the Carrot ETL workflow and offers best practices to ensure successful implementation. The troubleshooting guide is organized by tool and phase to help you quickly identify and resolve problems.
+
+## Common Issues and Solutions
+
+### WhiteRabbit Issues
+
+#### Problem: "Index 0 out of bounds for length 0"
+
+**Symptoms:**
+- Error occurs when trying to generate fake data
+- Scan report appears incomplete or corrupted
+
+**Solution:**
+1. Ensure scan report is generated before using fake data generation
+2. Verify that the scan completed successfully
+3. Check that the working folder contains valid data files
+4. Re-run the scan if necessary
+
+**Prevention:**
+- Always complete the scan process before proceeding
+- Verify scan report generation in the working folder
+- Test with small datasets first
+
+#### Problem: Memory errors during scan
+
+**Symptoms:**
+- "OutOfMemoryError" or "Java heap space" errors
+- WhiteRabbit crashes during large dataset processing
+- System becomes unresponsive
+
+**Solution:**
+Increase JVM memory allocation:
+```bash
+export EXTRA_JVM_ARGUMENTS="-Xmx2400m"
+./bin/whiteRabbit
+```
+
+**Alternative solutions:**
+- Reduce the number of rows per table in scan options
+- Process datasets in smaller chunks
+- Close other applications to free memory
+- Use a machine with more available RAM
+
+**Prevention:**
+- Monitor system memory usage
+- Start with conservative scan settings
+- Test memory requirements with sample data
+
+#### Problem: Scan report not generated
+
+**Symptoms:**
+- No `ScanReport.xlsx` file in working folder
+- Scan process appears to complete but no output
+- Error messages in status area
+
+**Solution:**
+1. Verify working folder is set correctly
+2. Check file permissions and accessibility
+3. Ensure sufficient disk space
+4. Review error messages in status area
+5. Check that data files are in supported formats
+
+**Troubleshooting steps:**
+```bash
+# Check working folder contents
+ls -la /path/to/working/folder
+
+# Verify file permissions
+ls -la /path/to/working/folder/*.csv
+
+# Check available disk space
+df -h /path/to/working/folder
+
+# Test file accessibility
+file /path/to/working/folder/sample.csv
+```
+
+### Carrot Mapper Issues
+
+#### Problem: Upload errors with data dictionary
+
+**Symptoms:**
+- Data dictionary upload fails
+- Validation errors during upload
+- Missing required field errors
+
+**Solution:**
+1. Ensure all required columns have values (only the last column can be empty)
+2. Check CSV format and encoding (use UTF-8)
+3. Verify column headers match expected format
+4. Remove any special characters or formatting
+
+**Data Dictionary Format Requirements:**
+```csv
+Field_Name,Field_Description,Data_Type,OMOP_Table,OMOP_Field,Transformation_Rules
+patient_id,Unique patient identifier,STRING,PERSON,person_id,
+visit_date,Date of visit,DATE,VISIT_OCCURRENCE,visit_start_date,
+diagnosis_code,ICD-10 diagnosis code,STRING,CONDITION_OCCURRENCE,condition_source_value,
+```
+
+**Common formatting issues:**
+- Extra spaces in column headers
+- Inconsistent date formats
+- Special characters in field names
+- Missing required field values
+
+#### Problem: Mapping validation failures
+
+**Symptoms:**
+- Mapping validation errors
+- Field mapping warnings
+- OMOP CDM compliance issues
+
+**Solution:**
+1. Review field mappings and ensure proper OMOP CDM field references
+2. Verify data types are compatible
+3. Check that required fields are mapped
+4. Validate vocabulary mappings
+
+**Validation checklist:**
+- [ ] All required OMOP CDM fields are mapped
+- [ ] Data types are compatible between source and target
+- [ ] Vocabulary mappings use standard concepts
+- [ ] Business rules are correctly implemented
+- [ ] Error handling is appropriate
+
+#### Problem: ETL rule generation failures
+
+**Symptoms:**
+- Rule generation process fails
+- Incomplete ETL specifications
+- Configuration export errors
+
+**Solution:**
+1. Review all mapping configurations
+2. Check for missing required information
+3. Validate transformation rules
+4. Ensure all dependencies are satisfied
+
+**Common causes:**
+- Incomplete field mappings
+- Invalid transformation rules
+- Missing vocabulary mappings
+- Configuration inconsistencies
+
+## Best Practices
+
+### 1. Start Small
+
+**Why it's important:**
+- Reduces complexity and risk
+- Allows for learning and iteration
+- Identifies issues early
+- Builds confidence and understanding
+
+**Implementation:**
+- Begin with 1-2 small tables
+- Use sample datasets for initial testing
+- Validate each step before proceeding
+- Document lessons learned
+
+**Example approach:**
+```yaml
+phased_implementation:
+  phase_1:
+    tables: ["patient_demographics"]
+    focus: "Basic patient information"
+    validation: "Simple field mappings"
+    
+  phase_2:
+    tables: ["visit_information"]
+    focus: "Visit and encounter data"
+    validation: "Date and relationship handling"
+    
+  phase_3:
+    tables: ["diagnosis_data"]
+    focus: "Clinical condition data"
+    validation: "Vocabulary and concept mapping"
+```
+
+### 2. Document Everything
+
+**What to document:**
+- All configuration decisions
+- Data quality issues found
+- Transformation rules created
+- Error handling strategies
+- Performance observations
+
+**Documentation format:**
+```yaml
+project_documentation:
+  configuration:
+    - scan_parameters: "WhiteRabbit configuration used"
+    - mapping_decisions: "Field mapping rationale"
+    - transformation_rules: "Business logic implementation"
+    
+  issues_and_solutions:
+    - data_quality_issues: "Problems encountered and solutions"
+    - performance_issues: "Bottlenecks and optimizations"
+    - validation_issues: "Compliance problems and fixes"
+    
+  lessons_learned:
+    - best_practices: "What worked well"
+    - avoid_these: "What to avoid in future"
+    - recommendations: "Suggestions for improvement"
+```
+
+**Documentation tools:**
+- Project notebooks or wikis
+- Version control for configurations
+- Issue tracking systems
+- Knowledge base articles
+
+### 3. Iterate and Refine
+
+**Why iteration is important:**
+- ETL design is inherently iterative
+- Requirements evolve during development
+- Data quality issues emerge during testing
+- Performance optimizations require experimentation
+
+**Iteration cycle:**
+```yaml
+iteration_process:
+  design:
+    - initial_mapping: "First attempt at field mappings"
+    - review_and_feedback: "Stakeholder input and validation"
+    - refinement: "Update mappings based on feedback"
+    
+  testing:
+    - test_execution: "Run ETL process with sample data"
+    - result_validation: "Check output quality and accuracy"
+    - issue_identification: "Identify problems and gaps"
+    
+  improvement:
+    - problem_analysis: "Understand root causes"
+    - solution_development: "Design fixes and improvements"
+    - implementation: "Apply changes and test again"
+```
+
+**Iteration best practices:**
+- Plan for multiple iterations
+- Set realistic expectations
+- Learn from each iteration
+- Document changes and rationale
+
+### 4. Validate Continuously
+
+**Validation points:**
+- After each configuration step
+- During data profiling
+- After mapping creation
+- During ETL execution
+- After data transformation
+
+**Validation methods:**
+```yaml
+validation_approaches:
+  automated_validation:
+    - schema_validation: "Check data structure compliance"
+    - constraint_validation: "Verify business rules"
+    - quality_checks: "Assess data quality metrics"
+    
+  manual_validation:
+    - sample_review: "Manual inspection of sample data"
+    - stakeholder_review: "Business user validation"
+    - cross_reference: "Verify against source systems"
+    
+  performance_validation:
+    - throughput_measurement: "Check processing speed"
+    - resource_utilization: "Monitor system resources"
+    - scalability_testing: "Test with larger datasets"
+```
+
+## Performance Optimization
+
+### WhiteRabbit Performance
+
+**Optimization strategies:**
+```yaml
+whiterabbit_optimization:
+  memory_management:
+    - jvm_heap_size: "Set appropriate memory allocation"
+    - garbage_collection: "Optimize GC settings"
+    - memory_monitoring: "Monitor memory usage"
+    
+  scan_optimization:
+    - batch_size: "Optimize rows per table setting"
+    - parallel_processing: "Use multiple scan threads"
+    - incremental_scanning: "Scan large datasets in chunks"
+    
+  file_handling:
+    - file_format: "Use efficient file formats"
+    - compression: "Compress large files"
+    - streaming: "Process files as streams"
+```
+
+### Carrot Mapper Performance
+
+**Optimization techniques:**
+```yaml
+mapper_optimization:
+  mapping_efficiency:
+    - batch_processing: "Process mappings in batches"
+    - caching: "Cache frequently accessed data"
+    - parallel_execution: "Use parallel processing where possible"
+    
+  validation_optimization:
+    - incremental_validation: "Validate changes incrementally"
+    - parallel_validation: "Run validations in parallel"
+    - selective_validation: "Focus on critical validations"
+    
+  export_optimization:
+    - selective_export: "Export only necessary configurations"
+    - compression: "Compress export files"
+    - streaming: "Stream large exports"
+```
+
+## Error Prevention Strategies
+
+### Proactive Error Prevention
+
+**Prevention techniques:**
+```yaml
+error_prevention:
+  configuration_validation:
+    - parameter_validation: "Validate all input parameters"
+    - dependency_checking: "Check system dependencies"
+    - compatibility_testing: "Test configuration compatibility"
+    
+  data_quality_assessment:
+    - profiling_analysis: "Analyze data quality before processing"
+    - issue_identification: "Identify potential problems early"
+    - mitigation_planning: "Plan for data quality issues"
+    
+  testing_strategies:
+    - unit_testing: "Test individual components"
+    - integration_testing: "Test component interactions"
+    - end_to_end_testing: "Test complete workflows"
+```
+
+### Error Recovery Planning
+
+**Recovery strategies:**
+```yaml
+recovery_planning:
+  automatic_recovery:
+    - retry_mechanisms: "Automatic retry with backoff"
+    - fallback_strategies: "Alternative processing paths"
+    - error_correction: "Automatic error correction"
+    
+  manual_recovery:
+    - error_documentation: "Document all errors and solutions"
+    - escalation_procedures: "Define escalation paths"
+    - manual_intervention: "Plan for manual intervention"
+    
+  prevention_improvement:
+    - root_cause_analysis: "Analyze error root causes"
+    - process_improvement: "Improve processes based on errors"
+    - knowledge_base: "Build knowledge base of solutions"
+```
+
+## Monitoring and Alerting
+
+### Performance Monitoring
+
+**Key metrics to monitor:**
+```yaml
+performance_monitoring:
+  processing_metrics:
+    - throughput: "Records processed per second"
+    - latency: "Processing time per record"
+    - efficiency: "Resource utilization vs. output"
+    
+  quality_metrics:
+    - success_rate: "Percentage of successful transformations"
+    - error_rate: "Percentage of failed transformations"
+    - data_completeness: "Percentage of complete records"
+    
+  system_metrics:
+    - cpu_usage: "CPU utilization percentage"
+    - memory_usage: "Memory utilization percentage"
+    - disk_io: "Disk I/O performance"
+    - network_usage: "Network bandwidth utilization"
+```
+
+### Alert Configuration
+
+**Alert setup:**
+```yaml
+alert_configuration:
+  error_alerts:
+    - critical_errors: "Immediate notification for critical failures"
+    - high_priority_errors: "Notification within 15 minutes"
+    - medium_priority_errors: "Notification within 1 hour"
+    
+  performance_alerts:
+    - performance_degradation: "Alert when performance drops below threshold"
+    - resource_exhaustion: "Alert when resources are running low"
+    - capacity_warnings: "Alert when approaching capacity limits"
+    
+  quality_alerts:
+    - quality_threshold_breaches: "Alert when quality metrics fall below targets"
+    - validation_failures: "Alert when validation rules fail"
+    - compliance_issues: "Alert when compliance requirements are not met"
+```
+
+## Support and Resources
+
+### Getting Help
+
+**Support channels:**
+- **Documentation**: Review official documentation first
+- **Community forums**: Post questions to user communities
+- **Issue trackers**: Report bugs and request features
+- **Professional support**: Contact vendor support for critical issues
+
+**Information to provide when seeking help:**
+```yaml
+support_request:
+  problem_description:
+    - what_you_were_doing: "Describe the action being performed"
+    - what_happened: "Describe what went wrong"
+    - what_you_expected: "Describe expected behavior"
+    
+  environment_details:
+    - system_information: "OS, version, hardware specs"
+    - software_versions: "Tool versions and configurations"
+    - data_characteristics: "Data size, format, and structure"
+    
+  error_information:
+    - error_messages: "Complete error messages and stack traces"
+    - log_files: "Relevant log file excerpts"
+    - screenshots: "Visual evidence of the problem"
+```
+
+### Learning Resources
+
+**Recommended resources:**
+- **Official documentation**: Start with tool-specific documentation
+- **Tutorials and guides**: Follow step-by-step tutorials
+- **Video content**: Watch demonstration videos
+- **Community content**: Read blog posts and articles
+- **Training courses**: Attend formal training sessions
+
+**Continuous learning:**
+- Stay updated with tool releases
+- Participate in user communities
+- Attend conferences and workshops
+- Share knowledge with others
+
+## Next Steps
+
+After reviewing this troubleshooting guide and implementing best practices, you should be well-equipped to handle common issues and optimize your Carrot ETL workflow.
+
+**Additional resources:**
+- [Additional Resources](./resources)
+- [Carrot Documentation](https://carrot.ac.uk/documentation)
+- [OHDSI Community](http://forums.ohdsi.org/)
+- [WhiteRabbit Documentation](https://ohdsi.github.io/WhiteRabbit/)
+
+**Remember:**
+- Prevention is better than cure
+- Document everything for future reference
+- Learn from each issue encountered
+- Share solutions with the community
+- Continuous improvement is key to success

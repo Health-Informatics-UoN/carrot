@@ -1,0 +1,393 @@
+import { Callout } from "nextra/components";
+import HighlightedText from '@/components/HighlightedText';
+
+# Phase 2: Data Transformation with Carrot Mapper
+
+## Overview
+
+The second phase of the Carrot ETL workflow focuses on using Carrot Mapper to create data mappings and transformation rules. This phase transforms the insights gained from WhiteRabbit profiling into actionable ETL configurations that can convert your source data into OMOP CDM format.
+
+## Step 4: Carrot Mapper Setup
+
+### 4.1 Access Carrot Mapper
+
+1. Navigate to your Carrot Mapper instance
+2. Log in with appropriate credentials
+3. Verify you have permissions to create projects
+
+<Callout type="info">
+  **Note:** Carrot Mapper is typically accessed through a web interface. Ensure you have the correct URL and access credentials before beginning this phase.
+</Callout>
+
+### 4.2 Create New Project
+
+1. Click "New Project" or equivalent button
+2. Enter project name and description
+3. Select appropriate project settings
+4. Save project configuration
+
+**Project Configuration Example:**
+```yaml
+project_settings:
+  name: "Hospital Data ETL Project"
+  description: "Transform hospital EHR data to OMOP CDM v5.4"
+  version: "1.0.0"
+  target_cdm_version: "5.4"
+  data_source_type: "EHR"
+  privacy_level: "de-identified"
+```
+
+## Step 5: Upload Scan Report
+
+### 5.1 Prepare Files for Upload
+
+1. Ensure you have:
+   - `ScanReport.xlsx` from WhiteRabbit
+   - Properly formatted data dictionary (CSV format)
+   - Required permissions and access
+
+<Callout type="warning">
+  **Important:** The data dictionary must be properly formatted with all required columns filled in. Only the last column can be empty.
+</Callout>
+
+### 5.2 Upload Process
+
+1. In Carrot Mapper, locate the upload section
+2. Upload your `ScanReport.xlsx` file
+3. Upload your data dictionary file
+4. Verify all files are properly loaded
+5. Review any validation messages or warnings
+
+**Data Dictionary Format Requirements:**
+```csv
+Field_Name,Field_Description,Data_Type,OMOP_Table,OMOP_Field,Transformation_Rules
+patient_id,Unique patient identifier,STRING,PERSON,person_id,
+visit_date,Date of visit,DATE,VISIT_OCCURRENCE,visit_start_date,
+diagnosis_code,ICD-10 diagnosis code,STRING,CONDITION_OCCURRENCE,condition_source_value,
+```
+
+## Step 6: Data Mapping Configuration
+
+### 6.1 Understand OMOP CDM Structure
+
+Familiarize yourself with key OMOP CDM tables:
+
+<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "20px" }}>
+  <div style={{ flex: "1" }}>
+    
+    **Core Clinical Tables**
+    - **PERSON**: Patient demographics and basic information
+    - **OBSERVATION_PERIOD**: Time periods of observation
+    - **VISIT_OCCURRENCE**: Healthcare visits and encounters
+    - **CONDITION_OCCURRENCE**: Diagnoses and conditions
+    - **DRUG_EXPOSURE**: Medication exposures and prescriptions
+    - **PROCEDURE_OCCURRENCE**: Medical procedures and interventions
+    - **MEASUREMENT**: Clinical measurements and lab results
+    - **OBSERVATION**: Clinical observations and assessments
+    
+    **Supporting Tables**
+    - **CONCEPT**: Standardized medical concepts
+    - **VOCABULARY**: Medical terminology vocabularies
+    - **DOMAIN**: Concept domain classifications
+    - **RELATIONSHIP**: Concept relationships and hierarchies
+
+  </div>
+  
+  <div style={{ flex: "0.4", textAlign: "right" }}>
+    <figure style={{ display: "inline-block", textAlign: "center" }}>
+      <img 
+        src="/docs/models.png" 
+        alt="OMOP CDM Data Model" 
+        width="200"
+        height="150"
+        style={{ 
+          maxWidth: "100%", 
+          height: "auto", 
+          border: "1px solid #ddd", 
+          borderRadius: "8px",
+          padding: "5px" 
+        }} 
+      />
+      <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+        Figure: OMOP CDM Model
+      </figcaption>
+    </figure>
+  </div>
+</div>
+
+### 6.2 Create Field Mappings
+
+1. For each source field, identify:
+   - Target OMOP table
+   - Target OMOP field
+   - Transformation rules needed
+   - Data type conversions required
+
+**Mapping Example:**
+```yaml
+field_mappings:
+  patient_demographics:
+    source_field: "patient_id"
+    target_table: "PERSON"
+    target_field: "person_id"
+    transformation: "direct_copy"
+    
+  visit_information:
+    source_field: "admission_date"
+    target_table: "VISIT_OCCURRENCE"
+    target_field: "visit_start_date"
+    transformation: "date_parse"
+    
+  diagnosis_data:
+    source_field: "icd10_code"
+    target_table: "CONDITION_OCCURRENCE"
+    target_field: "condition_source_value"
+    transformation: "code_mapping"
+```
+
+### 6.3 Define Transformations
+
+1. **Simple mappings**: Direct field-to-field copies
+2. **Complex transformations**: 
+   - Date format conversions
+   - Code system mappings (ICD-10 → SNOMED, etc.)
+   - Unit conversions
+   - Aggregations or calculations
+
+**Transformation Types:**
+```yaml
+transformation_rules:
+  date_conversions:
+    - type: "date_parse"
+      input_format: "MM/DD/YYYY"
+      output_format: "ISO8601"
+      
+  code_mappings:
+    - type: "vocabulary_mapping"
+      source_vocabulary: "ICD-10"
+      target_vocabulary: "SNOMED-CT"
+      
+  unit_conversions:
+    - type: "unit_conversion"
+      source_unit: "lbs"
+      target_unit: "kg"
+      conversion_factor: 0.453592
+```
+
+## Step 7: Generate ETL Rules
+
+### 7.1 Configure ETL Logic
+
+1. In Carrot Mapper, define:
+   - Source-to-target mappings
+   - Transformation rules
+   - Data quality checks
+   - Error handling procedures
+
+**ETL Configuration Example:**
+```yaml
+etl_configuration:
+  source_mapping:
+    table_name: "hospital_patients"
+    primary_key: "patient_id"
+    
+  target_mapping:
+    table_name: "PERSON"
+    schema: "omop_cdm"
+    
+  data_quality:
+    null_handling: "skip"
+    validation_rules:
+      - "required_field_check"
+      - "data_type_validation"
+      - "range_validation"
+      
+  error_handling:
+    on_error: "log_and_continue"
+    error_threshold: 0.05
+    error_logging: true
+```
+
+### 7.2 Validate Mappings
+
+1. Run validation checks
+2. Review any warnings or errors
+3. Test with sample data if available
+4. Iterate and refine as needed
+
+**Validation Checklist:**
+- [ ] All required fields are mapped
+- [ ] Data types are compatible
+- [ ] Transformation rules are valid
+- [ ] Business logic is correctly implemented
+- [ ] Error handling is appropriate
+
+### 7.3 Generate Rules
+
+1. Execute rule generation
+2. Review generated ETL specifications
+3. Ensure all business requirements are met
+
+## Step 8: Export Configuration
+
+### 8.1 Download JSON Configuration
+
+1. In Carrot Mapper, locate export options
+2. Select JSON format
+3. Choose configuration scope (full project or specific mappings)
+4. Download the JSON file
+
+**Export Options:**
+```yaml
+export_configuration:
+  format: "JSON"
+  scope: "full_project"
+  include_metadata: true
+  include_validation_rules: true
+  include_error_handling: true
+  version: "1.0.0"
+```
+
+### 8.2 Validate JSON
+
+1. Check file integrity
+2. Verify all mappings are included
+3. Test JSON syntax if needed
+
+**JSON Validation:**
+```bash
+# Using jq to validate JSON syntax
+jq . configuration.json > /dev/null && echo "Valid JSON" || echo "Invalid JSON"
+
+# Using Python to validate
+python -m json.tool configuration.json
+```
+
+## Advanced Mapping Techniques
+
+### Complex Field Mappings
+
+**Multiple Source Fields to Single Target:**
+```yaml
+complex_mapping:
+  target_field: "person_name"
+  source_fields: ["first_name", "middle_initial", "last_name"]
+  transformation: "concatenate"
+  separator: " "
+  format: "{first} {middle} {last}"
+```
+
+**Conditional Mappings:**
+```yaml
+conditional_mapping:
+  target_field: "gender_concept_id"
+  conditions:
+    - when: "source.gender = 'M'"
+      then: 8507  # Male concept ID
+    - when: "source.gender = 'F'"
+      then: 8532  # Female concept ID
+    - default: 0  # Unknown concept ID
+```
+
+### Vocabulary and Concept Mapping
+
+**Standard Medical Vocabularies:**
+- **ICD-10/ICD-11**: International Classification of Diseases
+- **SNOMED CT**: Systematized Nomenclature of Medicine
+- **LOINC**: Logical Observation Identifiers Names and Codes
+- **RxNorm**: Normalized Names for Clinical Drugs
+- **ATC**: Anatomical Therapeutic Chemical Classification
+
+**Mapping Strategies:**
+```yaml
+vocabulary_mapping:
+  strategy: "hierarchical"
+  fallback: "source_value_preservation"
+  validation: "concept_existence_check"
+  
+  mapping_rules:
+    - source_vocabulary: "ICD-10"
+      target_vocabulary: "SNOMED-CT"
+      mapping_type: "exact_match"
+      confidence_threshold: 0.8
+```
+
+## Data Quality and Validation
+
+### Quality Checks
+
+**Built-in Validation Rules:**
+- Required field validation
+- Data type validation
+- Range and constraint checking
+- Format validation
+- Business rule validation
+
+**Custom Validation Rules:**
+```yaml
+custom_validation:
+  rule_name: "age_reasonableness"
+  description: "Check if age is within reasonable range"
+  condition: "age >= 0 AND age <= 150"
+  severity: "warning"
+  action: "flag_for_review"
+```
+
+### Error Handling
+
+**Error Handling Strategies:**
+```yaml
+error_handling:
+  null_values:
+    strategy: "skip_record"
+    logging: true
+    
+  data_type_errors:
+    strategy: "attempt_conversion"
+    fallback: "use_default"
+    
+  business_rule_violations:
+    strategy: "flag_for_review"
+    notification: true
+```
+
+## Best Practices for Data Mapping
+
+### 1. Start with Core Tables
+
+- Begin with PERSON table mapping
+- Focus on essential demographic fields
+- Establish primary key relationships
+- Build incrementally
+
+### 2. Use Standard Vocabularies
+
+- Prefer standard medical terminologies
+- Document custom mappings
+- Validate concept existence
+- Maintain mapping documentation
+
+### 3. Plan for Data Quality
+
+- Anticipate data quality issues
+- Design robust error handling
+- Include validation rules
+- Plan for data review processes
+
+### 4. Document Everything
+
+- Record all mapping decisions
+- Document transformation logic
+- Note data quality issues
+- Maintain change history
+
+## Next Steps
+
+After completing the data mapping configuration in Carrot Mapper, you'll have a comprehensive ETL configuration ready for execution. The next phase focuses on [Data Execution and Validation](./phase3_execution).
+
+**Key Deliverables from Phase 2:**
+- ✅ Carrot Mapper project created and configured
+- ✅ Scan report and data dictionary uploaded
+- ✅ Field mappings and transformations defined
+- ✅ ETL rules generated and validated
+- ✅ JSON configuration exported and verified

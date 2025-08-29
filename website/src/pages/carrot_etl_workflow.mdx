@@ -1,0 +1,405 @@
+import { Callout } from "nextra/components";
+import HighlightedText from '@/components/HighlightedText';
+
+# Carrot ETL End-to-End Workflow Documentation
+
+## Project Overview
+This document outlines the complete workflow for running Carrot ETL end-to-end, from initial setup through data transformation. It documents the process of using WhiteRabbit for data profiling and Carrot Mapper for OMOP CDM transformation.
+
+## Workflow Overview
+The Carrot ETL workflow consists of three main phases:
+1. **Data Profiling Phase** - Using WhiteRabbit to understand source data
+2. **Transformation Phase** - Using Carrot Mapper to create and execute ETL rules
+3. **Execution Phase** - Using Carrot Transform to perform the actual data transformation
+
+## Prerequisites
+- macOS, Linux, or Windows system
+- Java 8 or higher installed
+- WhiteRabbit v1.0.0 or later
+- Access to Carrot Mapper platform
+- Carrot Transform tool installed
+- Source data files (CSV, SAS, or database access)
+
+---
+
+## Phase 1: Data Profiling with WhiteRabbit
+
+### Step 1: Installation and Setup
+
+#### 1.1 Download WhiteRabbit
+1. Go to [OHDSI WhiteRabbit releases](https://github.com/OHDSI/WhiteRabbit/releases/latest)
+2. Download the latest `WhiteRabbit_vX.X.X.zip` file
+3. Extract the zip file to your desired location
+
+#### 1.2 Verify Installation
+Check that you have the following structure:
+```
+WhiteRabbit_v1.0.0/
+├── bin/
+│   ├── whiteRabbit (macOS/Linux)
+│   ├── whiteRabbit.bat (Windows)
+│   ├── rabbitInAHat (macOS/Linux)
+│   └── rabbitInAHat.bat (Windows)
+├── repo/ (contains JAR files)
+└── examples/ (contains sample data)
+```
+
+#### 1.3 Launch WhiteRabbit
+**On macOS/Linux:**
+```bash
+cd /path/to/WhiteRabbit_v1.0.0
+./bin/whiteRabbit
+```
+
+**On Windows:**
+```cmd
+cd C:\path\to\WhiteRabbit_v1.0.0
+bin\whiteRabbit.bat
+```
+
+**Expected Result:** WhiteRabbit GUI opens with configuration sections.
+
+### Step 2: Data Source Configuration
+
+#### 2.1 Set Working Folder
+1. In WhiteRabbit GUI, locate the "Working Folder" section
+2. Click "Pick Folder" button
+3. Navigate to the folder containing your source data files
+4. Select the folder and confirm
+
+#### 2.2 Configure Data Source Type
+**For CSV/Text Files:**
+1. Select "Delimited text files" as source type
+2. Set delimiter:
+   - `comma` for CSV files
+   - `tab` for TSV files
+   - `semicolon` for semicolon-delimited
+   - `pipe` for pipe-delimited
+
+**For SAS Files:**
+1. Select "SAS" as source type
+2. No additional configuration needed
+
+**For Database:**
+1. Select your database type (MySQL, Oracle, PostgreSQL, SQL Server, etc.)
+2. Enter connection details:
+   - Server location (host:port)
+   - Username and password
+   - Database name
+3. Click "Test connection" to verify
+
+#### 2.3 Configure Scan Options
+1. **Scan field values**: Check this box (recommended)
+2. **Min cell count**: Set to 5 (default) - minimum frequency for values to appear
+3. **Rows per table**: Choose sampling size:
+   - 100,000 (default, good for most cases)
+   - 500,000 (for larger datasets)
+   - 1,000,000 (for very large datasets)
+   - All rows (for complete analysis)
+4. **Max distinct values**: Set to 1,000 (default) - maximum unique values per field
+5. **Numeric stats**: Check if you want statistical analysis of numeric fields
+
+### Step 3: Execute Data Scan
+
+#### 3.1 Select Files/Tables to Scan
+1. **For file-based sources**: Select specific files from the working folder
+2. **For databases**: Select specific tables to scan
+3. **Start small**: Begin with 1-2 files/tables for testing
+
+#### 3.2 Run the Scan
+1. Click "Scan tables" button
+2. Monitor progress in the status area
+3. Wait for completion message
+4. **Expected Result**: `ScanReport.xlsx` file created in working folder
+
+#### 3.3 Review Scan Results
+1. Open the generated `ScanReport.xlsx` file
+2. Review the following tabs:
+   - **Field Overview**: Data types, counts, and statistics
+   - **Table Overview**: Table summaries and row counts
+   - **Individual table tabs**: Value distributions for each field
+
+---
+
+## Phase 2: Data Transformation with Carrot Mapper
+
+### Step 4: Carrot Mapper Setup
+
+#### 4.1 Access Carrot Mapper
+1. Navigate to your Carrot Mapper instance
+2. Log in with appropriate credentials
+3. Verify you have permissions to create projects
+
+#### 4.2 Create New Project
+1. Click "New Project" or equivalent button
+2. Enter project name and description
+3. Select appropriate project settings
+4. Save project configuration
+
+### Step 5: Upload Scan Report
+
+#### 5.1 Prepare Files for Upload
+1. Ensure you have:
+   - `ScanReport.xlsx` from WhiteRabbit
+   - Properly formatted data dictionary (CSV format)
+   - Required permissions and access
+
+#### 5.2 Upload Process
+1. In Carrot Mapper, locate the upload section
+2. Upload your `ScanReport.xlsx` file
+3. Upload your data dictionary file
+4. Verify all files are properly loaded
+5. Review any validation messages or warnings
+
+**Data Dictionary Format Requirements:**
+```csv
+Field_Name,Field_Description,Data_Type,OMOP_Table,OMOP_Field,Transformation_Rules
+patient_id,Unique patient identifier,STRING,PERSON,person_id,
+visit_date,Date of visit,DATE,VISIT_OCCURRENCE,visit_start_date,
+diagnosis_code,ICD-10 diagnosis code,STRING,CONDITION_OCCURRENCE,condition_source_value,
+```
+
+### Step 6: Data Mapping Configuration
+
+#### 6.1 Understand OMOP CDM Structure
+Familiarize yourself with key OMOP CDM tables:
+- **PERSON**: Patient demographics and basic information
+- **OBSERVATION_PERIOD**: Time periods of observation
+- **VISIT_OCCURRENCE**: Healthcare visits and encounters
+- **CONDITION_OCCURRENCE**: Diagnoses and conditions
+- **DRUG_EXPOSURE**: Medication exposures and prescriptions
+- **PROCEDURE_OCCURRENCE**: Medical procedures and interventions
+
+#### 6.2 Create Field Mappings
+1. For each source field, identify:
+   - Target OMOP table
+   - Target OMOP field
+   - Transformation rules needed
+   - Data type conversions required
+
+#### 6.3 Define Transformations
+1. **Simple mappings**: Direct field-to-field copies
+2. **Complex transformations**: 
+   - Date format conversions
+   - Code system mappings (ICD-10 → SNOMED, etc.)
+   - Unit conversions
+   - Aggregations or calculations
+
+### Step 7: Generate ETL Rules
+
+#### 7.1 Configure ETL Logic
+1. In Carrot Mapper, define:
+   - Source-to-target mappings
+   - Transformation rules
+   - Data quality checks
+   - Error handling procedures
+
+#### 7.2 Validate Mappings
+1. Run validation checks
+2. Review any warnings or errors
+3. Test with sample data if available
+4. Iterate and refine as needed
+
+#### 7.3 Generate Rules
+1. Execute rule generation
+2. Review generated ETL specifications
+3. Ensure all business requirements are met
+
+### Step 8: Export Configuration
+
+#### 8.1 Download JSON Configuration
+1. In Carrot Mapper, locate export options
+2. Select JSON format
+3. Choose configuration scope (full project or specific mappings)
+4. Download the JSON file
+
+#### 8.2 Validate JSON
+1. Check file integrity
+2. Verify all mappings are included
+3. Test JSON syntax if needed
+
+---
+
+## Phase 3: Data Execution and Validation
+
+### Step 9: Install Carrot Transform
+
+#### 9.1 Installation Options
+**Option 1: Install from PyPI (Recommended)**
+```bash
+pip install carrot-transform
+```
+
+**Option 2: Install from source**
+```bash
+git clone https://github.com/Health-Informatics-UoN/carrot-transform
+cd carrot-transform
+pip install -e .
+```
+
+<Callout type="info">
+  **Note:** The PyPI package is actively maintained and is the recommended installation method for most users.
+</Callout>
+
+#### 9.2 Verify Installation
+```bash
+carrot-transform -v
+```
+
+**Expected Result:** Version number displayed, confirming successful installation.
+
+### Step 10: Execute Data Transformation
+
+#### 10.1 Prepare Target Environment
+1. Set up target database (if not already done)
+2. Ensure OMOP CDM schema is created
+3. Verify sufficient storage space
+4. Check database permissions
+
+#### 10.2 Run ETL Process
+**Basic Command Structure:**
+```bash
+carrot-transform run mapstream \
+  --input-dir /path/to/source/data \
+  --rules-file /path/to/mapping/rules.json \
+  --person-file /path/to/person/demographics.csv \
+  --output-dir /path/to/output \
+  --omop-version 5.3
+```
+
+**Required Arguments:**
+- `--input-dir`: Directory containing your source data files
+- `--rules-file`: JSON configuration file from Carrot Mapper
+- `--person-file`: CSV file with person IDs (first column)
+- `--output-dir`: Directory for OMOP-format output files
+
+**OMOP Configuration Options:**
+- **Option 1**: Use `--omop-version 5.3` (automatically finds config files)
+- **Option 2**: Specify custom files:
+  - `--omop-ddl-file`: DDL statements for OMOP tables
+  - `--omop-config-file`: Custom OMOP configuration
+
+**Optional Arguments:**
+- `--write-mode`: Set to `w` (overwrite) or `a` (append)
+- `--use-input-person-ids`: Use `Y` to preserve original IDs or `N` to generate new ones
+- `--log-file-threshold`: Control log file output (default: 0)
+
+#### 10.3 Monitor Execution
+1. Watch console output for progress
+2. Check log files for detailed information
+3. Monitor system resources
+4. Wait for completion message
+
+#### 10.4 Validate Results
+1. Check row counts match expectations
+2. Verify data quality rules passed
+3. Sample data for manual review
+4. Run OMOP CDM validation checks
+
+---
+
+## Troubleshooting and Best Practices
+
+### Common Issues and Solutions
+
+#### WhiteRabbit Issues
+**Problem**: "Index 0 out of bounds for length 0"
+**Solution**: Ensure scan report is generated before using fake data generation
+
+**Problem**: Memory errors during scan
+**Solution**: Increase JVM memory allocation:
+```bash
+export EXTRA_JVM_ARGUMENTS="-Xmx2400m"
+./bin/whiteRabbit
+```
+
+**Problem**: Scan report not generated
+**Solution**: Verify working folder is set correctly and files are accessible
+
+#### Carrot Mapper Issues
+**Problem**: Upload errors with data dictionary
+**Solution**: Ensure all required columns have values (only the last column can be empty)
+
+**Problem**: Mapping validation failures
+**Solution**: Review field mappings and ensure proper OMOP CDM field references
+
+#### Carrot Transform Issues
+**Problem**: Installation failures
+**Solution**: Ensure Python 3.7+ and pip are installed, use virtual environment
+
+**Problem**: Missing dependencies
+**Solution**: Install required system libraries (e.g., PostgreSQL development headers)
+
+**Problem**: Permission errors
+**Solution**: Check file and directory permissions, ensure write access to output directory
+
+### Best Practices
+
+#### 1. Start Small
+- Begin with small datasets for learning
+- Test each step before proceeding
+- Validate results at each stage
+
+#### 2. Document Everything
+- Keep detailed notes of all decisions
+- Document data quality issues found
+- Record transformation rules created
+
+#### 3. Iterate and Refine
+- ETL design is iterative
+- Expect to make multiple passes
+- Learn from each iteration
+
+#### 4. Validate Continuously
+- Check data quality at each step
+- Verify business rules are met
+- Test with stakeholders when possible
+
+---
+
+## Success Metrics and Completion Checklist
+
+### Phase 1 Completion
+- [ ] WhiteRabbit installed and launched
+- [ ] Data source configured and tested
+- [ ] Scan options configured appropriately
+- [ ] Data scan executed successfully
+- [ ] ScanReport.xlsx generated and reviewed
+
+### Phase 2 Completion
+- [ ] Carrot Mapper project created
+- [ ] Scan report uploaded successfully
+- [ ] Data dictionary uploaded successfully
+- [ ] Field mappings configured
+- [ ] ETL rules generated
+- [ ] JSON configuration exported
+
+### Phase 3 Completion
+- [ ] Carrot Transform installed and verified
+- [ ] Target environment prepared
+- [ ] ETL process executed successfully
+- [ ] Data transformation completed
+- [ ] Results validated against requirements
+- [ ] Data quality checks passed
+- [ ] OMOP CDM validation successful
+
+---
+
+## Additional Resources
+
+- [OHDSI WhiteRabbit Documentation](https://ohdsi.github.io/WhiteRabbit/)
+- [Carrot Documentation](https://carrot.ac.uk/documentation)
+- [OHDSI Community Forum](http://forums.ohdsi.org/)
+- [OMOP CDM Documentation](https://ohdsi.github.io/CommonDataModel/)
+
+---
+
+## Conclusion
+
+This workflow provides a comprehensive path from initial data profiling to successful OMOP CDM transformation using the Carrot ETL toolset. The key to success is taking each step methodically, validating results, and maintaining clear documentation throughout the process.
+
+Remember that ETL development is iterative - don't expect perfection on the first attempt. Use the sample data provided with WhiteRabbit to practice and learn before working with your production data.
+
+---
+
+*This documentation was created based on hands-on experience with WhiteRabbit v1.0.0 and the Carrot ETL workflow. Last updated: [Current Date]*

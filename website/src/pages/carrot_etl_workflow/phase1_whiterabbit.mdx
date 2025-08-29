@@ -1,0 +1,505 @@
+import { Callout } from "nextra/components";
+import HighlightedText from '@/components/HighlightedText';
+
+# Phase 1: Data Profiling with WhiteRabbit
+
+## Overview
+
+The first phase of the Carrot ETL workflow focuses on understanding your source data using WhiteRabbit, an open-source data profiling tool. This phase is crucial for creating effective data mappings and transformation rules in the subsequent phases.
+
+## Step 1: Installation and Setup
+
+### 1.1 Download WhiteRabbit
+
+1. Go to [OHDSI WhiteRabbit releases](https://github.com/OHDSI/WhiteRabbit/releases/latest)
+2. Download the latest `WhiteRabbit_vX.X.X.zip` file
+3. Extract the zip file to your desired location
+
+<Callout type="warning">
+  **Important:** WhiteRabbit and RabbitInAHat only work from paths with only ASCII characters. Avoid using non-ASCII characters in your installation path.
+</Callout>
+
+### 1.2 Verify Installation
+
+Check that you have the following structure:
+```
+WhiteRabbit_v1.0.0/
+├── bin/
+│   ├── whiteRabbit (macOS/Linux)
+│   ├── whiteRabbit.bat (Windows)
+│   ├── rabbitInAHat (macOS/Linux)
+│   └── rabbitInAHat.bat (Windows)
+├── repo/ (contains JAR files)
+├── examples/ (contains sample data)
+└── iniFileExamples/ (contains configuration examples)
+```
+
+### 1.3 Launch WhiteRabbit
+
+**On macOS/Linux:**
+```bash
+cd /path/to/WhiteRabbit_v1.0.0
+./bin/whiteRabbit
+```
+
+**On Windows:**
+```cmd
+cd C:\path\to\WhiteRabbit_v1.0.0
+bin\whiteRabbit.bat
+```
+
+<Callout type="info">
+  **Expected Result:** WhiteRabbit GUI opens with configuration sections for working folder, data source type, and scan options.
+</Callout>
+
+### 1.4 Memory Configuration
+
+WhiteRabbit may not start if the memory allocated by the JVM is too big or too small. By default, this is set to 1200m.
+
+**To increase memory (example: 2400m):**
+```bash
+# Set environment variable before starting
+export EXTRA_JVM_ARGUMENTS="-Xmx2400m"
+./bin/whiteRabbit
+
+# Or edit the batch file directly
+# In bin/whiteRabbit.bat, modify the line:
+# %JAVACMD% %JAVA_OPTS% -Xmx2400m...
+```
+
+**To decrease memory (example: 600m):**
+```bash
+export EXTRA_JVM_ARGUMENTS="-Xmx600m"
+./bin/whiteRabbit
+```
+
+<Callout type="warning">
+  **Memory Tips:** If you have a 32-bit Java VM installed and problems persist, consider installing 64-bit Java. Monitor system memory usage and adjust accordingly.
+</Callout>
+
+### 1.5 Temporary Directory Configuration
+
+For multi-user environments, you may need to configure a custom temporary directory for Apache POI (used for Excel report generation).
+
+**Set custom temporary directory:**
+```bash
+# Set environment variable
+export ORG_OHDSI_WHITERABBIT_POI_TMPDIR="/path/to/custom/temp/dir"
+
+# Or set Java system property
+export EXTRA_JVM_ARGUMENTS="-Dorg.ohdsi.whiterabbit.poi.tmpdir=/path/to/custom/temp/dir"
+
+# Then start WhiteRabbit
+./bin/whiteRabbit
+```
+
+<Callout type="info">
+  **Note:** The custom temporary directory should exist before starting WhiteRabbit and be writable by any user that may want to run WhiteRabbit. WhiteRabbit will create separate subdirectories for each user to avoid permission conflicts.
+</Callout>
+
+## Step 2: Data Source Configuration
+
+### 2.1 Set Working Folder
+
+1. In WhiteRabbit GUI, locate the "Working Folder" section
+2. Click "Pick Folder" button
+3. Navigate to the folder containing your source data files
+4. Select the folder and confirm
+
+<Callout type="warning">
+  **Important:** The working folder should contain all the data files you want to profile. WhiteRabbit will scan all supported file types in this directory.
+</Callout>
+
+### 2.2 Configure Data Source Type
+
+**For CSV/Text Files:**
+1. Select "Delimited text files" as source type
+2. Set delimiter:
+   - `comma` for CSV files
+   - `tab` for TSV files
+   - `semicolon` for semicolon-delimited
+   - `pipe` for pipe-delimited
+
+**For SAS Files:**
+1. Select "SAS" as source type
+2. No additional configuration needed
+
+<Callout type="warning">
+  **SAS Limitation:** It is currently not possible to produce fake data for SAS files from a scan report.
+</Callout>
+
+**For Database Sources:**
+WhiteRabbit supports multiple database platforms including MySQL, SQL Server, Oracle, PostgreSQL, Microsoft Access, Amazon RedShift, PDW, Teradata, Google BigQuery, Azure, and Snowflake.
+
+**MySQL Configuration:**
+- **Server location**: `<host>` or `<host>:<port>` (default port: 3306)
+- **User name**: MySQL username
+- **Password**: MySQL password
+- **Database name**: Target database name
+
+**Oracle Configuration:**
+- **Server location**: `<host>/<sid>`, `<host>:<port>/<sid>`, `<host>/<service_name>`, or `<host>:<port>/<service_name>`
+- **User name**: Oracle username
+- **Password**: Oracle password
+- **Database name**: Schema name (Oracle 'user')
+
+**SQL Server Configuration:**
+- **Server location**: `<host>` or `<host>:<port>` (default port: 1433)
+- **User name**: `<domain>/<user>` or just `<user>`
+- **Password**: SQL Server password
+- **Database name**: Target database name
+
+<Callout type="info">
+  **Windows Authentication:** When SQL Server JDBC drivers are installed, you can use Windows authentication by leaving user name and password empty.
+</Callout>
+
+**PostgreSQL Configuration:**
+- **Server location**: `<host>/<database>` or `<host>:<port>/<database>` (default port: 5432)
+- **User name**: PostgreSQL username
+- **Password**: PostgreSQL password
+- **Database name**: Schema name
+
+### 2.3 Configure Scan Options
+
+<div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "20px" }}>
+  <div style={{ flex: "1" }}>
+    
+    **Scan field values**: Check this box (recommended)
+    - Enables detailed analysis of field contents
+    - Provides value distributions and frequencies
+    - Required for fake data generation
+    
+    **Min cell count**: Set to 5 (default)
+    - Minimum frequency for values to appear in scan report
+    - Lower values provide more detail but increase report size
+    - Values appearing less than this count will not appear in the report
+    
+    **Rows per table**: Choose sampling size:
+    - 100,000 (default, good for most cases)
+    - 500,000 (for larger datasets)
+    - 1,000,000 (for very large datasets)
+    - All rows (for complete analysis)
+    
+    **Max distinct values**: Set to 1,000 (default)
+    - Maximum unique values per field to analyze
+    - Options: 100, 1,000, or 10,000
+    - Prevents memory issues with high-cardinality fields
+    
+    **Numeric stats**: Check if you want statistical analysis
+    - Provides min, max, mean, median for numeric fields
+    - Calculates standard deviation and quartiles
+    - Useful for identifying data quality issues
+
+  </div>
+  
+  <div style={{ flex: "0.4", textAlign: "right" }}>
+    <figure style={{ display: "inline-block", textAlign: "center" }}>
+      <img 
+        src="/docs/example_1.png" 
+        alt="WhiteRabbit Configuration" 
+        width="200"
+        height="150"
+        style={{ 
+          maxWidth: "100%", 
+          height: "auto", 
+          border: "1px solid #ddd", 
+          borderRadius: "8px",
+          padding: "5px" 
+        }} 
+      />
+      <figcaption style={{ marginTop: "8px", fontStyle: "italic", color: "#666" }}>
+        Figure: WhiteRabbit Configuration
+      </figcaption>
+    </figure>
+  </div>
+</div>
+
+**Numeric Statistics Reservoir Size:**
+When numeric statistics are enabled, you can set the reservoir size for statistical calculations:
+- Defines the number of values stored for calculation
+- If field has fewer values than reservoir size, statistics are exact
+- If field has more values, statistics are approximated from random sample
+- Average, minimum, and maximum are always true population statistics
+- Standard deviation and quartiles may be approximated
+
+## Step 3: Execute Data Scan
+
+### 3.1 Select Files/Tables to Scan
+
+1. **For file-based sources**: Select specific files from the working folder
+2. **For databases**: Select specific tables to scan
+3. **Start small**: Begin with 1-2 files/tables for testing
+
+<Callout type="info">
+  **Tip:** Start with a small subset of your data to test the configuration and understand the output format before scanning your entire dataset.
+</Callout>
+
+### 3.2 Run the Scan
+
+1. Click "Scan tables" button
+2. Monitor progress in the status area
+3. Wait for completion message
+4. **Expected Result**: `ScanReport.xlsx` file created in working folder
+
+### 3.3 Command Line Execution
+
+For automation or batch processing, you can run WhiteRabbit from the command line using configuration files.
+
+**Create Configuration File:**
+```ini
+# WhiteRabbit.ini example
+[WhiteRabbit]
+workingFolder=C:\temp\whiterabbit
+sourceType=delimitedTextFiles
+delimiter=comma
+scanFieldValues=true
+minCellCount=5
+rowsPerTable=100000
+maxDistinctValues=1000
+numericStats=true
+```
+
+**Run from Command Line:**
+```bash
+# Windows
+bin\whiteRabbit.bat -ini WhiteRabbit.ini
+
+# macOS/Linux
+./bin/whiteRabbit -ini WhiteRabbit.ini
+```
+
+<Callout type="info">
+  **Configuration Examples:** Sample configuration files can be found in the `iniFileExamples` folder of your WhiteRabbit installation.
+</Callout>
+
+### 3.4 Review Scan Results
+
+1. Open the generated `ScanReport.xlsx` file
+2. Review the following tabs:
+   - **Field Overview**: Data types, counts, and statistics
+   - **Table Overview**: Table summaries and row counts
+   - **Individual table tabs**: Value distributions for each field
+   - **Metadata tab** (indicated by "_"): WhiteRabbit settings used
+
+## Understanding the Scan Report
+
+### Field Overview Tab
+
+This tab provides a high-level summary of all fields across all tables:
+
+- **Column A**: Table name
+- **Column B**: Column name
+- **Column C**: Column description (populated by user, not WhiteRabbit)
+- **Column D**: Data type
+- **Column E**: Maximum length of values (characters/digits)
+- **Column F**: Total number of rows (returns -1 for text files)
+- **Column G**: Number of rows scanned
+- **Column H**: Number of empty rows
+- **Column I**: Count of unique values (may show ≤ if upper limit)
+- **Column J**: Percentage of unique values (0% = constant, 100% = unique)
+
+### Table Overview Tab
+
+Provides summary statistics for each table:
+
+- **Column A**: Table name
+- **Column B**: Table description (populated by user, not WhiteRabbit)
+- **Column C**: Total number of rows (returns -1 for text files)
+- **Column D**: Number of rows scanned
+- **Column E**: Number of fields in the table
+- **Column F**: Number of empty fields
+
+### Individual Table Tabs
+
+Each table gets its own tab showing detailed field analysis:
+
+- **Field names**: Source table columns across the top
+- **Value columns**: Each field generates two columns:
+  - First column: Distinct values (above min cell count)
+  - Second column: Frequency count for each value
+- **Truncation indicator**: "List truncated..." appears when unique values exceed max distinct values setting
+
+### Numerical Statistics
+
+When numeric statistics are enabled, additional columns are added to Field Overview (Columns K-Q):
+
+- **Column K**: Average
+- **Column L**: Standard Deviation (sampled)
+- **Column M**: Minimum
+- **Columns N/O/P**: Quartiles (sampled)
+- **Column Q**: Maximum
+
+<Callout type="info">
+  **Date Statistics:** For date fields, standard deviation is given in days, while other statistics are converted to date representation.
+</Callout>
+
+## Step 4: Generate Fake Data (Optional)
+
+WhiteRabbit can generate fake datasets based on scan reports, useful for ETL development when direct data access isn't available.
+
+### 4.1 Fake Data Generation Modes
+
+**Three generation modes:**
+1. **No values scanned**: Generates random strings or numbers
+2. **Values scanned**: Samples from actual scan values (frequency-based or uniform)
+3. **Unique values only**: Maintains uniqueness for primary keys
+
+### 4.2 Fake Data Configuration
+
+**Generation options:**
+- **Max rows per table**: Default 10,000 rows
+- **Uniform sampling**: Treats all values equally (increases representation of low-frequency values)
+
+### 4.3 Output Formats
+
+**Supported outputs:**
+- **Database tables**: MySQL, Oracle, SQL Server, PostgreSQL
+- **Delimited text files**: CSV, TSV, etc.
+
+<Callout type="info">
+  **Use Case:** Fake data generation is particularly useful for developing ETL code when you don't have direct access to production data or want to test with representative data structures.
+</Callout>
+
+## Common Configuration Scenarios
+
+### Large Dataset Profiling
+
+For datasets with millions of rows:
+
+```yaml
+scan_configuration:
+  rows_per_table: 1000000
+  max_distinct_values: 5000
+  min_cell_count: 10
+  enable_numeric_stats: true
+  memory_allocation: "2400m"
+```
+
+### High-Cardinality Fields
+
+For fields with many unique values:
+
+```yaml
+field_configuration:
+  max_distinct_values: 10000
+  min_cell_count: 1
+  enable_pattern_analysis: true
+```
+
+### Database Profiling
+
+For database sources:
+
+```yaml
+database_configuration:
+  connection_timeout: 300
+  query_timeout: 600
+  batch_size: 50000
+  enable_parallel_scanning: true
+```
+
+## Troubleshooting Common Issues
+
+### Memory Errors
+
+**Problem**: "OutOfMemoryError" or "Java heap space" errors
+**Solution**: Increase JVM memory allocation:
+```bash
+export EXTRA_JVM_ARGUMENTS="-Xmx2400m"
+./bin/whiteRabbit
+```
+
+**Alternative solutions:**
+- Reduce the number of rows per table in scan options
+- Process datasets in smaller chunks
+- Close other applications to free memory
+- Use a machine with more available RAM
+
+**Prevention:**
+- Monitor system memory usage
+- Start with conservative scan settings
+- Test memory requirements with sample data
+
+### Connection Timeouts
+
+**Problem**: Database connection failures
+**Solution**: 
+- Increase connection timeout values
+- Check network connectivity
+- Verify database permissions
+
+### Scan Report Generation
+
+**Problem**: ScanReport.xlsx not created
+**Solution**:
+- Verify working folder is set correctly
+- Check file permissions and accessibility
+- Ensure sufficient disk space
+- Review error messages in status area
+
+**Troubleshooting steps:**
+```bash
+# Check working folder contents
+ls -la /path/to/working/folder
+
+# Verify file permissions
+ls -la /path/to/working/folder/*.csv
+
+# Check available disk space
+df -h /path/to/working/folder
+
+# Test file accessibility
+file /path/to/working/folder/sample.csv
+```
+
+### Temporary Directory Issues
+
+**Problem**: Apache POI temporary directory conflicts in multi-user environments
+**Solution**: Set custom temporary directory:
+```bash
+export ORG_OHDSI_WHITERABBIT_POI_TMPDIR="/path/to/custom/temp/dir"
+./bin/whiteRabbit
+```
+
+## Best Practices for Data Profiling
+
+### 1. Start with Sample Data
+
+- Use small datasets for initial testing
+- Validate configuration before full scan
+- Understand output format and structure
+
+### 2. Document Your Configuration
+
+- Record all scan parameters used
+- Note any special configurations
+- Document data source characteristics
+
+### 3. Validate Results
+
+- Check that all expected tables are included
+- Verify field counts match expectations
+- Review data type inferences for accuracy
+
+### 4. Plan for Iteration
+
+- Expect to run multiple scans with different parameters
+- Adjust configuration based on initial results
+- Plan for incremental profiling of large datasets
+
+### 5. Use Fake Data Generation
+
+- Generate fake data for ETL development
+- Test with representative data structures
+- Validate ETL logic without production data access
+
+## Next Steps
+
+After completing the data profiling phase with WhiteRabbit, you'll have a comprehensive understanding of your source data structure and quality. This information will be essential for the next phase: [Data Transformation with Carrot Mapper](./phase2_mapper).
+
+**Key Deliverables from Phase 1:**
+- ✅ WhiteRabbit installed and configured
+- ✅ Source data scanned and analyzed
+- ✅ ScanReport.xlsx generated and reviewed
+- ✅ Data structure and quality documented
+- ✅ Optional: Fake data generated for testing
