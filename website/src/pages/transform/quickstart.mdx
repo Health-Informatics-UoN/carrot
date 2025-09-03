@@ -3,6 +3,7 @@
 ## Installation
 
 Carrot-Transform is available on PyPI, so you can install it with:
+
 ```bash
 pip install carrot-transform
 ```
@@ -10,13 +11,15 @@ pip install carrot-transform
 If you are working with the source code, refer to the [Development Notes](/transform/development)
 
 ## Running Carrot-Transform
+
 To execute Carrot-Transform, run:
+
 ```
 carrot-transform [command] [options]
 ```
 
-
 For example, you can get the version number with:
+
 ```
 carrot-transform -v
 ```
@@ -25,7 +28,9 @@ There are many mandatory and optional arguments for carrot transform. In the qui
 Enter the following (as one command):
 
 ### Basic Example
+
 To process a test dataset included in the repository, run:
+
 ```bash
 carrot-transform run mapstream \
   --input-dir @carrot/examples/test/inputs \
@@ -35,24 +40,27 @@ carrot-transform run mapstream \
   --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.3_ddl.sql \
   --omop-config-file @carrot/config/omop.json
 ```
+
 The '@carrot' is an alias to the folder containing the carrot-transform module, which can be used with either installation method. When using your own files, use your file path, and omit this.
 
 This will generate a set of output files in this directory:
+
 ```bash
 carrottransform/examples/test/test_output
 ```
+
 If it doesn't exist, this directory should be created for you.
 
-
 ## Arguments
+
 ### Required Arguments
 
-| Flag              | Description                                      |
-|-------------------|--------------------------------------------------|
-| `--input-dir`     | Directory containing input files                 |
-| `--rules-file`    | JSON file defining mapping rules                 |
-| `--person-file`   | CSV file (or table name) with person IDs and DOB |
-| `--output-dir`    | Directory to write OMOP-format TSV files         |
+| Flag            | Description                                      |
+| --------------- | ------------------------------------------------ |
+| `--input-dir`   | Directory containing input files                 |
+| `--rules-file`  | JSON file defining mapping rules                 |
+| `--person-file` | CSV file (or table name) with person IDs and DOB |
+| `--output-dir`  | Directory to write OMOP-format TSV files         |
 
 #### Person ID File
 
@@ -64,56 +72,20 @@ Carrot Transform uses a single Person ID file (or table), which must be specifie
 - This file must also reside in the same directory as the other input files (when using CSV mode).
 - This file can itself be an input to transformation rules.
 
-
 ### OMOP Configuration (Choose One Approach)
-| Approach            | Required Arguments |
-|---------------------|--------------------|
-| **Specify Files**   | `--omop-ddl-file` (DDL statements for OMOP tables) and `--omop-config-file` (override JSON config) |
+
+| Approach            | Required Arguments                                                                                                                                          |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Specify Files**   | `--omop-ddl-file` (DDL statements for OMOP tables) and `--omop-config-file` (override JSON config)                                                          |
 | **Specify Version** | `--omop-version` (e.g., `5.3`, which will automatically find `carrottransform/config/omop.json` and `carrottransform/config/OMOPCDM_postgresql_XX_ddl.sql`) |
 
-
 ### Optional Arguments
-| Flag                      | Default | Description |
-|---------------------------|---------|-------------|
-| `--write-mode`            | `w`     | Set to `w` (overwrite) or `a` (append) for output files |
-| `--saved-person-id-file`  | None    | Path to a file to save and share `person_id` state |
-| `--use-input-person-ids`  | `N`     | Use input person IDs (`Y`) or replace with new integers (`N`) |
-| `--last-used-ids-file`    | None    | Path to a file tracking last used IDs (tab-separated format) |
-| `--log-file-threshold`    | `0`     | Change output limit for log files |
-| `--input-db-url`          | None    | SQLAlchemy connection string for database input |
 
-#### Database Input (Experimental)
-
-Instead of reading from `.csv` files, Carrot Transform can read directly from a database using SQLAlchemy.
-
-- Provide a connection string via `--input-db-url`.
-- All input tables must match the format expected by Carrot Transform.
-- The `--rules-file` must still point to a local file on disk.
-- The `--person-file` will be interpreted as a **table name**, not a file path.
-
-Examples:
-
-- `--person-file C:/foo/bar/all_the_people.csv` will run:  
-  `SELECT * FROM all_the_people;`
-- `--person-file demographics_makeup.csv` will run:  
-  `SELECT * FROM demographics_makeup;`
-- `--input-db-url "sqlite:///./testing.db"` will connect to an SQLite database in the file `./testing.db`
-
-##### Database Workflow
-
-Carrot-Transform can read input tables from [SQLAlchemy](https://www.sqlalchemy.org/).
-This is experimental, and requires [specifying a connection-string](https://docs.sqlalchemy.org/en/20/tutorial/engine.html) as `--input-db-url` instead of an input dir folder.
-The person-file parameter and carrot-mapper workflow should still be used, as if working with .csv files, but carrot-transform can read from an SQLAlchemy database.
-
-1. Extract/export some rows from the various tables
-  - something like `SELECT column_name(s) FROM patients LIMIT 1000;` is written to `patients.csv`
-2. the usual [scan reports](https://carrot.ac.uk/mapper/user_guide/projects_datasets_scanreports) are performed on these subsets
-3. [when carrot-transform is invoked](https://carrot.ac.uk/transform/quickstart) instead of `--input-dir` one specifies `--input-db-url` with a database connection string
-  - the `--person-file` parameter should still point to the equivalent of `person_tablename.csv`
-  - the `--rules-file` parameter needs to refer to a file on the disk as usual
-4. Carrot Transform will still write data to `--output-dir` and otherwise operate as normal
-  - The following parameters have undefined behaviour with this functionality
-    - `--write-mode`
-    - `--saved-person-id-file`
-    - `--use-input-person-ids`
-    - `--last-used-ids-file`
+| Flag                     | Default | Description                                                         |
+| ------------------------ | ------- | ------------------------------------------------------------------- |
+| `--write-mode`           | `w`     | Set to `w` (overwrite) or `a` (append) for output files             |
+| `--saved-person-id-file` | None    | Path to a file to save and share `person_id` state                  |
+| `--use-input-person-ids` | `N`     | Use input person IDs (`Y`) or replace with new integers (`N`)       |
+| `--last-used-ids-file`   | None    | Path to a file tracking last used IDs (tab-separated format)        |
+| `--log-file-threshold`   | `0`     | Change output limit for log files                                   |
+| `--input-db-url`         | None    | SQLAlchemy connection string for database input (Version 1 Process) |
