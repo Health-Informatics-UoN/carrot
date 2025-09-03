@@ -1,6 +1,6 @@
-# Connect to a Database in Version 1 Process
+# Read data from a Database in Version 1 Process
 
-#### Database Input (Experimental)
+### Database Input (Experimental)
 
 Instead of reading from `.csv` files, Carrot Transform can read directly from a database using SQLAlchemy.
 
@@ -17,7 +17,7 @@ Examples:
   `SELECT * FROM demographics_makeup;`
 - `--input-db-url "sqlite:///./testing.db"` will connect to an SQLite database in the file `./testing.db`
 
-##### Database Workflow
+### Database Workflow
 
 Carrot-Transform can read input tables from [SQLAlchemy](https://www.sqlalchemy.org/).
 This is experimental, and requires [specifying a connection-string](https://docs.sqlalchemy.org/en/20/tutorial/engine.html) as `--input-db-url` instead of an input dir folder.
