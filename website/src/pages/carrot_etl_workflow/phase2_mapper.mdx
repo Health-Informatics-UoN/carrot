@@ -30,33 +30,19 @@ The second phase of the Carrot ETL workflow focuses on using Carrot Mapper to cr
 
 ## Step 4: Carrot Mapper Setup
 
+<Callout type="warning">
+  **Admin Configuration Required:** Carrot Mapper requires initial setup through the admin backend. This includes creating projects, configuring data sources, and setting up user permissions. Please contact your system administrator to ensure the Carrot Mapper environment is properly configured before proceeding with this tutorial.
+</Callout>
+
 ### 4.1 Access Carrot Mapper
 
 1. Navigate to your Carrot Mapper instance
 2. Log in with appropriate credentials
-3. Verify you have permissions to create projects
+3. Verify you have access to the configured project
 
 <Callout type="info">
-  **Note:** Carrot Mapper is typically accessed through a web interface. Make sure you have the correct URL and access credentials before starting this phase.
+  **Note:** Carrot Mapper is accessed through a web interface. The project and data source configuration should already be set up by your administrator.
 </Callout>
-
-### 4.2 Create New Project
-
-1. Click "New Project" or equivalent button
-2. Enter project name and description
-3. Select appropriate project settings
-4. Save project configuration
-
-**Project Configuration Example:**
-```yaml
-project_settings:
-  name: "Hospital Data ETL Project"
-  description: "Transform hospital EHR data to OMOP CDM v5.4"
-  version: "1.0.0"
-  target_cdm_version: "5.4"
-  data_source_type: "EHR"
-  privacy_level: "de-identified"
-```
 
 ## Step 5: Upload Scan Report
 
