@@ -5,25 +5,30 @@ import HighlightedText from '@/components/HighlightedText';
 
 ## What is Carrot Transform?
 
-**Carrot Transform** is like the **worker** that actually does the heavy lifting.
+**Carrot Transform** is a Python command-line tool that executes the transformation of data to the OMOP CDM, using the mapping rules generated with Carrot Mapper.
 
-Think of it this way:
-- **WhiteRabbit** (Phase 1) = Inspector who examines your data
-- **Carrot Mapper** (Phase 2) = Architect who creates the blueprint
-- **Carrot Transform** (Phase 3) = Construction crew that builds according to the blueprint
+**Key Features:**
+- **Local Deployment**: Runs within your data partner's environment next to the data, ensuring data security and privacy
+- **Command Line Tool**: Can be easily integrated into data pipelines and automated workflows
+- **Python-based**: Can be run from source or installed using pip
+- **OMOP CDM Output**: Transforms your source data into the standardized OMOP Common Data Model format
 
 **What Carrot Transform does:**
 - Takes your mapping rules from Carrot Mapper
-- Reads your original data files
-- Applies all the transformations you specified
+- Reads your original data files (CSV, SAS, database tables)
+- Applies all the transformations you specified in the mapping rules
 - Creates new files in the standard OMOP CDM format
-- Checks that everything was done correctly
+- Validates the transformed data against OMOP CDM standards
 
 **Why this step is important:**
-- This is where your data actually gets converted from its current format to the standard format
-- It's like having a translator who speaks both languages fluently
+- This is where your data actually gets converted from its current format to the standard OMOP CDM format
 - It ensures your data follows all the OMOP CDM rules and standards
-- It creates the final output that researchers can actually use
+- It creates the final output that researchers can use for analysis
+- It maintains data privacy by running locally within your environment
+
+<Callout type="info">
+  **Data Security**: Carrot Transform is designed to run locally within your environment, ensuring that sensitive healthcare data never leaves your secure infrastructure.
+</Callout>
 
 ## Overview
 
@@ -46,7 +51,7 @@ pip install -e .
 ```
 
 <Callout type="info">
-  **Note:** The PyPI package is actively maintained and is the recommended installation method for most users.
+  **Note:** The PyPI package is actively maintained and is the recommended installation method for most users. Carrot Transform is a Python tool that can be easily integrated into your existing data pipeline infrastructure.
 </Callout>
 
 ### 9.2 Verify Installation
@@ -57,7 +62,7 @@ carrot-transform -v
 **Expected Result:** Version number displayed, confirming successful installation.
 
 <Callout type="info">
-  **System Requirements:** Carrot Transform requires Python 3.10 or higher. For database operations, you may need additional system libraries (e.g., PostgreSQL development headers).
+  **System Requirements:** Carrot Transform requires Python 3.10 or higher. For database operations, you may need additional system libraries (e.g., PostgreSQL development headers). The tool is designed to run locally within your data partner's environment for maximum security and privacy.
 </Callout>
 
 ## Step 10: Execute Data Transformation
