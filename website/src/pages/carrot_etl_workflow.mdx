@@ -1,0 +1,73 @@
+# Carrot ETL End-to-End Workflow Documentation
+
+This guide walks you through the complete Carrot ETL workflow using realistic sample healthcare data. You'll transform patient records, visits, diagnoses, medications, and procedures into the OMOP Common Data Model format.
+
+## What You'll Accomplish
+
+By the end of this guide, you'll have:
+- Profiled sample healthcare data using WhiteRabbit
+- Created data mappings using Carrot Mapper
+- Executed the transformation using Carrot Transform
+- Generated OMOP CDM-compliant data ready for research
+
+## Sample Data Overview
+
+The sample data package contains everything you need to complete this workflow:
+
+**WhiteRabbit Input Files:**
+- **patients.csv** - Patient demographics and contact information
+- **test_with_dates.csv** - Sample data with various date formats
+- **test_data.csv** - Additional test data for profiling
+- **CONCEPT.csv** and **CONCEPT_SYNONYM.csv** - Medical concept reference data
+
+**WhiteRabbit Output Examples:**
+- **ScanReport_csv.xlsx** - Example scan report for CSV data
+- **ScanReport_sas.xlsx** - Example scan report for SAS data
+- **fake_data_csv/** - Generated fake data samples
+
+**Test Scan Reports:**
+- **ScanReport_minimal.xlsx** - Minimal scan report example
+- **ScanReport_with_empty.xlsx** - Scan report with empty values
+
+[Download sample data files →](/sample-data/sample-data.zip)
+
+## Prerequisites
+
+- macOS, Linux, or Windows system
+- Java 8 or higher installed
+- WhiteRabbit v1.0.0 or later
+- Access to Carrot Mapper platform
+- Carrot Transform tool installed
+- Python 3.7+ (for Carrot Transform)
+
+## Workflow Phases
+
+### Phase 1: Data Profiling with WhiteRabbit
+Use WhiteRabbit to analyze the sample data and generate a scan report. This phase helps you understand the data structure and quality before transformation.
+
+[WhiteRabbit](./carrot_etl_workflow/phase1_whiterabbit)
+
+### Phase 2: Data Transformation with Carrot Mapper
+Configure field mappings and transformation rules using Carrot Mapper. This phase defines how the sample data will be converted to OMOP CDM format.
+
+[Carrot Mapper](./carrot_etl_workflow/phase2_mapper)
+
+### Phase 3: Data Execution and Validation
+Execute the transformation using Carrot Transform and validate the results. This phase performs the actual data conversion and ensures quality standards are met.
+
+[Carrot Transform](./carrot_etl_workflow/phase3_execution)
+
+## Getting Started
+
+1. Download the sample data files to your local machine
+2. Follow each phase in order - each builds on the previous one
+3. Use the same sample data throughout the workflow for consistency
+
+## Additional Resources
+
+- [Troubleshooting Guide →](./carrot_etl_workflow/troubleshooting)
+- [Additional Resources →](./carrot_etl_workflow/resources)
+
+---
+
+Ready to begin? Start with [Phase 1: Data Profiling with WhiteRabbit](./carrot_etl_workflow/phase1_whiterabbit) to begin your ETL workflow.
