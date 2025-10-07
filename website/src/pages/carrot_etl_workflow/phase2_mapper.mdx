@@ -101,7 +101,235 @@ visit_date,Date of visit,DATE,VISIT_OCCURRENCE,visit_start_date,
 diagnosis_code,ICD-10 diagnosis code,STRING,CONDITION_OCCURRENCE,condition_source_value,
 ```
 
-## Step 6: Data Mapping Configuration
+## Step 6: Begin Data Mapping
+
+After successfully uploading your scan report and data dictionary, the system will process the files and make them available for mapping. Here's what happens next:
+
+### 6.1 Access Your Uploaded Scan Report
+
+1. **Navigate to Scan Reports**: Go to the "Scan Reports" page in Carrot Mapper
+2. **Click on Your Uploaded Scan Report**: Find and click on the scan report you just uploaded
+3. **View Scan Report Details**: This opens the scan report detail page
+
+### 6.2 Map Individual CSV Files
+
+On the scan report detail page, you'll see the individual CSV files from your data source. For this tutorial, you should see:
+- `covid19.csv`
+- `Demographics.csv`
+
+**To begin mapping:**
+
+#### Map covid19.csv
+1. **Click "Edit Table" on covid19.csv**: This opens the mapping interface
+
+<div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
+  <figure style={{ margin: "0" }}>
+    <img 
+      src="/docs/Editing Scan Report.png" 
+      alt="Carrot Mapper Edit Table Interface for covid19.csv" 
+      width="100%"
+      height="auto"
+      style={{ 
+        maxWidth: "800px", 
+        border: "3px solid #007acc", 
+        borderRadius: "16px",
+        padding: "12px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+        backgroundColor: "#ffffff"
+      }} 
+    />
+    <figcaption style={{ 
+      marginTop: "16px", 
+      fontStyle: "italic", 
+      color: "#333",
+      fontSize: "16px",
+      fontWeight: "600"
+    }}>
+      Figure: Edit Table Interface - Configuring Person ID and Date Event for covid19.csv
+    </figcaption>
+  </figure>
+</div>
+
+2. **Configure Key Fields**: You'll see dropdown menus for:
+   - **Person ID**: Select the field that contains unique patient identifiers (e.g., "PersonID")
+   - **Date Event**: Select the field that contains event dates (e.g., "Date")
+3. **Save Configuration**: Click "Save" to confirm your selections
+
+#### Map Demographics.csv
+1. **Click "Edit Table" on Demographics.csv**: Open the mapping interface
+2. **Configure Key Fields**: Set the dropdowns for:
+   - **Person ID**: Select the patient identifier field
+   - **Date Event**: Select the relevant date field
+3. **Save Configuration**: Click "Save" to confirm
+
+### 6.3 Concept Reuse Configuration
+
+During the mapping process, you'll be asked:
+
+**"Do you want to trigger the reuse of existing concepts?"**
+
+**Choose "Yes"** if you want to:
+- Reuse concepts that were previously mapped in other scan reports within the same parent dataset
+- Enable automatic concept matching based on field names and values
+- Speed up the mapping process for similar data
+
+<Callout type="info">
+  **Note:** Enabling concept reuse may make the auto-mapping process take longer to run, but it will provide more consistent mappings across your datasets.
+</Callout>
+
+### 6.4 Auto-Mapping Process
+
+After configuring both CSV files:
+- The system will automatically begin the mapping process for each file
+- Auto-mapping uses the field configurations you've set up
+- The process analyzes your data and suggests OMOP CDM mappings
+- You can review and modify these suggestions as needed
+
+<div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
+  <figure style={{ margin: "0" }}>
+    <img 
+      src="/docs/Mapping in Progress.png" 
+      alt="Carrot Mapper Auto-Mapping in Progress" 
+      width="100%"
+      height="auto"
+      style={{ 
+        maxWidth: "800px", 
+        border: "3px solid #007acc", 
+        borderRadius: "16px",
+        padding: "12px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+        backgroundColor: "#ffffff"
+      }} 
+    />
+    <figcaption style={{ 
+      marginTop: "16px", 
+      fontStyle: "italic", 
+      color: "#333",
+      fontSize: "16px",
+      fontWeight: "600"
+    }}>
+      Figure: Auto-Mapping Process in Progress - Jobs Running
+    </figcaption>
+  </figure>
+</div>
+
+**What You'll See During Auto-Mapping:**
+- Spinning orange circles in the "Jobs Progress" column indicate active processing
+- The system analyzes your data and creates initial mappings
+- This process may take several minutes depending on data size
+- You can monitor progress using the "Refresh Jobs Progress" button
+
+<div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
+  <figure style={{ margin: "0" }}>
+    <img 
+      src="/docs/Mapping Jobs Complete.png" 
+      alt="Carrot Mapper Auto-Mapping Complete" 
+      width="100%"
+      height="auto"
+      style={{ 
+        maxWidth: "800px", 
+        border: "3px solid #007acc", 
+        borderRadius: "16px",
+        padding: "12px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+        backgroundColor: "#ffffff"
+      }} 
+    />
+    <figcaption style={{ 
+      marginTop: "16px", 
+      fontStyle: "italic", 
+      color: "#333",
+      fontSize: "16px",
+      fontWeight: "600"
+    }}>
+      Figure: Auto-Mapping Process Complete - Ready for Review
+    </figcaption>
+  </figure>
+</div>
+
+**When Auto-Mapping Completes:**
+- The spinning circles will disappear from the "Jobs Progress" column and be replaced with green checkmarks
+- Your CSV files will show as ready for review and editing
+- You can now click "Edit Table" to review and refine the generated mappings
+- The system will have created initial field mappings based on your Person ID and Date Event selections
+
+## Step 7: Review Generated Rules and Mapping Diagram
+
+After the auto-mapping process completes, you can review the generated transformation rules and visualize your mappings.
+
+### 7.1 View Generated Rules
+
+1. **Click the "Rules" tab**: Navigate to the Rules tab in your scan report
+2. **Review Generated Rules**: You'll see all the transformation rules that were automatically created from your successful mapping
+3. **Examine Rule Details**: Each rule shows how your source data fields are mapped to OMOP CDM fields
+
+<div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
+  <figure style={{ margin: "0" }}>
+    <img 
+      src="/docs/View Generated Rules.png" 
+      alt="Carrot Mapper Generated Rules View" 
+      width="100%"
+      height="auto"
+      style={{ 
+        maxWidth: "800px", 
+        border: "3px solid #007acc", 
+        borderRadius: "16px",
+        padding: "12px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+        backgroundColor: "#ffffff"
+      }} 
+    />
+    <figcaption style={{ 
+      marginTop: "16px", 
+      fontStyle: "italic", 
+      color: "#333",
+      fontSize: "16px",
+      fontWeight: "600"
+    }}>
+      Figure: Generated Rules View - Field Mappings and OMOP CDM Transformations
+    </figcaption>
+  </figure>
+</div>
+
+### 7.2 View Mapping Diagram
+
+1. **Click "View Map Diagram"**: Located at the top left of the Rules tab
+2. **Visualize Mappings**: This displays a visual diagram showing how your source data connects to the OMOP CDM structure
+3. **Understand Relationships**: The diagram helps you see the overall data flow and field relationships
+
+<div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
+  <figure style={{ margin: "0" }}>
+    <img 
+      src="/docs/Mapping Diagram.png" 
+      alt="Carrot Mapper Mapping Diagram Visualization" 
+      width="100%"
+      height="auto"
+      style={{ 
+        maxWidth: "800px", 
+        border: "3px solid #007acc", 
+        borderRadius: "16px",
+        padding: "12px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+        backgroundColor: "#ffffff"
+      }} 
+    />
+    <figcaption style={{ 
+      marginTop: "16px", 
+      fontStyle: "italic", 
+      color: "#333",
+      fontSize: "16px",
+      fontWeight: "600"
+    }}>
+      Figure: Mapping Diagram - Visual Representation of Data Flow and Field Relationships
+    </figcaption>
+  </figure>
+</div>
+
+<Callout type="info">
+  **Tip:** The mapping diagram is particularly useful for understanding complex data relationships and ensuring your mappings align with OMOP CDM requirements.
+</Callout>
+
+## Step 8: Data Mapping Configuration
 
 ### 6.1 Understand OMOP CDM Structure
 
