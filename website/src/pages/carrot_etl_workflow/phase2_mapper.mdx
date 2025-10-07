@@ -103,24 +103,24 @@ diagnosis_code,ICD-10 diagnosis code,STRING,CONDITION_OCCURRENCE,condition_sourc
 
 ## Step 6: Begin Data Mapping
 
-After successfully uploading your scan report and data dictionary, the system will process the files and make them available for mapping. Here's what happens next:
+Once you've uploaded your scan report and data dictionary, the system processes the files and makes them ready for mapping. Here's what you do next:
 
 ### 6.1 Access Your Uploaded Scan Report
 
-1. **Navigate to Scan Reports**: Go to the "Scan Reports" page in Carrot Mapper
-2. **Click on Your Uploaded Scan Report**: Find and click on the scan report you just uploaded
-3. **View Scan Report Details**: This opens the scan report detail page
+1. **Go to the "Scan Reports" page** in Carrot Mapper
+2. **Find and click on your uploaded scan report**
+3. **This opens the scan report detail page**
 
 ### 6.2 Map Individual CSV Files
 
-On the scan report detail page, you'll see the individual CSV files from your data source. For this tutorial, you should see:
+On the scan report detail page, you'll see the CSV files from your data. For this tutorial, you should see:
 - `covid19.csv`
 - `Demographics.csv`
 
-**To begin mapping:**
+**Let's start mapping:**
 
 #### Map covid19.csv
-1. **Click "Edit Table" on covid19.csv**: This opens the mapping interface
+1. **Click "Edit Table" on covid19.csv** - this opens the mapping interface
 
 <div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
   <figure style={{ margin: "0" }}>
@@ -150,17 +150,17 @@ On the scan report detail page, you'll see the individual CSV files from your da
   </figure>
 </div>
 
-2. **Configure Key Fields**: You'll see dropdown menus for:
-   - **Person ID**: Select the field that contains unique patient identifiers (e.g., "PersonID")
-   - **Date Event**: Select the field that contains event dates (e.g., "Date")
-3. **Save Configuration**: Click "Save" to confirm your selections
+2. **Set up the key fields** - you'll see dropdown menus for:
+   - **Person ID**: Pick the field with patient identifiers (like "PersonID")
+   - **Date Event**: Pick the field with event dates (like "Date")
+3. **Click "Save"** to confirm your choices
 
 #### Map Demographics.csv
-1. **Click "Edit Table" on Demographics.csv**: Open the mapping interface
-2. **Configure Key Fields**: Set the dropdowns for:
-   - **Person ID**: Select the patient identifier field
-   - **Date Event**: Select the relevant date field
-3. **Save Configuration**: Click "Save" to confirm
+1. **Click "Edit Table" on Demographics.csv** - open the mapping interface
+2. **Set up the key fields** - pick the right dropdowns for:
+   - **Person ID**: Choose the patient identifier field
+   - **Date Event**: Choose the relevant date field
+3. **Click "Save"** to confirm
 
 ### 6.3 Concept Reuse Configuration
 
@@ -169,8 +169,8 @@ During the mapping process, you'll be asked:
 **"Do you want to trigger the reuse of existing concepts?"**
 
 **Choose "Yes"** if you want to:
-- Reuse concepts that were previously mapped in other scan reports within the same parent dataset
-- Enable automatic concept matching based on field names and values
+- Reuse concepts from other scan reports in the same dataset
+- Let the system automatically match concepts based on field names and values
 - Speed up the mapping process for similar data
 
 <Callout type="info">
@@ -179,11 +179,11 @@ During the mapping process, you'll be asked:
 
 ### 6.4 Auto-Mapping Process
 
-After configuring both CSV files:
-- The system will automatically begin the mapping process for each file
-- Auto-mapping uses the field configurations you've set up
-- The process analyzes your data and suggests OMOP CDM mappings
-- You can review and modify these suggestions as needed
+Once you've configured both CSV files:
+- The system automatically starts mapping each file
+- It uses the field settings you just configured
+- The process looks at your data and suggests OMOP CDM mappings
+- You can review and tweak these suggestions later
 
 <div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
   <figure style={{ margin: "0" }}>
@@ -213,11 +213,11 @@ After configuring both CSV files:
   </figure>
 </div>
 
-**What You'll See During Auto-Mapping:**
-- Spinning orange circles in the "Jobs Progress" column indicate active processing
-- The system analyzes your data and creates initial mappings
-- This process may take several minutes depending on data size
-- You can monitor progress using the "Refresh Jobs Progress" button
+**What you'll see while it's running:**
+- Spinning orange circles in the "Jobs Progress" column show it's working
+- The system looks through your data and creates initial mappings
+- This might take a few minutes depending on how much data you have
+- You can check progress using the "Refresh Jobs Progress" button
 
 <div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
   <figure style={{ margin: "0" }}>
@@ -247,21 +247,21 @@ After configuring both CSV files:
   </figure>
 </div>
 
-**When Auto-Mapping Completes:**
-- The spinning circles will disappear from the "Jobs Progress" column and be replaced with green checkmarks
-- Your CSV files will show as ready for review and editing
-- You can now click "Edit Table" to review and refine the generated mappings
-- The system will have created initial field mappings based on your Person ID and Date Event selections
+**When it's done:**
+- The spinning circles disappear and get replaced with green checkmarks
+- Your CSV files show as ready for review and editing
+- You can click "Edit Table" to look at and adjust the mappings
+- The system has created initial field mappings based on your Person ID and Date Event choices
 
 ## Step 7: Review Generated Rules and Mapping Diagram
 
-After the auto-mapping process completes, you can review the generated transformation rules and visualize your mappings.
+Once the auto-mapping is done, you can check out the rules it created and see how your mappings look.
 
 ### 7.1 View Generated Rules
 
-1. **Click the "Rules" tab**: Navigate to the Rules tab in your scan report
-2. **Review Generated Rules**: You'll see all the transformation rules that were automatically created from your successful mapping
-3. **Examine Rule Details**: Each rule shows how your source data fields are mapped to OMOP CDM fields
+1. **Click the "Rules" tab** in your scan report
+2. **Check out the generated rules** - you'll see all the transformation rules that were automatically created
+3. **Look at the details** - each rule shows how your source data fields are mapped to OMOP CDM fields
 
 <div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
   <figure style={{ margin: "0" }}>
@@ -293,9 +293,9 @@ After the auto-mapping process completes, you can review the generated transform
 
 ### 7.2 View Mapping Diagram
 
-1. **Click "View Map Diagram"**: Located at the top left of the Rules tab
-2. **Visualize Mappings**: This displays a visual diagram showing how your source data connects to the OMOP CDM structure
-3. **Understand Relationships**: The diagram helps you see the overall data flow and field relationships
+1. **Click "View Map Diagram"** - it's at the top left of the Rules tab
+2. **See your mappings visually** - this shows a diagram of how your source data connects to the OMOP CDM structure
+3. **Understand the relationships** - the diagram helps you see the overall data flow and how fields connect
 
 <div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
   <figure style={{ margin: "0" }}>
@@ -326,18 +326,29 @@ After the auto-mapping process completes, you can review the generated transform
 </div>
 
 <Callout type="info">
-  **Tip:** The mapping diagram is particularly useful for understanding complex data relationships and ensuring your mappings align with OMOP CDM requirements.
+  **Tip:** The mapping diagram is really helpful for understanding complex data relationships and making sure your mappings work with OMOP CDM requirements.
 </Callout>
 
-## Step 8: Data Mapping Configuration
+### 7.3 Review Rules in Review Tab
 
-### 6.1 Understand OMOP CDM Structure
+1. **Click the "Review Rules" tab** in your scan report
+2. **Check out your rules** - this gives you another way to look at your transformation rules
+3. **Double-check your mappings** - use this tab to make sure everything looks right before downloading
+
+## Step 8: Download Mapping Configuration
+
+Once you've checked out your rules and mapping diagram, you can download your mapping configuration to use with Carrot Transform.
+
+### 8.1 Access Actions Menu
+
+1. **Click the "Actions" button** - it's in the top right of the Rules tab
+2. **See what's available** - this opens a dropdown menu with download and management options
 
 <div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
   <figure style={{ margin: "0" }}>
     <img 
-      src="/docs/models.png" 
-      alt="OMOP CDM Data Model" 
+      src="/docs/Actions Button.png" 
+      alt="Carrot Mapper Actions Menu" 
       width="100%"
       height="auto"
       style={{ 
@@ -356,302 +367,113 @@ After the auto-mapping process completes, you can review the generated transform
       fontSize: "16px",
       fontWeight: "600"
     }}>
-      Figure: OMOP CDM Data Model
+      Figure: Actions Menu - Download Options and Scan Report Management
     </figcaption>
   </figure>
 </div>
 
-Familiarize yourself with key OMOP CDM tables:
+### 8.2 Download Mapping Configuration
 
-**Core Clinical Tables**
-- **PERSON**: Patient demographics and basic information
-- **OBSERVATION_PERIOD**: Time periods of observation
-- **VISIT_OCCURRENCE**: Healthcare visits and encounters
-- **CONDITION_OCCURRENCE**: Diagnoses and conditions
-- **DRUG_EXPOSURE**: Medication exposures and prescriptions
-- **PROCEDURE_OCCURRENCE**: Medical procedures and interventions
-- **MEASUREMENT**: Clinical measurements and lab results
-- **OBSERVATION**: Clinical observations and assessments
+**Available Download Options:**
 
-**Supporting Tables**
-- **CONCEPT**: Standardized medical concepts
-- **VOCABULARY**: Medical terminology vocabularies
-- **DOMAIN**: Concept domain classifications
-- **RELATIONSHIP**: Concept relationships and hierarchies
+**Downloads Section:**
+- **Mapping JSON**: Downloads your mapping configuration in JSON format (this is what Carrot Transform needs)
+- **Mapping JSON V2**: Downloads your mapping configuration in JSON V2 format (enhanced version)
+- **Mapping CSV**: Downloads your mapping configuration in CSV format
 
-### 6.2 Create Field Mappings
+**Scan Report Section:**
+- **Export**: Exports the scan report data
+- **Delete**: Deletes the scan report (be careful with this one)
 
-1. For each source field, identify:
-   - Target OMOP table
-   - Target OMOP field
-   - Transformation rules needed
-   - Data type conversions required
+### 8.3 Download Process
 
-**Mapping Example:**
-```yaml
-field_mappings:
-  patient_demographics:
-    source_field: "patient_id"
-    target_table: "PERSON"
-    target_field: "person_id"
-    transformation: "direct_copy"
-    
-  visit_information:
-    source_field: "admission_date"
-    target_table: "VISIT_OCCURRENCE"
-    target_field: "visit_start_date"
-    transformation: "date_parse"
-    
-  diagnosis_data:
-    source_field: "icd10_code"
-    target_table: "CONDITION_OCCURRENCE"
-    target_field: "condition_source_value"
-    transformation: "code_mapping"
-```
+**For Mapping JSON and Mapping CSV:**
+1. **Click "Mapping JSON" or "Mapping CSV"** - pick your preferred format
+2. **The system starts preparing your file** - it gets your mapping configuration ready
+3. **You'll be taken to the Downloads tab** - this happens automatically
+4. **Watch the progress** - keep an eye on it until it's ready
+5. **Download to your computer** - once it's ready, click to download it
 
-### 6.3 Define Transformations
+**For Mapping JSON V2:**
+1. **Click "Mapping JSON V2"** - this starts generating the Mapping Rules JSON V2
+2. **The system processes your mappings** - it creates the enhanced JSON V2 format
+3. **You'll be taken to the Downloads tab** - this happens automatically
+4. **Watch the generation progress** - keep an eye on it until it's done
 
-1. **Simple mappings**: Direct field-to-field copies
-2. **Complex transformations**: 
-   - Date format conversions
-   - Code system mappings (ICD-10 → SNOMED, etc.)
-   - Unit conversions
-   - Aggregations or calculations
+<div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
+  <figure style={{ margin: "0" }}>
+    <img 
+      src="/docs/Trigger Mapping Rules Generation.png" 
+      alt="Carrot Mapper Mapping Rules Generation in Progress" 
+      width="100%"
+      height="auto"
+      style={{ 
+        maxWidth: "800px", 
+        border: "3px solid #007acc", 
+        borderRadius: "16px",
+        padding: "12px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+        backgroundColor: "#ffffff"
+      }} 
+    />
+    <figcaption style={{ 
+      marginTop: "16px", 
+      fontStyle: "italic", 
+      color: "#333",
+      fontSize: "16px",
+      fontWeight: "600"
+    }}>
+      Figure: Downloads Tab - Mapping Rules JSON V2 Generation in Progress
+    </figcaption>
+  </figure>
+</div>
 
-**Transformation Types:**
-```yaml
-transformation_rules:
-  date_conversions:
-    - type: "date_parse"
-      input_format: "MM/DD/YYYY"
-      output_format: "ISO8601"
-      
-  code_mappings:
-    - type: "vocabulary_mapping"
-      source_vocabulary: "ICD-10"
-      target_vocabulary: "SNOMED-CT"
-      
-  unit_conversions:
-    - type: "unit_conversion"
-      source_unit: "lbs"
-      target_unit: "kg"
-      conversion_factor: 0.453592
-```
+5. **Download to your computer** - once generation is complete, click to download the JSON V2 file
 
-## Step 7: Generate ETL Rules
+<div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
+  <figure style={{ margin: "0" }}>
+    <img 
+      src="/docs/Download Mapping Rules.png" 
+      alt="Carrot Mapper Download Mapping Rules" 
+      width="100%"
+      height="auto"
+      style={{ 
+        maxWidth: "800px", 
+        border: "3px solid #007acc", 
+        borderRadius: "16px",
+        padding: "12px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+        backgroundColor: "#ffffff"
+      }} 
+    />
+    <figcaption style={{ 
+      marginTop: "16px", 
+      fontStyle: "italic", 
+      color: "#333",
+      fontSize: "16px",
+      fontWeight: "600"
+    }}>
+      Figure: Ready to download your Mapping Rules JSON V2 file
+    </figcaption>
+  </figure>
+</div>
 
-### 7.1 Configure ETL Logic
+<Callout type="info">
+  **Note:** The download process might take a few minutes depending on how big your mapping configuration is. For Mapping JSON V2, there's an extra generation step that could take longer. The Downloads tab will show you the progress and let you know when the file is ready.
+</Callout>
 
-1. In Carrot Mapper, define:
-   - Source-to-target mappings
-   - Transformation rules
-   - Data quality checks
-   - Error handling procedures
+## What's Next?
 
-**ETL Configuration Example:**
-```yaml
-etl_configuration:
-  source_mapping:
-    table_name: "hospital_patients"
-    primary_key: "patient_id"
-    
-  target_mapping:
-    table_name: "PERSON"
-    schema: "omop_cdm"
-    
-  data_quality:
-    null_handling: "skip"
-    validation_rules:
-      - "required_field_check"
-      - "data_type_validation"
-      - "range_validation"
-      
-  error_handling:
-    on_error: "log_and_continue"
-    error_threshold: 0.05
-    error_logging: true
-```
+Congratulations! You've successfully completed the Carrot Mapper workflow. You now have:
 
-### 7.2 Validate Mappings
+- ✅ Uploaded your scan report and data dictionary
+- ✅ Configured field mappings for your CSV files
+- ✅ Generated transformation rules automatically
+- ✅ Reviewed your mappings and rules
+- ✅ Downloaded your mapping configuration (JSON V2)
 
-1. Run validation checks
-2. Review any warnings or errors
-3. Test with sample data if available
-4. Iterate and refine as needed
+Your mapping configuration file is now ready to use with **Carrot Transform** in the next phase of the ETL workflow.
 
-**Validation Checklist:**
-- [ ] All required fields are mapped
-- [ ] Data types are compatible
-- [ ] Transformation rules are valid
-- [ ] Business logic is correctly implemented
-- [ ] Error handling is appropriate
+---
 
-### 7.3 Generate Rules
-
-1. Execute rule generation
-2. Review generated ETL specifications
-3. Ensure all business requirements are met
-
-## Step 8: Export Configuration
-
-### 8.1 Download JSON Configuration
-
-1. In Carrot Mapper, locate export options
-2. Select JSON format
-3. Choose configuration scope (full project or specific mappings)
-4. Download the JSON file
-
-**Export Options:**
-```yaml
-export_configuration:
-  format: "JSON"
-  scope: "full_project"
-  include_metadata: true
-  include_validation_rules: true
-  include_error_handling: true
-  version: "1.0.0"
-```
-
-### 8.2 Validate JSON
-
-1. Check file integrity
-2. Verify all mappings are included
-3. Test JSON syntax if needed
-
-**JSON Validation:**
-```bash
-# Using jq to validate JSON syntax
-jq . configuration.json > /dev/null && echo "Valid JSON" || echo "Invalid JSON"
-
-# Using Python to validate
-python -m json.tool configuration.json
-```
-
-## Advanced Mapping Techniques
-
-### Complex Field Mappings
-
-**Multiple Source Fields to Single Target:**
-```yaml
-complex_mapping:
-  target_field: "person_name"
-  source_fields: ["first_name", "middle_initial", "last_name"]
-  transformation: "concatenate"
-  separator: " "
-  format: "{first} {middle} {last}"
-```
-
-**Conditional Mappings:**
-```yaml
-conditional_mapping:
-  target_field: "gender_concept_id"
-  conditions:
-    - when: "source.gender = 'M'"
-      then: 8507  # Male concept ID
-    - when: "source.gender = 'F'"
-      then: 8532  # Female concept ID
-    - default: 0  # Unknown concept ID
-```
-
-### Vocabulary and Concept Mapping
-
-**Standard Medical Vocabularies:**
-- **ICD-10/ICD-11**: International Classification of Diseases
-- **SNOMED CT**: Systematized Nomenclature of Medicine
-- **LOINC**: Logical Observation Identifiers Names and Codes
-- **RxNorm**: Normalized Names for Clinical Drugs
-- **ATC**: Anatomical Therapeutic Chemical Classification
-
-**Mapping Strategies:**
-```yaml
-vocabulary_mapping:
-  strategy: "hierarchical"
-  fallback: "source_value_preservation"
-  validation: "concept_existence_check"
-  
-  mapping_rules:
-    - source_vocabulary: "ICD-10"
-      target_vocabulary: "SNOMED-CT"
-      mapping_type: "exact_match"
-      confidence_threshold: 0.8
-```
-
-## Data Quality and Validation
-
-### Quality Checks
-
-**Built-in Validation Rules:**
-- Required field validation
-- Data type validation
-- Range and constraint checking
-- Format validation
-- Business rule validation
-
-**Custom Validation Rules:**
-```yaml
-custom_validation:
-  rule_name: "age_reasonableness"
-  description: "Check if age is within reasonable range"
-  condition: "age >= 0 AND age <= 150"
-  severity: "warning"
-  action: "flag_for_review"
-```
-
-### Error Handling
-
-**Error Handling Strategies:**
-```yaml
-error_handling:
-  null_values:
-    strategy: "skip_record"
-    logging: true
-    
-  data_type_errors:
-    strategy: "attempt_conversion"
-    fallback: "use_default"
-    
-  business_rule_violations:
-    strategy: "flag_for_review"
-    notification: true
-```
-
-## Best Practices for Data Mapping
-
-### 1. Start with Core Tables
-
-- Begin with PERSON table mapping
-- Focus on essential demographic fields
-- Establish primary key relationships
-- Build incrementally
-
-### 2. Use Standard Vocabularies
-
-- Prefer standard medical terminologies
-- Document custom mappings
-- Validate concept existence
-- Maintain mapping documentation
-
-### 3. Plan for Data Quality
-
-- Anticipate data quality issues
-- Design robust error handling
-- Include validation rules
-- Plan for data review processes
-
-### 4. Document Everything
-
-- Record all mapping decisions
-- Document transformation logic
-- Note data quality issues
-- Maintain change history
-
-## Next Steps
-
-After completing the data mapping configuration in Carrot Mapper, you'll have an ETL configuration ready for execution. The next phase focuses on [Data Execution and Validation](./phase3_execution).
-
-**Key Deliverables from Phase 2:**
-- ✅ Carrot Mapper project created and configured
-- ✅ Scan report and data dictionary uploaded
-- ✅ Field mappings and transformations defined
-- ✅ ETL rules generated and validated
-- ✅ JSON configuration exported and verified
+**Next:** [Phase 3: Data Execution with Carrot Transform](./phase3_execution) - Use your mapping configuration to transform your data into OMOP CDM format
