@@ -12,4 +12,5 @@ export default {
   mapper: "Carrot Mapper",
   transform: "Carrot Transform",
   carrot_etl_guide: "Carrot Guide",
+  contributing: "Contributing",
 };
