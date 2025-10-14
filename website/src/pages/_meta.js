@@ -13,4 +13,5 @@ export default {
   transform: "Carrot Transform",
   carrot_etl_guide: "Carrot Guide",
   contributing: "Contributing",
+  branding: "Branding",
 };
