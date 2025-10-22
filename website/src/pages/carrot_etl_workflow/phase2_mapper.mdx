@@ -95,10 +95,11 @@ The second phase of the Carrot ETL workflow focuses on using Carrot Mapper to cr
 
 **Data Dictionary Format Requirements:**
 ```csv
-Field_Name,Field_Description,Data_Type,OMOP_Table,OMOP_Field,Transformation_Rules
-patient_id,Unique patient identifier,STRING,PERSON,person_id,
-visit_date,Date of visit,DATE,VISIT_OCCURRENCE,visit_start_date,
-diagnosis_code,ICD-10 diagnosis code,STRING,CONDITION_OCCURRENCE,condition_source_value,
+csv_file_name,field_name,code,value
+Covid19.csv,Symptom,SNOMED,
+Covid19.csv,Testtype,LOINC,
+Demographics.csv,Sex,F,Female
+Demographics.csv,Sex,M,Male
 ```
 
 ## Step 6: Begin Data Mapping
