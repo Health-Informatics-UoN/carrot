@@ -1,0 +1,31 @@
+# Security Guidelines
+
+This document outlines security and infrastructure recommendations for deploying and running Carrot Mapper within a network. 
+
+## Container Images 
+
+- Carrot Mapper should be deployed using container images to ensure consistency and security. 
+- Carrot Mapper should be regularly updated to the latest stable release.
+- Organisations can build their own image from source if required.
+
+## Version Pinning
+
+- Carrot Mapper containers should be pinned to a specific tagged version for stability. 
+- Using tagged versions ensures that you are deploying a known, tested version of the software, which helps in maintaining a stable and predictable environment. 
+- You can find a list of available version tags in the [container registry](https://github.com/orgs/Health-Informatics-UoN/packages?repo_name=carrot-mapper).
+
+## Networking
+
+- Carrot Mapper should be deployed within a private subnet for isolation from other services.
+
+## Configuration
+
+- Carrot Mapper credentials for databases and APIs should be stored in a secrets service.
+
+## Monitoring
+- Carrot Mapper logs should be forwarded to a centralised logging system.
+- Alerts should be set up for failed queries and excessive errors.
+- Container health checks and external monitoring should be used to ensure Carrot Mapper is running as expected.
+
+## Data Access
+- Database credentials used by Carrot Mapper should be limited to the minimum required permissions, only read-only (select) access to the OMOP CDM database schema is required.

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "omop-lite.fullname" . }}-config
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "omop-lite.labels" . | nindent 4 }}
+data:
+  SCHEMA_NAME: {{ .Values.config.schemaName | quote }}
+  DATA_DIR: {{ .Values.config.dataDir | quote }}
+  SYNTHETIC: {{ .Values.config.synthetic | quote }} 

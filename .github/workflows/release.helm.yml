@@ -1,0 +1,42 @@
+name: Release Helm Chart
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'charts/carrot-mapper/**'
+  workflow_dispatch:
+
+# Add permissions block
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: '3.12.0'
+
+      - name: Run chart-releaser
+        uses: bitdeps/helm-oci-charts-releaser@67e5abdb3029c0384bf80047edc4d5ab0583cd0b
+        with:
+          oci_registry: ghcr.io/health-informatics-uon/charts
+          oci_username: health-informatics-uon
+          oci_password: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          mark_as_latest: false

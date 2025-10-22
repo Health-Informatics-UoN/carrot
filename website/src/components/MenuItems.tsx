@@ -27,7 +27,7 @@ export const sidebarItems: SidebarItems = {
     },
     {
       label: "Login",
-      href: `${process.env.LOGIN_LINK}`,
+      href: "https://mapper.carrot.ac.uk",
       icon: LogIn,
     },
   ],

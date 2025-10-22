@@ -1,0 +1,85 @@
+# Airflow Webserver Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.webserver.name }}
+  labels:
+    component: airflow-webserver
+    app: airflow
+spec:
+  {{- if .Values.webserver.autoscaling.enabled }}
+  replicas: {{ .Values.webserver.autoscaling.minReplicas }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: airflow
+  template:
+    metadata:
+      labels:
+        app: airflow
+        component: airflow-webserver
+    spec:
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:14
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h postgres-service -p 5432 -U {{ .Values.config.AIRFLOW_POSTGRES_USER }}; do
+                echo "Waiting for postgres..."
+                sleep 2
+              done
+        - name: wait-for-minio
+          image: curlimages/curl:latest
+          command:
+            - sh
+            - -c
+            - |
+              until curl -f http://minio-service:9000/minio/health/live; do
+                echo "Waiting for minio..."
+                sleep 2
+              done
+        - name: wait-for-api
+          image: curlimages/curl:latest
+          command:
+            - sh
+            - -c
+            - |
+              until curl -f http://api-service:8000/health; do
+                echo "Waiting for API..."
+                sleep 5
+              done
+      containers:
+        - name: airflow-webserver
+          image: "ghcr.io/health-informatics-uon/carrot/airflow-webserver:{{ .Values.image.tag | default .Values.global.appVersion }}"
+          ports:
+            - name: {{ .Values.service.name }}
+              containerPort: {{ .Values.service.targetPort }}
+          env:
+            - name: AIRFLOW_ADMIN_USERNAME
+              value: "{{ .Values.webserver.env.AIRFLOW_ADMIN_USERNAME }}"
+            - name: AIRFLOW_ADMIN_PASSWORD
+              value: "{{ .Values.webserver.env.AIRFLOW_ADMIN_PASSWORD }}"
+          envFrom:
+            - configMapRef:
+                name: {{ include "airflow.fullname" . }}-config
+            - secretRef:
+                name: {{ include "airflow.fullname" . }}-secrets
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+

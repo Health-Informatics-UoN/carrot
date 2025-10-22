@@ -61,44 +61,9 @@ Carrot can be configured using environment variables which can be different depe
     </Tr>
     <Tr>
       <Td>
-        <Mandatory>`WORKERS_URL`</Mandatory>
-      </Td>
-      <Td>
-        The URL for `Workers` (Azure functions) service which `Backend` should
-        connect to. Structure is similar to `FRONTEND_URL`.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>
-        <Mandatory>`WORKERS_UPLOAD_NAME`</Mandatory>{" "}
-        <Mandatory>`WORKERS_RULES_EXPORT_NAME`</Mandatory>
-      </Td>
-      <Td>
-        Name of queues in Azurite that `Workers` send messages about ScanReport
-        uploads and Mapping Rules exports, respectively.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>`WORKERS_RULES_NAME`</Td>
-      <Td>
-        Name of point where `Backend` triggers Workers' jobs. Default to
-        `RulesOrchestrator`
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>
-        {" "}
-        <Mandatory>`WORKERS_RULES_KEY`</Mandatory>
-      </Td>
-      <Td>
-        The key to authorise the request sent to `Workers` from `Backend`.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>
         <Mandatory>`STORAGE_CONN_STRING`</Mandatory>
       </Td>
-      <Td>The key to connect Backend and Azure local storage.</Td>
+      <Td>The key to connect Backend and local storage.</Td>
     </Tr>
     <Tr>
       <Td>
@@ -139,17 +104,6 @@ Carrot can be configured using environment variables which can be different depe
         The type of storage to use and the options are `Azure` and `MinIO`. This
         variable is required to let Carrot know which storage type to use. Use
         `azure` for Azure Storage and deployment in Azure.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>
-        <Mandatory>`WORKER_SERVICE_TYPE`</Mandatory>
-      </Td>
-      <Td>
-        The type of worker service to use and the options are `Azure` and
-        `Airflow`. This variable is required to let Carrot know which worker
-        service to use. Use `azure` for Azure Functions and `airflow` for
-        Airflow.
       </Td>
     </Tr>
     <Tr>
@@ -203,12 +157,7 @@ api:
     - DB_USER=postgres
     - DB_PASSWORD=postgres
     - DEBUG=True
-    - WORKERS_UPLOAD_NAME=upload-reports-queue
     - SECRET_KEY=secret
-    - WORKERS_URL=http://workers:80
-    - WORKERS_RULES_NAME=RulesOrchestrator
-    - WORKERS_RULES_KEY=rules_key
-    - WORKERS_RULES_EXPORT_NAME=rules-exports-queue
     - STORAGE_CONN_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;
     - SIGNING_KEY=secret
     - SUPERUSER_DEFAULT_USERNAME=admin-local
@@ -456,269 +405,18 @@ Coming soon
 
 ## Other services
 
-### Azure functions
-
-Carrot optionally uses Azure functions as workers to process the tasks.
-
-**Configuration Section**
-
-<Table>
-  <thead>
-    <Tr>
-      <Th>Key</Th>
-      <Th>Description</Th>
-    </Tr>
-  </thead>
-  <tbody>
-    <Tr>
-      <Td>`AzureWebJobsSecretStorageType`</Td>
-      <Td>
-        Specifies the repository or provider to use for key storage. Carrot's
-        workers uses this as `files` for workers auth keys are persisted on the
-        file system. In other words, we ask Docker to look for secrets locally
-        which created at [step
-        2](quickstart#authentication-setup-for-azure-functions) in the dev.
-        quickstart. Only required in local development.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>`IsEncrypted`</Td>
-      <Td>
-        This setting represents whether the values in local.settings.json are
-        encrypted using a local machine key. Only required in local development.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>
-        {" "}
-        <Mandatory>`FUNCTIONS_WORKER_RUNTIME`</Mandatory>
-      </Td>
-      <Td>
-        The language or language stack of the worker runtime to load in the
-        function app.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>
-        {" "}
-        <Mandatory>`DB_ENGINE`</Mandatory>
-      </Td>
-      <Td>
-        The database backend to use. Carrot's workers uses `Postgres` database
-        backend.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>
-        `DB_HOST` `DB_PORT` `DB_NAME` `DB_USER`{" "}
-        <Mandatory>`DB_PASSWORD`</Mandatory>
-      </Td>
-      <Td>
-        These settings (`port`, `host`, `name`, `user`, `password`) are required
-        for PostgreSQL database connection.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>
-        `RULES_QUEUE_NAME` `RULES_FILE_QUEUE_NAME`{" "}
-        <Mandatory>`WORKERS_UPLOAD_NAME`</Mandatory>
-      </Td>
-      <Td>
-        Name of queues in Azurite that `Workers` send messages about Rules
-        actions triggers, Mapping Rules exports and ScanReport uploads,
-        respectively.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>`WEBSITE_HOSTNAME`</Td>
-      <Td>
-        The address that can be used to reach the function app from outside.
-        Only required in local development.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>
-        <Mandatory>`STORAGE_CONN_STRING`</Mandatory>{" "}
-        <Mandatory>`AzureWebJobsStorage`</Mandatory>
-      </Td>
-      <Td>The keys to connect Workers and Azure storage.</Td>
-    </Tr>
-    <Tr>
-      <Td>
-        <Mandatory>`STORAGE_TYPE`</Mandatory>
-      </Td>
-      <Td>
-        The type of storage to use and the options are `Azure` and `MinIO`. This
-        variable is required to let Carrot know which storage type to use. Use
-        `azure` for Azure Storage and deployment in Azure.
-      </Td>
-    </Tr>
-  </tbody>
-</Table>
-
-**Examples**
-
-<Tabs items={['Local development', 'Azure', 'Terraform']}>
-  <Tabs.Tab>
-
-Below is the setting example for Carrot's Azure functions or `workers` service which is one part of Compose Stack used for local development.
-
-**Note:** The `STORAGE_TYPE` environment variable is set to `azure` as default.
-
-```yaml
-workers:
-  image: carrot-workers
-  build:
-    context: app
-    dockerfile: workers/Dockerfile
-  ports:
-    - 8080:80
-    - 7071:80
-  environment:
-    - AzureWebJobsSecretStorageType=files
-    - IsEncrypted=false
-    - AzureWebJobsStorage=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;
-    - FUNCTIONS_WORKER_RUNTIME=python
-    - STORAGE_CONN_STRING=DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;
-    - APP_URL=http://api:8000/
-    - WORKERS_UPLOAD_NAME=upload-reports-queue
-    - RULES_QUEUE_NAME=rules-queue
-    - RULES_FILE_QUEUE_NAME=rules-exports-queue
-    - WEBSITE_HOSTNAME=localhost:7071
-    - DB_ENGINE=django.db.backends.postgresql
-    - DB_HOST=db
-    - DB_PORT=5432
-    - DB_NAME=postgres
-    - DB_USER=postgres
-    - DB_PASSWORD=postgres
-    - STORAGE_TYPE=${STORAGE_TYPE:-azure}
-    # MinIO Configurations (Automatically uses if STORAGE_TYPE is set to minio)
-    - MINIO_ENDPOINT=minio:9000
-    - MINIO_ACCESS_KEY=minioadmin
-    - MINIO_SECRET_KEY=minioadmin
-  volumes:
-    - ./app/workers:/home/site/wwwroot
-    - ./app/shared:/shared
-    - ./app/workers/Secrets:/azure-functions-host/Secrets/
-  depends_on:
-    - api
-    - azurite
-```
-
-This service is built based on the Dockerfile inside `app/workers/` folder and exposed on ports `8080:80` and `7071:80`. It will start after the `api` and `azurite` services are successfully up. When running, it also created some volumes that support its functionalities and authentication.
-
-  </Tabs.Tab>
-  <Tabs.Tab>
-
-You can see, edit, add or change environment variables on Azure web app by using `Advanced edit` on the page.
-
-Below is just an example of variables that need adding to the Azure environment. Apart from these, there are some necessary variables that Azure may add to the environment automatically.
-
-```json
-[
-  { "other variables...": "values..." },
-  {
-    "name": "AzureWebJobsStorage",
-    "value": "<conn-key> same with STORAGE_CONN_STRING",
-    "slotSetting": false
-  },
-  {
-    "name": "DB_ENGINE",
-    "value": "django.db.backends.postgresql",
-    "slotSetting": false
-  },
-  {
-    "name": "DB_HOST",
-    "value": "<db-host>",
-    "slotSetting": false
-  },
-  {
-    "name": "DB_NAME",
-    "value": "<db-name>",
-    "slotSetting": false
-  },
-  {
-    "name": "DB_PASSWORD",
-    "value": "<db-pass> (should be in Key vault)",
-    "slotSetting": false
-  },
-  {
-    "name": "DB_PORT",
-    "value": "5432",
-    "slotSetting": false
-  },
-  {
-    "name": "DB_USER",
-    "value": "<db-user>",
-    "slotSetting": false
-  },
-  {
-    "name": "FUNCTIONS_EXTENSION_VERSION",
-    "value": "~4",
-    "slotSetting": false
-  },
-  {
-    "name": "FUNCTIONS_WORKER_RUNTIME",
-    "value": "python",
-    "slotSetting": false
-  },
-  {
-    "name": "STORAGE_CONN_STRING",
-    "value": "<conn-key> should be in Key vault",
-    "slotSetting": false
-  },
-  {
-    "name": "RULES_FILE_QUEUE_NAME",
-    "value": "rules-files",
-    "slotSetting": false
-  },
-  {
-    "name": "RULES_QUEUE_NAME",
-    "value": "rules",
-    "slotSetting": false
-  },
-  {
-    "name": "WORKERS_UPLOAD_NAME",
-    "value": "upload",
-    "slotSetting": false
-  }
-]
-```
-
-  </Tabs.Tab>
-    <Tabs.Tab>
-
-Coming soon
-
-  </Tabs.Tab>
-</Tabs>
-
 ### Azurite
 
-Carrot optionally uses Azurite as queues and blobs storage for Azure functions.
+Carrot optionally uses Azurite as blobs storage.
 
-If `STORAGE_TYPE` is set to `azure`, Carrot will **automatically create the necessary resources such as `Queue` & `Containers` for you** (see below).
+If `STORAGE_TYPE` is set to `azure`, Carrot will **automatically create the necessary `Containers` for you** (see below).
 
-<Tabs items={['Queues', 'Blob Containers']}>
-  <Tabs.Tab>
-
-```
-Queue for Rules actions triggers, e.g., `rules-queue`
-Queue for Mapping rules exports, e.g., `rules-exports-queue`
-Queue for Scan reports uploads, e.g., `upload-reports-queue`
-```
-
-  </Tabs.Tab>
-  <Tabs.Tab>
-
+**Blob Containers**
 ```
 Container for ScanReport blobs, e.g., `scan-reports`
 Container for Data dictionary blobs, e.g., `data-dictionaries`
 Container for Mapping rules files, e.g., `rules-exports`
 ```
-
-  </Tabs.Tab>
-</Tabs>
 
 **Examples**
 
@@ -730,7 +428,7 @@ Additionally, it runs Azure local storage for Carrot's workers on ports `10000:1
 
 The `command` and `AZURITE_ACCOUNTS` environment variable in this example make sure the connection between `azurite` and `workers` proper.
 
-After `db` is up, [this service](https://github.com/AndyRae/omop-lite/pkgs/container/omop-lite) runs a DDL script to create a `omop` schema in the `db`, then load the vocabs downloaded from Athena there.
+After `db` is up, [this service](https://github.com/health-informatics-uon/omop-lite/pkgs/container/omop-lite) runs a DDL script to create a `omop` schema in the `db`, then load the vocabs downloaded from Athena there.
 
 When `omop` schema existed, `omop-lite` will closes automatically.
 
@@ -744,7 +442,7 @@ db:
     - POSTGRES_PASSWORD=postgres
 
 omop-lite:
-  image: ghcr.io/andyrae/omop-lite
+  image: ghcr.io/health-informatics-uon/omop-lite
   volumes:
     - ./vocabs:/vocabs
   depends_on:
@@ -790,7 +488,7 @@ The Carrot Database would require two data components at the beginning:
 - An `omop` schema with loaded vocabularies
 - Seeding data about OMOP tables and fields names
 
-For local development, the former can be created by [omop-lite](https://github.com/AndyRae/omop-lite/pkgs/container/omop-lite) package as the example below ([step 1 in developer quickstart guide](quickstart#omop-schema-and-vocabs-setting)) and the latter can be done by [step 4 in developer quickstart guide](quickstart#initial-data-preparation).
+For local development, the former can be created by [omop-lite](https://github.com/health-informatics-uon/omop-lite/pkgs/container/omop-lite) package as the example below ([step 1 in developer quickstart guide](quickstart#omop-schema-and-vocabs-setting)) and the latter can be done by [step 4 in developer quickstart guide](quickstart#initial-data-preparation).
 
 ### MinIO
 

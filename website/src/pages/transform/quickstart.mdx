@@ -3,6 +3,7 @@
 ## Installation
 
 Carrot-Transform is available on PyPI, so you can install it with:
+
 ```bash
 pip install carrot-transform
 ```
@@ -10,63 +11,112 @@ pip install carrot-transform
 If you are working with the source code, refer to the [Development Notes](/transform/development)
 
 ## Running Carrot-Transform
+
 To execute Carrot-Transform, run:
+
 ```
 carrot-transform [command] [options]
 ```
 
-
 For example, you can get the version number with:
+
 ```
 carrot-transform -v
 ```
 
-There are many mandatory and optional arguments for carrot transform. In the quick start, we will demonstrate the mandatory arguments on a test case (taken from carrot-CDM) included in the repository.
-Enter the following (as one command):
+There are many mandatory and optional arguments for Carrot Transform. In the quick start, we will demonstrate the mandatory arguments on a test case included in the repository.
 
-### Basic Example
+Transform will read the CSV files in the local directory in the basic examples below. For details about how to read data from a database, see the [Database Connection](/transform/db_connection) section.
+
+### Version 1 Process
+
+V1 process of Transform will take the V1 JSON from Mapper as rules file.
+
+To run the V1 process, enter the following (as one command):
+
+#### Basic Example
+
 To process a test dataset included in the repository, run:
+
 ```bash
 carrot-transform run mapstream \
   --input-dir @carrot/examples/test/inputs \
-  --rules-file @carrot/examples/test/rules/rules_14June2021.json \
+  --rules-file @carrot/examples/test/rules/v1.json \
   --person-file @carrot/examples/test/inputs/Demographics.csv \
   --output-dir carrottransform/examples/test/test_output \
-  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.3_ddl.sql \
-  --omop-config-file @carrot/config/omop.json
+  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql \
+  --omop-config-file @carrot/config/config.json
 ```
+
+### Version 2 Process
+
+V2 process of Transform will take the V2 JSON from Mapper as rules file.
+
+To run the V2 process, enter the following (as one command):
+
+#### Basic Example
+
+To process a test dataset included in the repository, run:
+
+```bash
+carrot-transform run_v2 folder \
+  --input-dir @carrot/examples/test/inputs \
+  --rules-file @carrot/examples/test/rules/v2.json \
+  --person-file @carrot/examples/test/inputs/Demographics.csv \
+  --output-dir carrottransform/examples/test/test_output \
+  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql \
+  --omop-config-file @carrot/config/config.json
+```
+
+### Arguments
+
+#### Required Arguments
+
+| Flag            | Description                                      |
+| --------------- | ------------------------------------------------ |
+| `--input-dir`   | Directory containing input files                 |
+| `--rules-file`  | JSON file defining mapping rules                 |
+| `--person-file` | CSV file (or table name) with person IDs and DOB |
+| `--output-dir`  | Directory to write OMOP-format TSV files         |
+
+#### Optional Arguments
+
+| Flag                     | Default | Description                                                         |
+| ------------------------ | ------- | ------------------------------------------------------------------- |
+| `--write-mode`           | `w`     | Set to `w` (overwrite) or `a` (append) for output files             |
+| `--saved-person-id-file` | None    | Path to a file to save and share `person_id` state                  |
+| `--use-input-person-ids` | `N`     | Use input person IDs (`Y`) or replace with new integers (`N`)       |
+| `--last-used-ids-file`   | None    | Path to a file tracking last used IDs (tab-separated format)        |
+| `--log-file-threshold`   | `0`     | Change output limit for log files                                   |
+| `--input-db-url`         | None    | SQLAlchemy connection string for database input (Version 1 Process) |
+
+### Additional Information
+
+#### @carrot Alias
+
 The '@carrot' is an alias to the folder containing the carrot-transform module, which can be used with either installation method. When using your own files, use your file path, and omit this.
 
-This will generate a set of output files in this directory:
+The flag `--output-dir carrottransform/examples/test/test_output` will generate a set of output files in this directory:
+
 ```bash
 carrottransform/examples/test/test_output
 ```
+
 If it doesn't exist, this directory should be created for you.
 
+#### Person ID File/Table
 
-## Arguments
-### Required Arguments
+Carrot Transform uses a single Person ID file (or table), which must be specified using `--person-file`.
 
-| Flag               | Description                                    |
-|--------------------|------------------------------------------------|
-| `--input-dir`      | Directory containing input files               |
-| `--rules-file`     | JSON file with mapping rules                   |
-| `--person-file`    | CSV file where the first column contains person IDs |
-| `--output-dir`     | Directory for OMOP-format TSV files            |
+- The first column must contain person IDs (these will be anonymized).
+- A column named `"date"` must hold each person's date of birth.
+- Person IDs not found in this file will be excluded from all OMOP tables.
+- This file must also reside in the same directory as the other input files (when using CSV mode).
+- This file can itself be an input to transformation rules.
 
+#### OMOP Configuration (Choose One Approach)
 
-### OMOP Configuration (Choose One Approach)
-| Approach          | Required Arguments |
-|------------------|--------------------|
-| **Specify Files** | `--omop-ddl-file` (DDL statements for OMOP tables) and `--omop-config-file` (override JSON config) |
-| **Specify Version** | `--omop-version` (e.g., `5.3`, which will automatically find `carrottransform/config/omop.json` and `carrottransform/config/OMOPCDM_postgresql_XX_ddl.sql`) |
-
-
-### Optional Arguments
-| Flag                      | Default | Description |
-|---------------------------|---------|-------------|
-| `--write-mode`            | `w`     | Set to `w` (overwrite) or `a` (append) for output files |
-| `--saved-person-id-file`  | None    | Path to a file to save and share `person_id` state |
-| `--use-input-person-ids`  | `N`     | Use input person IDs (`Y`) or replace with new integers (`N`) |
-| `--last-used-ids-file`    | None    | Path to a file tracking last used IDs (tab-separated format) |
-| `--log-file-threshold`    | `0`     | Change output limit for log files |
+| Approach            | Required Arguments                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Specify Files**   | `--omop-ddl-file` (DDL statements for OMOP tables. The version 5.4 of OMOP CDM can be downloaded from [here](https://github.com/Health-Informatics-UoN/carrot-transform/blob/main/carrottransform/config/OMOPCDM_postgresql_5.4_ddl.sql)) and `--omop-config-file` (overriding JSON config, can be downloaded from [here](https://github.com/Health-Informatics-UoN/carrot-transform/blob/main/carrottransform/config/config.json)) |
+| **Specify Version** | `--omop-version` (e.g., `5.4`, which will automatically find `carrottransform/config/config.json` and `carrottransform/config/OMOPCDM_postgresql_XX_ddl.sql`)                                                                                                                                                                                                                                                                       |

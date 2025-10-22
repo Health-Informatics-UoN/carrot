@@ -18,7 +18,7 @@ Choose a suitable `Subscription`, `Region` and a name for your `Resource group`.
 
 ### Web apps
 
-Two web apps will need creating: One for Backend and another for Frontend.
+Four web apps will need creating: One for Backend, one for Frontend, two for Airflow.
 
 **Basics**
 
@@ -32,7 +32,7 @@ Choose `Other container registries` as `Image source`.
 
 For `Docker hub options`, setup as below:
 
-<Tabs items={['Frontend app', 'Backend app']}>
+<Tabs items={['Frontend app', 'Backend app', 'Airflow Scheduler', 'Airflow Webserver']}>
   <Tabs.Tab>
   Access type: `Public`
 
@@ -70,6 +70,46 @@ carrot/backend:<tag>
 You can choose a version of this container by using the tag for the image. Look for available tags [here](https://github.com/Health-Informatics-UoN/carrot-mapper/pkgs/container/carrot%2Fbackend).
 
   </Tabs.Tab>
+
+  <Tabs.Tab>
+
+Access type: `Public`
+
+Registry server URL:
+
+```bash
+ghcr.io/health-informatics-uon
+```
+
+Image and tag:
+
+```bash
+carrot/airflow-webserver:<tag>
+```
+
+You can choose a version of this container by using the tag for the image. Look for available tags [here](https://github.com/Health-Informatics-UoN/carrot-mapper/pkgs/container/carrot%2Fbackend).
+
+  </Tabs.Tab>
+
+  <Tabs.Tab>
+
+Access type: `Public`
+
+Registry server URL:
+
+```bash
+ghcr.io/health-informatics-uon
+```
+
+Image and tag:
+
+```bash
+carrot/airflow-scheduler:<tag>
+```
+
+You can choose a version of this container by using the tag for the image. Look for available tags [here](https://github.com/Health-Informatics-UoN/carrot-mapper/pkgs/container/carrot%2Fbackend).
+
+  </Tabs.Tab>
 </Tabs>
 
 **Networking**: As default.
@@ -77,33 +117,6 @@ You can choose a version of this container by using the tag for the image. Look 
 **Monitor + Secure**: We recommend Application Insights to be enabled.
 
 **Tags**: Give name and value for the web app's tag, if needed.
-
-### Function app
-
-Choose `App service` when prompted.
-
-**Basics**
-
-Choose a suitable `Subscription`, `Resource group`, `Region`, `Pricing plan`, and a name for your Function app.
-
-Select `Container Image` as the mode of deploying.
-
-**Storage**: Choose or create an Azure storage where the Function app will store its Blobs and Queues.
-
-**Networking**: As default.
-
-**Monitor + Secure**: We recommend Application Insights to be enabled.
-
-**Tags**: Give name and value for the web app's tag, if needed.
-
-**Container Image**: A default image will be used as you create a function app. Therefore, after the app being deployed you must change this image by doing so:
-
-- Access the newly created Function app.
-- Under tab `Deployment`, choose `Deployment center`.
-- Choose `Private Registry` as Registry source.
-- Change Server URL to: `https://ghcr.io`.
-- Change Full Image Name and Tag to: `health-informatics-uon/carrot/workers:<tag>`. Look for available tags [here](https://github.com/Health-Informatics-UoN/carrot-mapper/pkgs/container/carrot%2Fworkers).
-- Save the Settings.
 
 
 ### PostgreSQL Database
@@ -136,9 +149,9 @@ Using Data factory or other ways to create a schema named `omop` in your databas
 
 ### Storage
 
-You need to decide which storage and queue you would like to use for Carrot.
+You need to decide which storage you would like to use for Carrot.
 
-Carrot will create the required resources such as Containers and Queues based on the `STORAGE_TYPE` environment variable in the `docker-compose.yml` file. 
+Carrot will create the required resources such as Containers based on the `STORAGE_TYPE` environment variable in the `docker-compose.yml` file. 
 
 </Steps>
 
@@ -184,31 +197,6 @@ Navigate to `Environment variables` section under `Settings` of your Backend web
         for PostgreSQL database connection. Put the details based on the setting
         of your Database. `DB_PASSWORD` is recommended to be put in the Key
         Vault.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>`WORKERS_URL`</Td>
-      <Td>
-        The URL of `Workers` (Azure functions) service which `Backend` should
-        connect to.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>`WORKERS_UPLOAD_NAME` `WORKERS_RULES_EXPORT_NAME`</Td>
-      <Td>
-        Name of queues in Azurite that `Workers` send messages about ScanReport
-        uploads and Mapping Rules exports, respectively. These should match with
-        the queues for ScanReport uploads and Mapping rules file exports in
-        Azure storage.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>`WORKERS_RULES_KEY`</Td>
-      <Td>
-        The key to authorise the request sent to `Workers` from `Backend`. Get
-        this value by navigating to the Function app, then inside `App keys`
-        under `Functions`, copy the `_master` key. It is recommended to put this
-        in the Key Vault.
       </Td>
     </Tr>
     <Tr>
@@ -309,77 +297,14 @@ Navigate to `Environment variables` section under `Settings` of your Frontend we
   </tbody>
 </Table>
 
-### Function app
+### Airflow Scheduler app
 
-Navigate to `Environment variables` section under `Settings` of your Function app, then add the variables below:
+Navigate to `Environment variables` section under `Settings` of your Airflow Scheduler app, then add the variables as outlined in the [configuration](/mapper/deployment/configuration#airflow-webserver-and-scheduler).
 
-<Table>
-  <thead>
-    <Tr>
-      <Th>Key</Th>
-      <Th>Description</Th>
-    </Tr>
-  </thead>
-  <tbody>
-    <Tr>
-      <Td> `FUNCTIONS_WORKER_RUNTIME`</Td>
-      <Td>
-        The language or language stack of the worker runtime to load in the
-        function app. Put here `python`.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td> `DB_ENGINE`</Td>
-      <Td>
-        The database backend to use. Put here `django.db.backends.postgresql`.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>`DB_HOST` `DB_PORT` `DB_NAME` `DB_USER` `DB_PASSWORD`</Td>
-      <Td>
-        These settings (`port`, `host`, `name`, `user`, `password`) are required
-        for PostgreSQL database connection. Put the details based on the setting
-        of your Database. `DB_PASSWORD` is recommended to be put in the Key
-        Vault.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>`RULES_QUEUE_NAME` `RULES_FILE_QUEUE_NAME` `WORKERS_UPLOAD_NAME`</Td>
-      <Td>
-        Matching name of queues in Azurite that `Workers` send messages about
-        Rules actions triggers, Mapping Rules exports and ScanReport uploads,
-        respectively.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>`STORAGE_CONN_STRING`</Td>
-      <Td>
-        The key to connect Backend and Azure local storage. Get this value by
-        navigating to the Azure storage, then inside `Access keys` under
-        `Security + Networking`, copy the `Connection string`. It is recommended
-        to put this in the Key Vault.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>`STORAGE_TYPE`</Td>
-      <Td>
-        The type of storage to use.  This variable is required to let Carrot know which storage
-        type to use. **Only put `azure` for Azure deployment**.
-      </Td>
-    </Tr>
-    <Tr>
-      <Td>`AzureWebJobsStorage`</Td>
-      <Td>Same value with the above.</Td>
-    </Tr>
-    <Tr>
-      <Td>`SECRET_KEY`</Td>
-      <Td>
-        Same value with `SECRET_KEY` in Backend app. It is recommended to put
-        this in the Key Vault.
-      </Td>
-    </Tr>
-  </tbody>
-</Table>
+
+### Airflow Webserver app
+
+Navigate to `Environment variables` section under `Settings` of your Airflow Webserver app, then add the variables as outlined in the [configuration](/mapper/deployment/configuration#airflow-webserver-and-scheduler).
 
 ### Key vault
 

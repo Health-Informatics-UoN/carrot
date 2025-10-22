@@ -1,0 +1,66 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "omop-lite.fullname" . }}-init
+  labels:
+    {{- include "omop-lite.labels" . | nindent 4 }}
+    component: initialization
+spec:
+  {{- if .Values.job.activeDeadlineSeconds }}
+  activeDeadlineSeconds: {{ .Values.job.activeDeadlineSeconds }}
+  {{- end }}
+  {{- if .Values.job.backoffLimit }}
+  backoffLimit: {{ .Values.job.backoffLimit }}
+  {{- end }}
+  template:
+    metadata:
+      labels:
+        {{- include "omop-lite.selectorLabels" . | nindent 8 }}
+        component: initialization
+    spec:
+      restartPolicy: {{ .Values.job.restartPolicy }}
+      initContainers:
+        - name: wait-for-postgres
+          image: postgres:14
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h postgres-service -p 5432 -U {{ .Values.dependencies.postgres.user }}; do
+                echo "Waiting for postgres..."
+                sleep 2
+              done
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "ghcr.io/health-informatics-uon/omop-lite:{{ .Values.image.tag | default "latest" }}"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: DB_HOST
+              value: postgres-service
+            - name: DB_PASSWORD
+              value: {{ .Values.dependencies.postgres.password }}
+            - name: DB_NAME
+              value: {{ .Values.dependencies.postgres.name }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "omop-lite.fullname" . }}-config
+          {{- if .Values.volumeMounts.enabled }}
+          volumeMounts:
+            - name: {{ .Values.volumeMounts.vocabs.name }}
+              mountPath: {{ .Values.volumeMounts.vocabs.mountPath }}
+              readOnly: {{ .Values.volumeMounts.vocabs.readOnly }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- if .Values.volumes.enabled }}
+      volumes:
+        {{- if .Values.volumes.vocabs.configMap.enabled }}
+        - name: {{ .Values.volumeMounts.vocabs.name }}
+          configMap:
+            name: {{ include "omop-lite.fullname" . }}-vocabs
+        {{- else if .Values.volumes.vocabs.persistentVolumeClaim.enabled }}
+        - name: {{ .Values.volumeMounts.vocabs.name }}
+          persistentVolumeClaim:
+            claimName: {{ include "omop-lite.fullname" . }}-vocabs-pvc
+        {{- end }}
+      {{- end }} 

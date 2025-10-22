@@ -1,0 +1,25 @@
+# ConfigMap for frontend configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: carrot-mapper
+data:
+  BACKEND_URL: "http://api-service:8000"
+  BACKEND_ORIGIN: "api-service:8000"
+  NEXTAUTH_URL: "http://localhost:3000/"
+  NEXTAUTH_BACKEND_URL: "http://api-service:8000/api/"
+  NODE_ENV: "development"
+  BODY_SIZE_LIMIT: "20971520"
+  NEXT_PUBLIC_ENABLE_REUSE_TRIGGER_OPTION: "true"
+
+---
+# Secret for sensitive data
+apiVersion: v1
+kind: Secret
+metadata:
+  name: frontend-secrets
+  namespace: carrot-mapper
+type: Opaque
+stringData:
+  NEXTAUTH_SECRET: "verycomplexsecretkey"
