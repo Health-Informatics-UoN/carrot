@@ -1,0 +1,291 @@
+import { Callout } from "nextra/components";
+import HighlightedText from '@/components/HighlightedText';
+
+# Phase 1: Data Profiling with WhiteRabbit
+
+In this phase, you'll use WhiteRabbit to analyze the sample healthcare data and generate a scan report. This report will help you understand the data structure and quality before creating mappings in the next phase.
+
+## What You'll Accomplish
+
+By the end of this phase, you'll have:
+- Downloaded and set up WhiteRabbit
+- Scanned the sample data files
+- Generated a comprehensive scan report
+- Reviewed the data structure and quality
+
+## Step 1: Download and Install WhiteRabbit
+
+### 1.1 Download WhiteRabbit
+
+1. Go to the [OHDSI WhiteRabbit releases page](https://github.com/OHDSI/WhiteRabbit/releases/latest)
+2. Download the latest `WhiteRabbit_vX.X.X.zip` file
+3. Extract the zip file to your desired location (e.g., `~/WhiteRabbit_v1.0.0/`)
+
+<Callout type="warning">
+  **Important:** WhiteRabbit only works from paths with ASCII characters. Avoid using non-ASCII characters in your installation path.
+</Callout>
+
+### 1.2 Launch WhiteRabbit
+
+**On macOS/Linux:**
+```bash
+cd ~/WhiteRabbit_v1.0.0
+./bin/whiteRabbit
+```
+
+**On Windows:**
+```cmd
+cd C:\WhiteRabbit_v1.0.0
+bin\whiteRabbit.bat
+```
+
+You should see the WhiteRabbit GUI open with configuration sections.
+
+## Step 2: Configure WhiteRabbit for Sample Data
+
+### 2.1 Set Working Folder
+
+<div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
+  <figure style={{ margin: "0" }}>
+    <img 
+      src="/docs/wr_locations.png" 
+      alt="WhiteRabbit Working Folder Configuration" 
+      width="100%"
+      height="auto"
+      style={{ 
+        maxWidth: "800px", 
+        border: "3px solid #007acc", 
+        borderRadius: "16px",
+        padding: "12px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+        backgroundColor: "#ffffff"
+      }} 
+    />
+    <figcaption style={{ 
+      marginTop: "16px", 
+      fontStyle: "italic", 
+      color: "#333",
+      fontSize: "16px",
+      fontWeight: "600"
+    }}>
+      Figure: WhiteRabbit Working Folder and Data Source Configuration
+    </figcaption>
+  </figure>
+</div>
+
+1. In WhiteRabbit GUI, locate the "Working Folder" section
+2. Click "Pick Folder" button
+3. Navigate to the folder where you extracted the sample data files
+4. Select the folder and confirm
+
+<Callout type="info">
+  **Tip:** Create a dedicated folder for this tutorial (e.g., `~/carrot-tutorial/`) and extract the sample data zip file there. This will create a `sample-data` folder with all the necessary files.
+</Callout>
+
+### 2.2 Configure Data Source Type
+
+Since our sample data is in CSV format:
+
+1. In the "Source Data" section, select "Delimited text files" as source type
+2. Set delimiter to `comma` (for CSV files)
+3. Click "Test connection" to verify the configuration
+
+### 2.3 Configure Scan Options
+
+<div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
+  <figure style={{ margin: "0" }}>
+    <img 
+      src="/docs/wr_scan.png" 
+      alt="WhiteRabbit Scan Options Configuration" 
+      width="100%"
+      height="auto"
+      style={{ 
+        maxWidth: "800px", 
+        border: "3px solid #007acc", 
+        borderRadius: "16px",
+        padding: "12px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+        backgroundColor: "#ffffff"
+      }} 
+    />
+    <figcaption style={{ 
+      marginTop: "16px", 
+      fontStyle: "italic", 
+      color: "#333",
+      fontSize: "16px",
+      fontWeight: "600"
+    }}>
+      Figure: WhiteRabbit Scan Options Configuration
+    </figcaption>
+  </figure>
+</div>
+
+Use these recommended settings for the tutorial:
+
+- **Scan field values**: ✅ Check this box (essential for data analysis)
+- **Min cell count**: Set to 5 (default - values appearing less than 5 times won't appear in the report)
+- **Rows per table**: Choose "All rows" (our sample data is small)
+- **Max distinct values**: Set to 1,000 (sufficient for our data)
+- **Numeric stats**: ✅ Check this box (useful for analysis)
+
+## Step 3: Execute the Data Scan
+
+### 3.1 Select Files to Scan
+
+<div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
+  <figure style={{ margin: "0" }}>
+    <img 
+      src="/docs/wr_file selection.png" 
+      alt="WhiteRabbit File Selection Interface" 
+      width="100%"
+      height="auto"
+      style={{ 
+        maxWidth: "800px", 
+        border: "3px solid #007acc", 
+        borderRadius: "16px",
+        padding: "12px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+        backgroundColor: "#ffffff"
+      }} 
+    />
+    <figcaption style={{ 
+      marginTop: "16px", 
+      fontStyle: "italic", 
+      color: "#333",
+      fontSize: "16px",
+      fontWeight: "600"
+    }}>
+      Figure: WhiteRabbit File Selection Interface
+    </figcaption>
+  </figure>
+</div>
+
+1. In the file selection area, you should see the sample data files from the `wr_input_csv` folder:
+   - `patients.csv`
+   - `test_with_dates.csv`
+   - `test_data.csv`
+   - `CONCEPT.csv`
+   - `CONCEPT_SYNONYM.csv`
+
+2. Select all the CSV files for scanning
+
+### 3.2 Run the Scan
+
+1. Click "Scan tables" button
+2. Monitor progress in the status area
+3. Wait for completion message
+
+**Expected Result:** `ScanReport.xlsx` file created in your working folder
+
+<Callout type="info">
+  **Note:** The scan process may take a few minutes depending on your system performance. WhiteRabbit will analyze each file and generate detailed statistics about the data structure and content.
+</Callout>
+
+## Step 4: Review the Scan Results
+
+### 4.1 Open the Scan Report
+
+1. Navigate to your working folder
+2. Open the generated `ScanReport.xlsx` file
+
+### 4.2 Examine the Report Structure
+
+The scan report contains several tabs as described in the [official WhiteRabbit documentation](https://ohdsi.github.io/WhiteRabbit/WhiteRabbit.html):
+
+**Field Overview Tab:**
+- **Column A**: Table name
+- **Column B**: Column name  
+- **Column C**: Column description (populated by user, not WhiteRabbit)
+- **Column D**: Data type
+- **Column E**: Maximum length of values (characters/digits)
+- **Column F**: Total number of rows (returns -1 for text files)
+- **Column G**: Number of rows scanned
+- **Column H**: Number of empty rows
+- **Column I**: Count of unique values (may show ≤ if upper limit)
+- **Column J**: Percentage of unique values (0% = constant, 100% = unique)
+
+**Table Overview Tab:**
+- **Column A**: Table name
+- **Column B**: Table description (populated by user, not WhiteRabbit)
+- **Column C**: Total number of rows (returns -1 for text files)
+- **Column D**: Number of rows scanned
+- **Column E**: Number of fields in the table
+- **Column F**: Number of empty fields
+
+**Individual Table Tabs:**
+- Each table has its own tab showing detailed field analysis
+- **Field names**: Source table columns across the top
+- **Value columns**: Each field generates two columns:
+  - First column: Distinct values (above min cell count)
+  - Second column: Frequency count for each value
+- **Truncation indicator**: "List truncated..." appears when unique values exceed max distinct values setting
+
+### 4.3 Key Findings to Note
+
+As you review the scan report, pay attention to:
+
+**Data Types:**
+- Are dates properly recognized as dates?
+- Are numeric fields detected correctly?
+- Are text fields appropriately sized?
+
+**Data Quality:**
+- Are there any missing values?
+- Do the value distributions make sense?
+- Are there any unexpected values or patterns?
+
+**Data Relationships:**
+- How do patient IDs appear across tables?
+- Are visit IDs properly linked?
+- Do diagnosis codes follow expected patterns?
+
+<Callout type="info">
+  **Understanding Value Scans:** If you enabled "Scan field values", the individual table tabs will show actual data values and their frequencies. This helps identify data quality issues and understand the content of your source data.
+</Callout>
+
+## Step 5: Prepare for Next Phase
+
+### 5.1 Document Your Findings
+
+Before moving to Phase 2, note:
+- Any data quality issues you discovered
+- Field mappings that seem straightforward
+- Fields that might need special transformation rules
+
+### 5.2 Download the Data Dictionary
+
+You'll need the data dictionary file for the next phase:
+- Download `data_dictionary.csv` from the sample data
+- Review the field descriptions and OMOP mappings
+- This will guide your mapping decisions in Carrot Mapper
+
+## Expected Results
+
+After completing this phase, you should have:
+
+- ✅ WhiteRabbit successfully installed and launched
+- ✅ All five sample data files scanned
+- ✅ `ScanReport.xlsx` generated with comprehensive analysis
+- ✅ Understanding of data structure and quality
+- ✅ Data dictionary ready for next phase
+
+## Troubleshooting
+
+### WhiteRabbit Won't Start
+- Check Java installation: `java -version`
+- Try reducing memory: `export EXTRA_JVM_ARGUMENTS="-Xmx600m"`
+- Ensure you're in the correct directory
+
+### Scan Fails
+- Verify all CSV files are in the working folder
+- Check file permissions
+- Ensure files aren't corrupted
+
+### Missing Data in Report
+- Verify "Scan field values" is checked
+- Check that all files were selected for scanning
+- Review error messages in the status area
+
+---
+
+**Next:** [Phase 2: Data Transformation with Carrot Mapper](./phase2_mapper) - Use the scan report to create data mappings
