@@ -44,8 +44,7 @@ carrot-transform run mapstream \
   --rules-file @carrot/examples/test/rules/v1.json \
   --person-file @carrot/examples/test/inputs/Demographics.csv \
   --output-dir carrottransform/examples/test/test_output \
-  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql \
-  --omop-config-file @carrot/config/config.json
+  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql
 ```
 
 ### Version 2 Process
@@ -64,8 +63,7 @@ carrot-transform run_v2 folder \
   --rules-file @carrot/examples/test/rules/v2.json \
   --person-file @carrot/examples/test/inputs/Demographics.csv \
   --output-dir carrottransform/examples/test/test_output \
-  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql \
-  --omop-config-file @carrot/config/config.json
+  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql
 ```
 
 ### Arguments
@@ -118,5 +116,5 @@ Carrot Transform uses a single Person ID file (or table), which must be specifie
 
 | Approach            | Required Arguments                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Specify Files**   | `--omop-ddl-file` (DDL statements for OMOP tables. The version 5.4 of OMOP CDM can be downloaded from [here](https://github.com/Health-Informatics-UoN/carrot-transform/blob/main/carrottransform/config/OMOPCDM_postgresql_5.4_ddl.sql)) and `--omop-config-file` (overriding JSON config, can be downloaded from [here](https://github.com/Health-Informatics-UoN/carrot-transform/blob/main/carrottransform/config/config.json)) |
+| **Specify Files**   | `--omop-ddl-file` (DDL statements for OMOP tables. The version 5.4 of OMOP CDM can be downloaded from [here](https://github.com/Health-Informatics-UoN/carrot-transform/blob/main/carrottransform/config/OMOPCDM_postgresql_5.4_ddl.sql)) |
 | **Specify Version** | `--omop-version` (e.g., `5.4`, which will automatically find `carrottransform/config/config.json` and `carrottransform/config/OMOPCDM_postgresql_XX_ddl.sql`)                                                                                                                                                                                                                                                                       |
