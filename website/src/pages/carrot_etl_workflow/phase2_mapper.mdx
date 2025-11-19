@@ -54,7 +54,7 @@ The second phase of the Carrot ETL workflow focuses on using Carrot Mapper to cr
    - Required permissions and access
 
 <Callout type="info">
-  **Sample Files:** You can find example scan reports and sample data dictionaries in the [Carrot GitHub repository example files](https://github.com/Health-Informatics-UoN/carrot/tree/main/example%20files).
+  **Sample Files:** You can also find example scan reports and sample data dictionaries in the [Carrot GitHub repository example files](https://github.com/Health-Informatics-UoN/carrot/tree/main/example%20files).
 </Callout>
 
 <Callout type="warning">
@@ -97,7 +97,7 @@ The second phase of the Carrot ETL workflow focuses on using Carrot Mapper to cr
 4. Verify all files are properly loaded
 5. Review any validation messages or warnings
 
-**Data Dictionary Format Requirements:**
+**Data Dictionary Format Example:**
 ```csv
 csv_file_name,field_name,code,value
 Covid19.csv,Symptom,SNOMED,
@@ -105,6 +105,10 @@ Covid19.csv,Testtype,LOINC,
 Demographics.csv,Sex,F,Female
 Demographics.csv,Sex,M,Male
 ```
+
+<Callout type="info">
+  For detailed requirements on data formatting and CSV file structure, see the [Data Standards](/standards) page.
+</Callout>
 
 ## Step 6: Begin Data Mapping
 
