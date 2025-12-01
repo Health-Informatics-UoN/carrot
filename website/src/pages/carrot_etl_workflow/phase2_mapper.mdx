@@ -44,9 +44,8 @@ The second phase of the Carrot ETL workflow focuses on using Carrot Mapper to cr
   **Note:** Carrot Mapper is accessed through a web interface. The project and data source configuration should already be set up by your administrator.
 </Callout>
 
-## Step 5: Upload Scan Report
 
-### 5.1 Prepare Files for Upload
+#### Prepare Files for Upload
 
 1. Ensure you have:
    - `ScanReport.xlsx` from WhiteRabbit
@@ -101,20 +100,20 @@ The second phase of the Carrot ETL workflow focuses on using Carrot Mapper to cr
 
 Once you've uploaded your scan report (and optionally a data dictionary), the system processes the files and makes them ready for mapping. Here's what you do next:
 
-### 6.1 Access Your Uploaded Scan Report
+#### Access Your Uploaded Scan Report
 
 1. **Go to the "Scan Reports" page** in Carrot Mapper
 2. **Find and click on your uploaded scan report**
 3. **This opens the scan report detail page**
 
-### 6.2 Map Individual CSV Files
+#### Map Individual CSV Files
 
 On the scan report detail page, you'll see the CSV files from your data. For this tutorial, you should see:
 - `patients.csv`
 
 **Let's start mapping:**
 
-#### Map patients.csv
+##### Map patients.csv
 1. **Click "Edit Table" on patients.csv** - this opens the mapping interface
 
 <div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
@@ -166,7 +165,7 @@ During the mapping process, you'll be asked:
   **Note:** Enabling concept reuse may make the auto-mapping process take longer to run, but it will provide more consistent mappings across your datasets.
 </Callout>
 
-### 6.4 Auto-Mapping Process
+#### Auto-Mapping Process
 
 Once you've configured the CSV file:
 - The system automatically starts mapping it
@@ -247,7 +246,7 @@ Once you've configured the CSV file:
 When you upload a scan report and data dictionary for the very first time, you'll need to map your data manually. This is because we dont have existing OMOP concepts for the new Scan Report and/or Data Dictionary we are uploading.
 Here's how the manual-mapping process works in Carrot Mapper:
 
-#### 1. Navigate to an Uploaded File
+##### Navigate to an Uploaded File
 
 - Open one of your uploaded source files in this case `patient.csv` from the file list.
 - You'll see a preview of its contents. These are the columns and some sampled rows from your source data.
@@ -256,7 +255,7 @@ Here's how the manual-mapping process works in Carrot Mapper:
   <figure style={{ margin: "0" }}>
     <img 
       src="/docs/Navigate to Patient data.png" 
-      alt="Carrot Mapper Auto-Mapping Complete" 
+      alt="Getting ready to begin manual mapping" 
       width="100%"
       height="auto"
       style={{ 
@@ -281,7 +280,7 @@ Here's how the manual-mapping process works in Carrot Mapper:
 </div>
 
 
-#### 2. Using AI Suggestions to Map Fields
+##### Using AI Suggestions to Map Fields
 
 Carrot Mapper provides AI-powered suggestions based on Athena to help you quickly map your data values to OMOP concepts. Below is how we can achieve it:
 
@@ -289,11 +288,11 @@ We first navigate into a field that we need to do the mapping, in this case we s
 `F` menans "Female" and `M` means "Male". At this stage, we shall navigate to the column that says `AI Suggestions` and click on the `Suggestion` button. Lets beging with `M` row.
 After clicking the suggestions button, we get a drop down list with domains for us to select from as seen below.
 
-<div style={{ textAlign: "center", marginTop: "14px", marginBottom: "22px" }}>
+<div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
   <figure style={{ margin: "0" }}>
     <img 
       src="/docs/Selecting Domain.png" 
-      alt="Carrot Mapper Auto-Mapping Complete" 
+      alt="Selecting a domain for mapping" 
       width="100%"
       height="auto"
       style={{ 
@@ -324,46 +323,116 @@ We then click add and mapper will apply the OMOP concept we selected. After sele
 A blue concept tag appers on the table row under the concept column showing the mapped OMOP concept. Incase we wanted to change the OMOP concept, the blue concept tag has an `X` button that
 we can use to remove the concept and we can now be able to add another one.
 
+<div style={{ 
+  display: "flex", 
+  gap: "24px", 
+  justifyContent: "center", 
+  alignItems: "flex-start",
+  marginTop: "24px", 
+  marginBottom: "32px",
+  flexWrap: "wrap"
+}}>
+  <figure style={{ margin: "0", flex: "1", minWidth: "650px", maxWidth: "70%" }}>
+    <img 
+      src="/docs/Adding Concept.png" 
+      alt="Adding the most accurate concept from AI suggestions" 
+      width="100%"
+      height="auto"
+      style={{ 
+        width: "100%",
+        border: "3px solid #007acc", 
+        borderRadius: "16px",
+        padding: "12px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+        backgroundColor: "#ffffff"
+      }} 
+    />
+    <figcaption style={{ 
+      marginTop: "16px", 
+      fontStyle: "italic", 
+      color: "#333",
+      fontSize: "16px",
+      fontWeight: "600",
+      textAlign: "center"
+    }}>
+      Figure: Adding the most accurate concept from AI suggestions
+    </figcaption>
+  </figure>
+  <figure style={{ margin: "0", flex: "1", minWidth: "650px", maxWidth: "70%" }}>
+    <img 
+      src="/docs/Added OMOP concept.png" 
+      alt="View mapped value from AI suggestions" 
+      width="100%"
+      height="auto"
+      style={{ 
+        width: "100%",
+        border: "3px solid #007acc", 
+        borderRadius: "16px",
+        padding: "12px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+        backgroundColor: "#ffffff"
+      }} 
+    />
+    <figcaption style={{ 
+      marginTop: "16px", 
+      fontStyle: "italic", 
+      color: "#333",
+      fontSize: "16px",
+      fontWeight: "600",
+      textAlign: "center"
+    }}>
+      Figure: View mapped value from AI suggestions
+    </figcaption>
+  </figure>
+</div>
 
-#### 3. Manually Mapping Data Values (Alternative Method)
 
-If AI suggestions don't appear or you need to map to a specific OMOP concept that wasn't suggested, you can manually enter OMOP concept codes:
+## Manually Mapping Data Values (Alternative Method)
 
-1. **Locate the value** you want to map in the table.
-2. **Click into the text box** to the left of the **"Add"** button.
-3. **Type the OMOP concept code** you want to assign (e.g., `8532` for Female or `8507` for Male).
-4. **Click "Add"** - If successful, you'll see a confirmation banner and a blue concept tag in the table.
+We may also do mapping manually by adding OMOP concepts by typing the concepts value in the input field to the left of the add button.
+For this example we shall map Female. The OMOP concept code is `8532`. Please see below on how to map it using the input field.
+<div style={{ 
+  display: "flex", 
+  gap: "24px", 
+  justifyContent: "center", 
+  alignItems: "flex-start",
+  marginTop: "24px", 
+  marginBottom: "32px",
+  flexWrap: "wrap"
+}}>
+  <figure style={{ margin: "0", flex: "1", minWidth: "650px", maxWidth: "70%" }}>
+    <img 
+      src="/docs/Concept Added.png" 
+      alt="Adding concept manually on the input area" 
+      width="100%"
+      height="auto"
+      style={{ 
+        width: "100%",
+        border: "3px solid #007acc", 
+        borderRadius: "16px",
+        padding: "12px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+        backgroundColor: "#ffffff"
+      }} 
+    />
+    <figcaption style={{ 
+      marginTop: "16px", 
+      fontStyle: "italic", 
+      color: "#333",
+      fontSize: "16px",
+      fontWeight: "600",
+      textAlign: "center"
+    }}>
+      Figure: Adding concept manually on the input area
+    </figcaption>
+  </figure>
+</div>
 
-**Example: Manual Gender Mapping**
-
-- Navigate to the **gender** field.
-- For the `F` row, type `8532` in the text box and click **"Add"**.
-- For the `M` row, type `8507` in the text box and click **"Add"**.
-- After adding, a green banner confirms each mapping, and the OMOP concept appears in the table row.
-
-#### 4. Reviewing and Adjusting Mappings
-
-- To review your new mappings, go to the **Rules** tab.
-- You'll see that new mapping rules have been automatically created—one for each value you mapped (e.g., F → Female, M → Male).
-- These rules define how your source data will be translated in the OMOP CDM.
-
-#### 5. Removing a Concept (Optional)
-
-- To delete a mapping, click the grey **x** on the right of the concept tag within the table.
-- Return to the **Rules** page, and you'll see that the mapping rule for this value has also been deleted.
-
-> **Tip:** Start with AI suggestions for faster mapping, then manually adjust any values that need different concepts. You can mix both methods—use AI suggestions where they're accurate, and manually map values where you need more control.
-
-Now, you're ready to complete the mapping for all required values and proceed to view the generated rules and mapping diagrams!
-
-
-
-
-## Step 7: Review Generated Rules and Mapping Diagram
+### Review Generated Rules and Mapping Diagram
 
 Once the auto-mapping is done, you can check out the rules it created and see how your mappings look.
 
-### 7.1 View Generated Rules
+#### View Generated Rules
 
 1. **Click the "Rules" tab** in your scan report
 2. **Check out the generated rules** - you'll see all the transformation rules that were automatically created
@@ -372,8 +441,8 @@ Once the auto-mapping is done, you can check out the rules it created and see ho
 <div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
   <figure style={{ margin: "0" }}>
     <img 
-      src="/docs/View Generated Rules.png" 
-      alt="Carrot Mapper Generated Rules View" 
+      src="/docs/Male and Female mapping.png" 
+      alt="View mapped value from manual mapping" 
       width="100%"
       height="auto"
       style={{ 
@@ -397,7 +466,7 @@ Once the auto-mapping is done, you can check out the rules it created and see ho
   </figure>
 </div>
 
-### 7.2 View Mapping Diagram
+#### View Mapping Diagram
 
 1. **Click "View Map Diagram"** - it's at the top left of the Rules tab
 2. **See your mappings visually** - this shows a diagram of how your source data connects to the OMOP CDM structure
@@ -435,17 +504,17 @@ Once the auto-mapping is done, you can check out the rules it created and see ho
   **Tip:** The mapping diagram is really helpful for understanding complex data relationships and making sure your mappings work with OMOP CDM requirements.
 </Callout>
 
-### 7.3 Review Rules in Review Tab
+#### Review Rules in Review Tab
 
 1. **Click the "Review Rules" tab** in your scan report
 2. **Check out your rules** - this gives you another way to look at your transformation rules
 3. **Double-check your mappings** - use this tab to make sure everything looks right before downloading
 
-## Step 8: Download Mapping Configuration
+### Download Mapping Configuration
 
 Once you've checked out your rules and mapping diagram, you can download your mapping configuration to use with Carrot Transform.
 
-### 8.1 Access Actions Menu
+#### Access Actions Menu
 
 1. **Click the "Actions" button** - it's in the top right of the Rules tab
 2. **See what's available** - this opens a dropdown menu with download and management options
