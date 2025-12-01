@@ -32,125 +32,109 @@ import HighlightedText from '@/components/HighlightedText';
 
 ## Overview
 
-The final phase of the Carrot ETL workflow focuses on executing the data transformation process and validating the results. This phase combines all the work from the previous phases to actually transform your source data into OMOP CDM format and check that everything worked correctly.
+The final phase of the Carrot ETL workflow focuses on executing the data transformation process. This phase combines all the work from the previous phases:
 
-## Step 9: Install Carrot Transform
+- **From Phase 1**: Your original source data files (`patients.csv`)
+- **From Phase 2**: Your mapping rules JSON file (e.g., `Rules - Scan report test 2 - 6 - V2.json`)
 
-### 9.1 Installation Options
+Carrot Transform uses these inputs to actually transform your data into OMOP CDM format.
 
-**Option 1: Install from PyPI (Recommended)**
+## Step 9: Download and Set Up Carrot Transform
+
+### 9.1 Download Carrot Transform
+
+Download the latest release of Carrot Transform from GitHub:
+
+1. Go to [https://github.com/Health-Informatics-UoN/carrot-transform](https://github.com/Health-Informatics-UoN/carrot-transform)
+2. Download the latest release
+3. Extract the files to a location on your computer (e.g., `~/Documents/carrot-transform/`)
+
+### 9.2 Install uv
+
+Carrot Transform uses `uv` to manage dependencies and run the tool. Install `uv` by following the [installation guide](https://carrot.ac.uk/transform/development#using-uv).
+
+Once `uv` is installed, navigate to the carrot-transform directory you downloaded:
+
 ```bash
-pip install carrot-transform
+cd ~/Documents/carrot-transform
 ```
 
-**Option 2: Install from source**
+## Step 10: Execute Data Transformation with Sample Data
+
+In this step, you'll use the files you've created in the previous phases to transform your data. Let's walk through a real example using the sample data.
+
+### 10.1 Prepare Your Files
+
+Before running Carrot Transform, make sure you have all the necessary files from the previous phases:
+
+**From Phase 1 (WhiteRabbit):**
+- Your original source data files (e.g., `patients.csv` from `WhiteRabbit_sample_input_csv/` folder)
+
+**From Phase 2 (Carrot Mapper):**
+- Your mapping rules JSON file that you downloaded from Carrot Mapper (e.g., `Rules - Scan report test 2 - 6 - V2.json`)
+
+**For this example, let's assume you have:**
+- Source data directory: `~/carrot-tutorial/WhiteRabbit_sample_input_csv/` containing `patients.csv`
+- Mapping rules file: The JSON V2 file you downloaded from Carrot Mapper (e.g., `Rules - Scan report test 2 - 6 - V2.json`)
+- Person file: `~/carrot-tutorial/WhiteRabbit_sample_input_csv/patients.csv` (this contains the person IDs)
+
+### 10.2 Run the Transformation
+
+**Example Command:**
 ```bash
-git clone https://github.com/Health-Informatics-UoN/carrot-transform
-cd carrot-transform
-pip install -e .
+uv run carrot-transform run_v2 mapstream \
+  --rules-file examples/test/rules/v2.json \
+  --output-dir output/ \
+  --person-file examples/test/inputs/Demographics.csv \
+  --input-dir examples/test/inputs/ \
+  --omop-version "5.4"
 ```
+
+**What each argument does:**
+- `run_v2 mapstream`: Runs the version 2 transformation process using mapstream
+- `--input-dir`: Directory containing your source CSV files (from Phase 1)
+- `--rules-file`: The JSON V2 mapping rules file you downloaded from Carrot Mapper (from Phase 2)
+- `--person-file`: The CSV file containing person/demographic data (first column should be person IDs)
+- `--output-dir`: Where Carrot Transform will write the transformed OMOP CDM files
+- `--omop-version`: Specifies the OMOP CDM version to use (e.g., "5.4")
 
 <Callout type="info">
-  **Note:** The PyPI package is actively maintained and is the recommended installation method for most users. Carrot Transform is a Python tool that can be easily integrated into your existing data pipeline infrastructure.
+  **Note:** Make sure you're in the carrot-transform directory when running this command. Adjust the file paths to match your actual file locations.
 </Callout>
-
-### 9.2 Verify Installation
-```bash
-carrot-transform -v
-```
-
-**Expected Result:** Version number displayed, confirming successful installation.
-
-<Callout type="info">
-  **System Requirements:** Carrot Transform requires Python 3.10 or higher. For database operations, you may need additional system libraries (e.g., PostgreSQL development headers). The tool is designed to run locally within your data partner's environment for maximum security and privacy.
-</Callout>
-
-## Step 10: Execute Data Transformation
-
-### 10.1 Prepare Target Environment
-
-1. Set up target database (if not already done)
-2. Ensure OMOP CDM schema is created
-3. Verify sufficient storage space
-4. Check database permissions
-
-<Callout type="warning">
-  **Important:** Ensure your target database has sufficient capacity and performance characteristics to handle the expected data volume and transformation workload.
-</Callout>
-
-**Target Environment Checklist:**
-```yaml
-environment_requirements:
-  database:
-    type: "PostgreSQL/MySQL/SQL Server"
-    version: "Compatible with OMOP CDM"
-    storage: "Sufficient for 2-3x source data size"
-    
-  schema:
-    omop_cdm_schema: "Created and accessible"
-    required_tables: "All core tables present"
-    indexes: "Optimized for query performance"
-    
-  permissions:
-    create_tables: "ETL user has permissions"
-    insert_data: "ETL user can insert records"
-    create_indexes: "ETL user can create indexes"
-```
-
-### 10.2 Run ETL Process
-
-**Basic Command Structure:**
-```bash
-carrot-transform run mapstream \
-  --input-dir /path/to/source/data \
-  --rules-file /path/to/mapping/rules.json \
-  --person-file /path/to/person/demographics.csv \
-  --output-dir /path/to/output \
-  --omop-version 5.3
-```
-
-**Required Arguments:**
-- `--input-dir`: Directory containing your source data files
-- `--rules-file`: JSON configuration file from Carrot Mapper
-- `--person-file`: CSV file with person IDs (first column)
-- `--output-dir`: Directory for OMOP-format output files
-
-**OMOP Configuration Options:**
-- **Option 1**: Use `--omop-version 5.3` (automatically finds config files)
-- **Option 2**: Specify custom files:
-  - `--omop-ddl-file`: DDL statements for OMOP tables
-  - `--omop-config-file`: Custom OMOP configuration
-
-**Optional Arguments:**
-- `--write-mode`: Set to `w` (overwrite) or `a` (append)
-- `--use-input-person-ids`: Use `Y` to preserve original IDs or `N` to generate new ones
-- `--log-file-threshold`: Control log file output (default: 0)
 
 ### 10.3 What Happens During Transformation
 
-**Transformation Process:**
-```yaml
-transformation_steps:
-  initialization:
-    - load_rules: "Parse JSON mapping rules from Carrot Mapper"
-    - validate_configuration: "Check OMOP CDM configuration"
-    - prepare_output: "Create output directory structure"
-    
-  data_processing:
-    - read_source_data: "Load source files (CSV, SAS, etc.)"
-    - apply_mappings: "Execute field-to-field transformations"
-    - apply_business_rules: "Implement complex transformation logic"
-    - generate_omop_records: "Create OMOP CDM compliant records"
-    
-  output_generation:
-    - write_omop_files: "Generate TSV files for each OMOP table"
-    - create_metadata: "Generate transformation metadata and logs"
-    - validate_output: "Check output file integrity"
+When you run the command, Carrot Transform will:
+
+1. **Load the mapping rules** - Reads your JSON rules file from Carrot Mapper
+2. **Read your source data** - Loads the CSV files from your input directory
+3. **Apply transformations** - Uses the mapping rules to convert your data fields to OMOP CDM format
+4. **Generate OMOP files** - Creates TSV (tab-separated values) files for each OMOP CDM table
+5. **Write output** - Saves all the transformed files to your output directory
+
+**Expected Console Output:**
+```
+2025-11-24 10:44:36,718 - carrottransform.tools.logger - INFO - Detected v2.json format, using direct v2 parser...
+2025-11-24 10:44:36,718 - carrottransform.tools.logger - INFO - Loaded v2 mapping rules from: examples/test/rules/v2.json in 0.01870 secs
+2025-11-24 10:44:36,722 - carrottransform.tools.logger - INFO - Headers in Person file: ['PersonID', 'sex', 'date_of_birth', 'ethnicity']
+2025-11-24 10:44:36,772 - carrottransform.tools.logger - INFO - Processing data...
+2025-11-24 10:44:36,772 - carrottransform.tools.logger - INFO - Streaming input file: Symptoms.csv
+2025-11-24 10:44:36,799 - carrottransform.tools.logger - INFO - Streaming input file: covid19_antibody.csv
+2025-11-24 10:44:36,837 - carrottransform.tools.logger - INFO - Streaming input file: Demographics.csv
+2025-11-24 10:44:36,903 - carrottransform.tools.logger - INFO - person_id stats: total loaded 1000, reject count 0
+2025-11-24 10:44:36,903 - carrottransform.tools.logger - INFO - TARGET: condition_occurrence: output count 400
+2025-11-24 10:44:36,903 - carrottransform.tools.logger - INFO - TARGET: measurement: output count 1000
+2025-11-24 10:44:36,903 - carrottransform.tools.logger - INFO - TARGET: observation: output count 400
+2025-11-24 10:44:36,903 - carrottransform.tools.logger - INFO - TARGET: person: output count 1000
+2025-11-24 10:44:36,906 - carrottransform.tools.logger - INFO - V2 processing completed successfully in 0.20648 secs
 ```
 
-**Output Structure:**
+### 10.4 Understanding the Output
+
+After the transformation completes, check your output directory. You should see files like:
+
 ```
-output_directory/
+transform_output/
 ├── PERSON.tsv
 ├── OBSERVATION_PERIOD.tsv
 ├── VISIT_OCCURRENCE.tsv
@@ -163,386 +147,110 @@ output_directory/
 └── transformation.log
 ```
 
-### 10.4 Monitor Execution
+**What each file contains:**
 
-1. **Watch console output** for progress indicators
-2. **Check log files** for detailed information
-3. **Monitor system resources** (CPU, memory, disk I/O)
-4. **Wait for completion message**
+- **PERSON.tsv**: Patient demographic information (age, gender, race, ethnicity)
+- **OBSERVATION_PERIOD.tsv**: Time periods during which the person was observed
+- **VISIT_OCCURRENCE.tsv**: Healthcare visits and encounters
+- **CONDITION_OCCURRENCE.tsv**: Diagnoses and conditions
+- **DRUG_EXPOSURE.tsv**: Medications and drug exposures
+- **PROCEDURE_OCCURRENCE.tsv**: Medical procedures performed
+- **MEASUREMENT.tsv**: Clinical measurements (lab results, vital signs, etc.)
+- **OBSERVATION.tsv**: Other clinical observations
+- **metadata.json**: Information about the transformation process
+- **transformation.log**: Detailed log of the transformation execution
 
-**Expected Console Output:**
-```
-[INFO] Starting Carrot Transform execution...
-[INFO] Loading mapping rules from: /path/to/rules.json
-[INFO] Processing input directory: /path/to/source/data
-[INFO] Found 3 source files to process
-[INFO] Processing file 1/3: demographics.csv
-[INFO] Generated 1000 PERSON records
-[INFO] Processing file 2/3: visits.csv
-[INFO] Generated 5000 VISIT_OCCURRENCE records
-[INFO] Processing file 3/3: conditions.csv
-[INFO] Generated 8000 CONDITION_OCCURRENCE records
-[INFO] Transformation completed successfully
-[INFO] Output files written to: /path/to/output
-```
+### 10.5 Example Output: PERSON.tsv
 
-## Data Validation Framework
+Here's what a transformed `PERSON.tsv` file might look like (this is example data showing the structure):
 
-### Row Count Validation
-
-**Expected vs. Actual Counts:**
-```yaml
-count_validation:
-  source_tables:
-    - table: "patient_demographics"
-      expected_rows: 10000
-      tolerance: "±5%"
-      
-  target_tables:
-    - table: "PERSON"
-      expected_rows: 10000
-      actual_rows: 10000
-      status: "PASSED"
-      
-  relationship_validation:
-    - parent_table: "PERSON"
-      child_table: "VISIT_OCCURRENCE"
-      expected_ratio: "1:many"
-      orphan_check: "No orphaned visits"
+```tsv
+person_id	gender_concept_id	year_of_birth	month_of_birth	day_of_birth	birth_datetime	race_concept_id	ethnicity_concept_id	location_id	provider_id	care_site_id	person_source_value	gender_source_value	race_source_value	race_source_concept_id	ethnicity_source_value	ethnicity_source_concept_id
+1	8507	1985	5	15		8527	0			M		M		
+2	8532	1990	3	22		8527	0			F		F		
+3	8507	1978	11	8		8527	0			M		M		
 ```
 
-### Data Quality Validation
+**What this shows:**
+- **person_id**: Unique identifier for each person
+- **gender_concept_id**: Standard OMOP concept ID for gender (8507 = Male, 8532 = Female)
+- **year_of_birth, month_of_birth, day_of_birth**: Date of birth components
+- **race_concept_id**: Standard OMOP concept ID for race
+- **gender_source_value**: Original gender value from your source data (M, F)
+- The transformed data now uses standard OMOP concept IDs instead of your original values
 
-<div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
-  <figure style={{ margin: "0" }}>
-    <img 
-      src="/docs/truncating_columns.png" 
-      alt="Data Quality Validation" 
-      width="100%"
-      height="auto"
-      style={{ 
-        maxWidth: "800px", 
-        border: "3px solid #007acc", 
-        borderRadius: "16px",
-        padding: "12px",
-        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
-        backgroundColor: "#ffffff"
-      }} 
-    />
-    <figcaption style={{ 
-      marginTop: "16px", 
-      fontStyle: "italic", 
-      color: "#333",
-      fontSize: "16px",
-      fontWeight: "600"
-    }}>
-      Figure: Quality Validation
-    </figcaption>
-  </figure>
-</div>
+### 10.6 Example Output: CONDITION_OCCURRENCE.tsv
 
-**Completeness Checks**
-- Required field presence
-- Data coverage analysis
-- Missing value patterns
-- Population completeness
+Here's what a transformed `CONDITION_OCCURRENCE.tsv` file might look like:
 
-**Accuracy Checks**
-- Data type compliance
-- Range and constraint validation
-- Business rule compliance
-- Cross-field validation
-
-**Consistency Checks**
-- Format consistency
-- Naming convention compliance
-- Value consistency
-- Temporal consistency
-
-### OMOP CDM Compliance Validation
-
-**Schema Compliance:**
-```yaml
-cdm_validation:
-  table_structure:
-    - required_tables: ["PERSON", "OBSERVATION_PERIOD", "VISIT_OCCURRENCE"]
-    - field_validation: "All required fields present"
-    - data_type_check: "Field types match CDM specification"
-    
-  constraint_validation:
-    - primary_keys: "Unique and not null"
-    - foreign_keys: "Referential integrity maintained"
-    - check_constraints: "Business rules enforced"
-    
-  vocabulary_compliance:
-    - standard_concepts: "Using standard medical vocabularies"
-    - concept_validation: "All concepts exist in vocabulary tables"
-    - mapping_quality: "High-confidence mappings used"
+```tsv
+condition_occurrence_id	person_id	condition_concept_id	condition_start_date	condition_start_datetime	condition_end_date	condition_end_datetime	condition_type_concept_id	stop_reason	provider_id	visit_occurrence_id	visit_detail_id	condition_source_value	condition_source_concept_id	condition_status_source_value	condition_status_concept_id
+1	1	320128	2023-01-15	2023-01-15 00:00:00		2023-01-15	32020		1		I10			Active	
+2	2	440540	2023-02-20	2023-02-20 00:00:00		2023-02-20	32020		2		E11.9			Active	
 ```
 
-## Performance Monitoring and Optimization
+**What this shows:**
+- **person_id**: Links to the person in the PERSON table
+- **condition_concept_id**: Standard OMOP concept ID for the condition (320128 = Hypertension, 440540 = Diabetes)
+- **condition_start_date**: When the condition was first recorded
+- **condition_source_value**: Original diagnosis code from your source data (I10, E11.9)
+- The transformation converted your original diagnosis codes to standard OMOP concept IDs
 
-### Execution Metrics
+### 10.7 How the Transformation Works
 
-**Key Performance Indicators:**
-```yaml
-performance_metrics:
-  processing_speed:
-    - records_per_second: "Target: 1000+ records/sec"
-    - throughput: "GB/hour processed"
-    - efficiency: "Resource utilization vs. output"
-    
-  resource_usage:
-    - cpu_utilization: "Target: 70-80%"
-    - memory_usage: "Target: 80-90%"
-    - disk_io: "Monitor for bottlenecks"
-    - network_usage: "For distributed processing"
-    
-  quality_metrics:
-    - success_rate: "Target: >95%"
-    - error_rate: "Target: <5%"
-    - data_completeness: "Target: >90%"
-    - validation_pass_rate: "Target: >95%"
+Here's a simple example of how data flows through the transformation:
+
+**Your Original Data (patients.csv):**
+```csv
+PersonID,Date,Gender,DOB,Diagnosis
+1,2023-01-15,M,1985-05-15,I10
+2,2023-02-20,F,1990-03-22,E11.9
 ```
 
-### Optimization Strategies
+**Your Mapping Rules (from Carrot Mapper):**
+- `PersonID` → `person_id` in PERSON table
+- `Gender` → `gender_concept_id` (M → 8507, F → 8532)
+- `DOB` → `year_of_birth`, `month_of_birth`, `day_of_birth`
+- `Diagnosis` → `condition_concept_id` in CONDITION_OCCURRENCE table (I10 → 320128, E11.9 → 440540)
+- `Date` → `condition_start_date`
 
-**Performance Tuning:**
-```yaml
-optimization_strategies:
-  database_optimization:
-    - index_strategy: "Create indexes on join and filter columns"
-    - partition_strategy: "Partition large tables by date or key"
-    - compression: "Use appropriate compression for data types"
-    
-  processing_optimization:
-    - batch_size: "Optimize batch size for memory and performance"
-    - parallel_processing: "Use multiple threads/processes"
-    - caching: "Cache frequently accessed reference data"
-    
-  resource_optimization:
-    - memory_allocation: "Allocate sufficient memory for operations"
-    - connection_pooling: "Optimize database connections"
-    - timeout_settings: "Set appropriate timeouts for operations"
-```
+**Transformed Output (OMOP CDM format):**
+- **PERSON.tsv**: Contains person demographics with standard concept IDs
+- **CONDITION_OCCURRENCE.tsv**: Contains conditions with standard concept IDs and proper date formatting
 
-## Error Handling and Recovery
+The transformation applies all the mapping rules you created in Carrot Mapper to convert your source data into the standardized OMOP CDM format.
 
-### Error Classification and Handling
+## Step 11: Verify Your Results
 
-**Error Types:**
-```yaml
-error_categories:
-  data_quality_errors:
-    - null_values: "Handle missing required data"
-    - format_errors: "Fix data format issues"
-    - constraint_violations: "Resolve business rule violations"
-    
-  system_errors:
-    - connection_failures: "Retry with exponential backoff"
-    - timeout_errors: "Increase timeout or optimize queries"
-    - resource_limitations: "Scale resources or optimize processing"
-    
-  transformation_errors:
-    - mapping_failures: "Review and fix mapping rules"
-    - vocabulary_errors: "Validate concept mappings"
-    - business_logic_errors: "Review transformation logic"
-```
+### 11.1 Check Output Files
 
-**Recovery Strategies:**
-```yaml
-recovery_strategies:
-  automatic_recovery:
-    - retry_mechanism: "Automatic retry with backoff"
-    - fallback_strategies: "Alternative processing paths"
-    - error_correction: "Automatic data correction where possible"
-    
-  manual_intervention:
-    - error_review: "Manual review of error logs"
-    - data_correction: "Manual data fixes"
-    - process_restart: "Restart failed processes"
-    
-  escalation_procedures:
-    - notification: "Alert appropriate teams"
-    - documentation: "Document issues and resolutions"
-    - process_improvement: "Update procedures to prevent recurrence"
-```
+1. Navigate to your output directory
+2. Verify that the expected OMOP CDM table files were created
+3. Open a few files to check that data looks correct
 
-## Quality Assurance and Testing
+### 11.2 Review Sample Records
 
-### Testing Strategies
+- Open `PERSON.tsv` and verify person records look correct
+- Check that dates are in the correct format (YYYY-MM-DD)
+- Verify that concept IDs are present (not just source values)
+- Look at a few records from other tables to ensure transformations worked
 
-**Testing Approaches:**
-```yaml
-testing_strategies:
-  unit_testing:
-    - individual_transformations: "Test each transformation rule"
-    - field_mappings: "Validate field-to-field mappings"
-    - business_logic: "Test business rule implementations"
-    
-  integration_testing:
-    - end_to_end_workflow: "Test complete data flow"
-    - cross_table_relationships: "Validate referential integrity"
-    - data_consistency: "Check data consistency across tables"
-    
-  user_acceptance_testing:
-    - stakeholder_review: "Business user validation"
-    - sample_data_review: "Manual review of sample records"
-    - business_rule_validation: "Verify business requirements met"
-```
+### 11.3 Check the Log File
 
-### Validation Tools and Techniques
+Review `transformation.log` for any warnings or errors. The log will show:
+- Which files were processed
+- How many records were generated for each table
+- Any issues encountered during transformation
 
-**Automated Validation:**
-```yaml
-validation_tools:
-  built_in_validation:
-    - schema_validation: "CDM schema compliance"
-    - constraint_validation: "Database constraint checking"
-    - business_rule_validation: "Custom rule validation"
-    
-  external_validation:
-    - cdm_validation_tools: "OHDSI validation tools"
-    - data_quality_tools: "Third-party quality assessment"
-    - performance_testing: "Load and stress testing"
-    
-  manual_validation:
-    - sample_review: "Manual review of sample data"
-    - cross_reference_checking: "Verify against source systems"
-    - business_logic_verification: "Validate business rules"
-```
+## What's Next?
 
-## Monitoring and Alerting
+Congratulations! You've successfully completed the Carrot ETL End-to-End Workflow. Your data has been transformed into OMOP CDM format and is ready for research use.
 
-### Real-time Monitoring
-
-**Monitoring Dashboard:**
-```yaml
-monitoring_configuration:
-  real_time_metrics:
-    - processing_status: "Active, paused, completed, failed"
-    - progress_tracking: "Percentage complete, records processed"
-    - performance_metrics: "Throughput, resource usage, error rates"
-    
-  alerting_rules:
-    - error_thresholds: "Alert when error rate > 5%"
-    - performance_degradation: "Alert when throughput < 80% of baseline"
-    - system_health: "Alert on system failures or resource exhaustion"
-    
-  notification_channels:
-    - email: "Send alerts to operations team"
-    - slack: "Post alerts to monitoring channels"
-    - pagerduty: "Escalate critical issues"
-```
-
-### Logging and Audit
-
-**Comprehensive Logging:**
-```yaml
-logging_configuration:
-  log_levels:
-    - error: "Log all errors and exceptions"
-    - warning: "Log warnings and potential issues"
-    - info: "Log processing milestones and status"
-    - debug: "Log detailed execution information"
-    
-  audit_trail:
-    - data_access: "Log all data access and modifications"
-    - transformation_history: "Track all data transformations"
-    - quality_metrics: "Record quality assessment results"
-    - compliance_checks: "Log compliance validation results"
-```
-
-## Success Criteria and Completion
-
-### Validation Success Criteria
-
-**Quality Thresholds:**
-```yaml
-success_criteria:
-  data_quality:
-    - completeness: ">90% of required fields populated"
-    - accuracy: ">95% of records pass validation rules"
-    - consistency: ">95% of cross-field validations pass"
-    
-  performance_metrics:
-    - processing_speed: "Meet or exceed performance targets"
-    - resource_efficiency: "Optimal resource utilization"
-    - scalability: "Process handles expected data volumes"
-    
-  compliance_requirements:
-    - cdm_compliance: "100% OMOP CDM schema compliance"
-    - vocabulary_standards: "Use standard medical vocabularies"
-    - business_rules: "All business requirements satisfied"
-```
-
-### Completion Checklist
-
-**Phase 3 Completion:**
-- [ ] Carrot Transform installed and verified
-- [ ] Target environment prepared and configured
-- [ ] ETL process executed successfully
-- [ ] Data transformation completed
-- [ ] Results validated against requirements
-- [ ] Data quality checks passed
-- [ ] OMOP CDM validation successful
-- [ ] Performance requirements met
-- [ ] Documentation completed
-- [ ] Stakeholder approval received
-
-## Post-Execution Activities
-
-### Documentation and Knowledge Transfer
-
-**Documentation Requirements:**
-```yaml
-documentation_deliverables:
-  technical_documentation:
-    - etl_configuration: "Complete ETL configuration details"
-    - transformation_rules: "All transformation logic documented"
-    - validation_results: "Quality assessment and validation results"
-    
-  operational_documentation:
-    - run_procedures: "Step-by-step execution procedures"
-    - monitoring_guidelines: "Monitoring and alerting procedures"
-    - troubleshooting_guides: "Common issues and solutions"
-    
-  business_documentation:
-    - data_dictionary: "Target data structure and definitions"
-    - quality_metrics: "Data quality assessment results"
-    - compliance_report: "Regulatory compliance documentation"
-```
-
-### Maintenance and Support
-
-**Ongoing Activities:**
-```yaml
-maintenance_activities:
-  regular_maintenance:
-    - performance_monitoring: "Continuous performance tracking"
-    - quality_assessment: "Regular data quality reviews"
-    - process_optimization: "Continuous improvement initiatives"
-    
-  support_activities:
-    - issue_resolution: "Address operational issues"
-    - user_support: "Support end users and stakeholders"
-    - training: "Provide training and documentation updates"
-    
-  continuous_improvement:
-    - feedback_collection: "Gather user and stakeholder feedback"
-    - process_refinement: "Refine and optimize processes"
-    - technology_updates: "Evaluate and implement new technologies"
-```
-
-## Next Steps
-
-Congratulations! You have successfully completed the Carrot ETL End-to-End Workflow. Your data has been transformed into OMOP CDM format and validated for quality and compliance.
-
-**What's Next:**
-- **Operational Use**: Begin using your transformed data for research and analysis
-- **Continuous Improvement**: Monitor performance and identify optimization opportunities
-- **Knowledge Sharing**: Share your experience with the Carrot community
-- **Advanced Features**: Explore additional Carrot capabilities and features
+**What you've accomplished:**
+- ✅ Profiled your data with WhiteRabbit
+- ✅ Created mappings with Carrot Mapper
+- ✅ Transformed your data with Carrot Transform
+- ✅ Generated OMOP CDM-compliant output files
 
 **Additional Resources:**
 - [Troubleshooting and Best Practices](./troubleshooting)
@@ -551,3 +259,5 @@ Congratulations! You have successfully completed the Carrot ETL End-to-End Workf
 - [OHDSI Community](http://forums.ohdsi.org/)
 
 ---
+
+**Next:** Review the [Troubleshooting Guide](./troubleshooting) if you encounter any issues, or explore [Additional Resources](./resources) for more information.

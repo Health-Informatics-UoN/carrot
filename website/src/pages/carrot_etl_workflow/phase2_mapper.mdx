@@ -50,15 +50,14 @@ The second phase of the Carrot ETL workflow focuses on using Carrot Mapper to cr
 
 1. Ensure you have:
    - `ScanReport.xlsx` from WhiteRabbit
-   - Properly formatted data dictionary (CSV format)
    - Required permissions and access
 
 <Callout type="info">
-  **Sample Files:** You can also find example scan reports and sample data dictionaries in the [Carrot GitHub repository example files](https://github.com/Health-Informatics-UoN/carrot/tree/main/example%20files).
+  **Data Dictionary (Optional):** A data dictionary is not mandatory for the upload process. If you have a data dictionary that matches your scan report, you can upload it to provide additional context about your data fields. However, for this tutorial, we'll proceed without a data dictionary to demonstrate the upload process.
 </Callout>
 
 <Callout type="warning">
-  **Important:** The data dictionary must be properly formatted with all required columns filled in. Only the last column can be empty.
+  **Note:** The sample `sample-dataDictionary.csv` file in the sample data package is not related to the `ScanReport.xlsx` in terms of data accuracy. It's provided as an example format only. For this tutorial, we'll upload the scan report without a data dictionary.
 </Callout>
 
 ### 5.2 Upload Process
@@ -93,26 +92,17 @@ The second phase of the Carrot ETL workflow focuses on using Carrot Mapper to cr
 
 1. In Carrot Mapper, locate the upload section
 2. Upload your `ScanReport.xlsx` file
-3. Upload your `sample-dataDictionary.csv` file
-4. Verify all files are properly loaded
+3. (Optional) If you have a data dictionary that matches your scan report, you can upload it here. For this tutorial, we'll skip the data dictionary upload.
+4. Verify the scan report is properly loaded
 5. Review any validation messages or warnings
 
-**Data Dictionary Format Example:**
-```csv
-csv_file_name,field_name,code,value
-Covid19.csv,Symptom,SNOMED,
-Covid19.csv,Testtype,LOINC,
-Demographics.csv,Sex,F,Female
-Demographics.csv,Sex,M,Male
-```
-
 <Callout type="info">
-  For detailed requirements on data formatting and CSV file structure, see the [Data Standards](/standards) page.
+  **If you do use a data dictionary:** For detailed requirements on data formatting and CSV file structure, see the [Data Standards](/standards) page.
 </Callout>
 
 ## Step 6: Begin Data Mapping
 
-Once you've uploaded your scan report and data dictionary, the system processes the files and makes them ready for mapping. Here's what you do next:
+Once you've uploaded your scan report (and optionally a data dictionary), the system processes the files and makes them ready for mapping. Here's what you do next:
 
 ### 6.1 Access Your Uploaded Scan Report
 
@@ -123,19 +113,18 @@ Once you've uploaded your scan report and data dictionary, the system processes 
 ### 6.2 Map Individual CSV Files
 
 On the scan report detail page, you'll see the CSV files from your data. For this tutorial, you should see:
-- `covid19.csv`
-- `Demographics.csv`
+- `patients.csv`
 
 **Let's start mapping:**
 
-#### Map covid19.csv
-1. **Click "Edit Table" on covid19.csv** - this opens the mapping interface
+#### Map patients.csv
+1. **Click "Edit Table" on patients.csv** - this opens the mapping interface
 
 <div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
   <figure style={{ margin: "0" }}>
     <img 
       src="/docs/Editing Scan Report.png" 
-      alt="Carrot Mapper Edit Table Interface for covid19.csv" 
+      alt="Carrot Mapper Edit Table Interface for patients.csv" 
       width="100%"
       height="auto"
       style={{ 
@@ -154,7 +143,7 @@ On the scan report detail page, you'll see the CSV files from your data. For thi
       fontSize: "16px",
       fontWeight: "600"
     }}>
-      Figure: Edit Table Interface - Configuring Person ID and Date Event for covid19.csv
+      Figure: Edit Table Interface - Configuring Person ID and Date Event for patients.csv
     </figcaption>
   </figure>
 </div>
@@ -164,12 +153,6 @@ On the scan report detail page, you'll see the CSV files from your data. For thi
    - **Date Event**: Pick the field with event dates (like "Date")
 3. **Click "Save"** to confirm your choices
 
-#### Map Demographics.csv
-1. **Click "Edit Table" on Demographics.csv** - open the mapping interface
-2. **Set up the key fields** - pick the right dropdowns for:
-   - **Person ID**: Choose the patient identifier field
-   - **Date Event**: Choose the relevant date field
-3. **Click "Save"** to confirm
 
 ### 6.3 Concept Reuse Configuration
 
@@ -188,8 +171,8 @@ During the mapping process, you'll be asked:
 
 ### 6.4 Auto-Mapping Process
 
-Once you've configured both CSV files:
-- The system automatically starts mapping each file
+Once you've configured the CSV file:
+- The system automatically starts mapping it
 - It uses the field settings you just configured
 - The process looks at your data and suggests OMOP CDM mappings
 - You can review and tweak these suggestions later
