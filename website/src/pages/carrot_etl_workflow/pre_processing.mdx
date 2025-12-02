@@ -1,8 +1,11 @@
 import { Callout } from "nextra/components";
 import HighlightedText from '@/components/HighlightedText';
+import { Steps } from "nextra/components";
 
 
-## Stage 1: Data Pre-processing
+## Data Pre-processing
+
+<Steps>
 
 ### Select Data
 
@@ -85,7 +88,7 @@ import HighlightedText from '@/components/HighlightedText';
 
 
 
-  1. **Define Data Anonymisation**
+  **Define Data Anonymisation**
   <div style={{ marginTop: "0px" }}>
   - Identify the Personally identifiable information (PII) / Personal Data: data attributes (**[see PII definition and description](#pii-section)**).
   - Locate and highlight the Direct-Identifier data.
@@ -94,7 +97,7 @@ import HighlightedText from '@/components/HighlightedText';
   </div>
 
 
-  2. **Anonymise dataset**
+  **Anonymise dataset**
   <div style={{ marginTop: "0px" }}>
   - It is the responsibility of the Data Owner to de-identify datasets!
   - <HighlightedText>Direct identifier data ‘must be removed’</HighlightedText> from each dataset – remove the row data from the columns, do not delete the columns.
@@ -312,3 +315,4 @@ import HighlightedText from '@/components/HighlightedText';
   </div>
 
 </div>
+</Steps>

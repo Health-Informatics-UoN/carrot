@@ -1,5 +1,7 @@
 import { Callout } from "nextra/components";
 import HighlightedText from '@/components/HighlightedText';
+import { Steps } from "nextra/components";
+
 
 # Phase 3: Data Execution and Validation
 
@@ -39,9 +41,11 @@ The final phase of the Carrot ETL workflow focuses on executing the data transfo
 
 Carrot Transform uses these inputs to actually transform your data into OMOP CDM format.
 
-## Step 9: Download and Set Up Carrot Transform
+<Steps>
 
-### 9.1 Download Carrot Transform
+## Download and Set Up Carrot Transform
+
+**Download Carrot Transform**
 
 Download the latest release of Carrot Transform from GitHub:
 
@@ -49,7 +53,7 @@ Download the latest release of Carrot Transform from GitHub:
 2. Download the latest release
 3. Extract the files to a location on your computer (e.g., `~/Documents/carrot-transform/`)
 
-### 9.2 Install uv
+**Install uv**
 
 Carrot Transform uses `uv` to manage dependencies and run the tool. Install `uv` by following the [installation guide](https://carrot.ac.uk/transform/development#using-uv).
 
@@ -251,6 +255,8 @@ Congratulations! You've successfully completed the Carrot ETL End-to-End Workflo
 - ✅ Created mappings with Carrot Mapper
 - ✅ Transformed your data with Carrot Transform
 - ✅ Generated OMOP CDM-compliant output files
+
+</Steps>
 
 **Additional Resources:**
 - [Troubleshooting and Best Practices](./troubleshooting)

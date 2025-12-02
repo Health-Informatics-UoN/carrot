@@ -1,16 +1,15 @@
 import { Callout } from "nextra/components";
 import HighlightedText from '@/components/HighlightedText';
+import { Steps } from "nextra/components";
+
 
 # Phase 2: Data Transformation with Carrot Mapper
 
 ## What is Carrot Mapper?
 
-**Carrot Mapper** is like a **translation service** for your data. 
+**Carrot Mapper** is a webapp which allows the user to use the metadata (as output by WhiteRabbit) from a dataset to produce mapping rules to the OMOP standard, in the JSON format. These can be ingested by Carrot Transform to perform the mapping of the contents of the dataset to OMOP.
 
-Think of it this way:
-- **WhiteRabbit** (Phase 1) told you what's in your data
-- **Carrot Mapper** (Phase 2) helps you create a "dictionary" that translates your data into the standard OMOP CDM format
-- **Carrot Transform** (Phase 3) uses that dictionary to actually do the translation
+Carrot Mapper provides automated mapping from a selection of vocabularies, reuse of mapping rules across datasets, and manual mapping rule generation. It also provides a number of helpful features to support and encourage standardised mappings across datasets.
 
 **What Carrot Mapper does:**
 - Takes your scan report from WhiteRabbit
@@ -18,23 +17,17 @@ Think of it this way:
 - Creates rules for how to transform your data
 - Generates a configuration file that Carrot Transform will use
 
-**Why this step is important:**
-- Your data might call a patient "patient_id" but OMOP calls it "person_id"
-- Your dates might be in "MM/DD/YYYY" format but OMOP needs "YYYY-MM-DD"
-- Your diagnosis codes might be in one format but need to be in another
-- Carrot Mapper helps you specify all these translations
-
 ## Overview
 
 The second phase of the Carrot ETL workflow focuses on using Carrot Mapper to create data mappings and transformation rules. This phase uses the insights gained from WhiteRabbit profiling and turns them into ETL configurations that can convert your source data into OMOP CDM format.
 
-## Step 4: Carrot Mapper Setup
+<Steps>
+
+### Carrot Mapper Setup
 
 <Callout type="warning">
   **Admin Configuration Required:** Carrot Mapper requires initial setup through the admin backend. This includes creating projects, configuring data sources, and setting up user permissions. Please contact your system administrator to ensure the Carrot Mapper environment is properly configured before proceeding with this tutorial.
 </Callout>
-
-### 4.1 Access Carrot Mapper
 
 1. Navigate to your Carrot Mapper instance
 2. Log in with appropriate credentials
@@ -45,7 +38,7 @@ The second phase of the Carrot ETL workflow focuses on using Carrot Mapper to cr
 </Callout>
 
 
-#### Prepare Files for Upload
+## Prepare Files for Upload
 
 1. Ensure you have:
    - `ScanReport.xlsx` from WhiteRabbit
@@ -54,9 +47,6 @@ The second phase of the Carrot ETL workflow focuses on using Carrot Mapper to cr
 <Callout type="info">
   **Data Dictionary (Optional):** A data dictionary is not mandatory for the upload process. If you have a data dictionary that matches your scan report, you can upload it to provide additional context about your data fields. However, for this tutorial, we'll proceed without a data dictionary to demonstrate the upload process.
 </Callout>
-
-
-### 5.2 Upload Process
 
 <div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
   <figure style={{ margin: "0" }}>
@@ -96,24 +86,20 @@ The second phase of the Carrot ETL workflow focuses on using Carrot Mapper to cr
   **If you do use a data dictionary:** For detailed requirements on data formatting and CSV file structure, see the [Data Standards](/standards) page.
 </Callout>
 
-## Step 6: Begin Data Mapping
+## Begin Data Mapping
 
 Once you've uploaded your scan report (and optionally a data dictionary), the system processes the files and makes them ready for mapping. Here's what you do next:
-
-#### Access Your Uploaded Scan Report
 
 1. **Go to the "Scan Reports" page** in Carrot Mapper
 2. **Find and click on your uploaded scan report**
 3. **This opens the scan report detail page**
 
-#### Map Individual CSV Files
 
 On the scan report detail page, you'll see the CSV files from your data. For this tutorial, you should see:
 - `patients.csv`
 
 **Let's start mapping:**
 
-##### Map patients.csv
 1. **Click "Edit Table" on patients.csv** - this opens the mapping interface
 
 <div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
@@ -150,15 +136,14 @@ On the scan report detail page, you'll see the CSV files from your data. For thi
 3. **Click "Save"** to confirm your choices
 
 
-### 6.3 Concept Reuse Configuration
+### Concept Reuse Configuration
 
-During the mapping process, you'll be asked:
+During this process, you will see a check box asking the following:
 
 **"Do you want to trigger the reuse of existing concepts?"**
 
 **Choose "Yes"** if you want to:
-- Reuse concepts from other scan reports in the same dataset
-- Let the system automatically match concepts based on field names and values
+- Reuse concepts from other scan reports in the same dataset to trigger auto-mapping based on existing concepts.
 - Speed up the mapping process for similar data
 
 <Callout type="info">
@@ -239,48 +224,10 @@ Once you've configured the CSV file:
 - The spinning circles disappear and get replaced with green checkmarks
 - Your CSV files show as ready for review and editing
 - You can click "Edit Table" to look at and adjust the mappings
-- The system has created initial field mappings based on your Person ID and Date Event choices
-
-### 6.5 Manual-Mapping Process
-
-When you upload a scan report and data dictionary for the very first time, you'll need to map your data manually. This is because we dont have existing OMOP concepts for the new Scan Report and/or Data Dictionary we are uploading.
-Here's how the manual-mapping process works in Carrot Mapper:
-
-##### Navigate to an Uploaded File
-
-- Open one of your uploaded source files in this case `patient.csv` from the file list.
-- You'll see a preview of its contents. These are the columns and some sampled rows from your source data.
-- Click **"patients.csv"** name so we can access the mapping interface for our data.
-<div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
-  <figure style={{ margin: "0" }}>
-    <img 
-      src="/docs/Navigate to Patient data.png" 
-      alt="Getting ready to begin manual mapping" 
-      width="100%"
-      height="auto"
-      style={{ 
-        maxWidth: "800px", 
-        border: "3px solid #007acc", 
-        borderRadius: "16px",
-        padding: "12px",
-        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
-        backgroundColor: "#ffffff"
-      }} 
-    />
-    <figcaption style={{ 
-      marginTop: "16px", 
-      fontStyle: "italic", 
-      color: "#333",
-      fontSize: "16px",
-      fontWeight: "600"
-    }}>
-      Figure: Getting ready to begin manual mapping
-    </figcaption>
-  </figure>
-</div>
+- The system has created initial field mappings based on your Person ID and Date Event choices. Please note this is dependent on existence of similar scan reports in the same dataset.
 
 
-##### Using AI Suggestions to Map Fields
+### Using AI Suggestions to Map Fields
 
 Carrot Mapper provides AI-powered suggestions based on Athena to help you quickly map your data values to OMOP concepts. Below is how we can achieve it:
 
@@ -387,7 +334,7 @@ we can use to remove the concept and we can now be able to add another one.
 </div>
 
 
-## Manually Mapping Data Values (Alternative Method)
+### Manually Mapping Data Values
 
 We may also do mapping manually by adding OMOP concepts by typing the concepts value in the input field to the left of the add button.
 For this example we shall map Female. The OMOP concept code is `8532`. Please see below on how to map it using the input field.
@@ -432,8 +379,6 @@ For this example we shall map Female. The OMOP concept code is `8532`. Please se
 
 Once the auto-mapping is done, you can check out the rules it created and see how your mappings look.
 
-#### View Generated Rules
-
 1. **Click the "Rules" tab** in your scan report
 2. **Check out the generated rules** - you'll see all the transformation rules that were automatically created
 3. **Look at the details** - each rule shows how your source data fields are mapped to OMOP CDM fields
@@ -466,7 +411,7 @@ Once the auto-mapping is done, you can check out the rules it created and see ho
   </figure>
 </div>
 
-#### View Mapping Diagram
+Now below lets see how to view our mapping diagram whihc is based on the rules generated
 
 1. **Click "View Map Diagram"** - it's at the top left of the Rules tab
 2. **See your mappings visually** - this shows a diagram of how your source data connects to the OMOP CDM structure
@@ -504,17 +449,11 @@ Once the auto-mapping is done, you can check out the rules it created and see ho
   **Tip:** The mapping diagram is really helpful for understanding complex data relationships and making sure your mappings work with OMOP CDM requirements.
 </Callout>
 
-#### Review Rules in Review Tab
-
-1. **Click the "Review Rules" tab** in your scan report
-2. **Check out your rules** - this gives you another way to look at your transformation rules
-3. **Double-check your mappings** - use this tab to make sure everything looks right before downloading
 
 ### Download Mapping Configuration
 
 Once you've checked out your rules and mapping diagram, you can download your mapping configuration to use with Carrot Transform.
 
-#### Access Actions Menu
 
 1. **Click the "Actions" button** - it's in the top right of the Rules tab
 2. **See what's available** - this opens a dropdown menu with download and management options
@@ -547,10 +486,6 @@ Once you've checked out your rules and mapping diagram, you can download your ma
   </figure>
 </div>
 
-### 8.2 Download Mapping Configuration
-
-**Available Download Options:**
-
 **Downloads Section:**
 - **Mapping JSON**: Downloads your mapping configuration in JSON format (this is what Carrot Transform needs)
 - **Mapping JSON V2**: Downloads your mapping configuration in JSON V2 format (enhanced version)
@@ -558,9 +493,7 @@ Once you've checked out your rules and mapping diagram, you can download your ma
 
 **Scan Report Section:**
 - **Export**: Exports the scan report data
-- **Delete**: Deletes the scan report (be careful with this one)
-
-### 8.3 Download Process
+- **Delete**: Deletes the scan report
 
 **For Mapping JSON and Mapping CSV:**
 1. **Click "Mapping JSON" or "Mapping CSV"** - pick your preferred format
@@ -628,13 +561,15 @@ Once you've checked out your rules and mapping diagram, you can download your ma
       fontSize: "16px",
       fontWeight: "600"
     }}>
-      Figure: Ready to download your Mapping Rules JSON V2 file
+      Figure: Ready to download your Mapping Rules JSON file
     </figcaption>
   </figure>
 </div>
 
+</Steps>
+
 <Callout type="info">
-  **Note:** The download process might take a few minutes depending on how big your mapping configuration is. For Mapping JSON V2, there's an extra generation step that could take longer. The Downloads tab will show you the progress and let you know when the file is ready.
+  **Note:** The download process might take a few minutes depending on how big your mapping configuration.
 </Callout>
 
 ## What's Next?
@@ -645,7 +580,7 @@ Congratulations! You've successfully completed the Carrot Mapper workflow. You n
 - ✅ Configured field mappings for your CSV files
 - ✅ Generated transformation rules automatically
 - ✅ Reviewed your mappings and rules
-- ✅ Downloaded your mapping configuration (JSON V2)
+- ✅ Downloaded your mapping configuration (JSON)
 
 Your mapping configuration file is now ready to use with **Carrot Transform** in the next phase of the ETL workflow.
 
