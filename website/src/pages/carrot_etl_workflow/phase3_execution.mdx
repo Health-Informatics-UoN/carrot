@@ -34,10 +34,9 @@ import { Steps } from "nextra/components";
 
 ## Overview
 
-The final phase of the Carrot ETL workflow focuses on executing the data transformation process. This phase combines all the work from the previous phases:
+The final phase of the Carrot ETL workflow focuses on executing the data transformation process. This phase uses data from from the previous phase.
+In this case, we shall make use of JSON or CSV files we downloaded from carrot mapper.
 
-- **From Phase 1**: Your original source data files (`patients.csv`)
-- **From Phase 2**: Your mapping rules JSON file (e.g., `Rules - Scan report test 2 - 6 - V2.json`)
 
 Carrot Transform uses these inputs to actually transform your data into OMOP CDM format.
 
@@ -63,42 +62,40 @@ Once `uv` is installed, navigate to the carrot-transform directory you downloade
 cd ~/Documents/carrot-transform
 ```
 
-## Step 10: Execute Data Transformation with Sample Data
+## Execute Data Transformation with Sample Data
 
 In this step, you'll use the files you've created in the previous phases to transform your data. Let's walk through a real example using the sample data.
+Let us note that since we have V1 and V2 rules, they are transnformed abit differently. For us to transform V1 rules, we use the command below:
 
-### 10.1 Prepare Your Files
-
-Before running Carrot Transform, make sure you have all the necessary files from the previous phases:
-
-**From Phase 1 (WhiteRabbit):**
-- Your original source data files (e.g., `patients.csv` from `WhiteRabbit_sample_input_csv/` folder)
-
-**From Phase 2 (Carrot Mapper):**
-- Your mapping rules JSON file that you downloaded from Carrot Mapper (e.g., `Rules - Scan report test 2 - 6 - V2.json`)
-
-**For this example, let's assume you have:**
-- Source data directory: `~/carrot-tutorial/WhiteRabbit_sample_input_csv/` containing `patients.csv`
-- Mapping rules file: The JSON V2 file you downloaded from Carrot Mapper (e.g., `Rules - Scan report test 2 - 6 - V2.json`)
-- Person file: `~/carrot-tutorial/WhiteRabbit_sample_input_csv/patients.csv` (this contains the person IDs)
-
-### 10.2 Run the Transformation
-
-**Example Command:**
 ```bash
-uv run carrot-transform run_v2 mapstream \
-  --rules-file examples/test/rules/v2.json \
-  --output-dir output/ \
-  --person-file examples/test/inputs/Demographics.csv \
-  --input-dir examples/test/inputs/ \
-  --omop-version "5.4"
+uv run -m carrottransform.cli.subcommands.run mapstream \
+    --input-dir carrottransform/examples/test/inputs \
+    --person-file carrottransform/examples/test/inputs/patients.csv \
+    --rules-file carrottransform/examples/test/rules/rules_2Dec2025_V1.json \
+    --output-dir build \
+    --omop-ddl-file carrottransform/config/OMOPCDM_postgresql_5.3_ddl.sql
+```
+
+**Prepare Your Files**
+For this example, we shall make use of the JSON V2 file we downloded from carrot mapper. You can also find it [here →](/sample-data/sample-data.zip)
+
+### Run the Transformation
+
+**Were going to run this command:**
+```bash
+uv run -m carrottransform.cli.subcommands.run_v2 folder \
+   --input-dir carrottransform/examples/test/inputs \
+   --person-file carrottransform/examples/test/inputs/patients.csv \
+   --rules-file carrottransform/examples/test/rules/rules_2Dec2025.json \
+   --output-dir build \
+   --omop-ddl-file carrottransform/config/OMOPCDM_postgresql_5.4_ddl.sql
 ```
 
 **What each argument does:**
-- `run_v2 mapstream`: Runs the version 2 transformation process using mapstream
+- `run_v2 folder`: Runs the version 2 transformation process
 - `--input-dir`: Directory containing your source CSV files (from Phase 1)
 - `--rules-file`: The JSON V2 mapping rules file you downloaded from Carrot Mapper (from Phase 2)
-- `--person-file`: The CSV file containing person/demographic data (first column should be person IDs)
+- `--person-file`: The CSV file containing person data
 - `--output-dir`: Where Carrot Transform will write the transformed OMOP CDM files
 - `--omop-version`: Specifies the OMOP CDM version to use (e.g., "5.4")
 
@@ -106,7 +103,7 @@ uv run carrot-transform run_v2 mapstream \
   **Note:** Make sure you're in the carrot-transform directory when running this command. Adjust the file paths to match your actual file locations.
 </Callout>
 
-### 10.3 What Happens During Transformation
+### What Happens During Transformation
 
 When you run the command, Carrot Transform will:
 
@@ -118,133 +115,68 @@ When you run the command, Carrot Transform will:
 
 **Expected Console Output:**
 ```
-2025-11-24 10:44:36,718 - carrottransform.tools.logger - INFO - Detected v2.json format, using direct v2 parser...
-2025-11-24 10:44:36,718 - carrottransform.tools.logger - INFO - Loaded v2 mapping rules from: examples/test/rules/v2.json in 0.01870 secs
-2025-11-24 10:44:36,722 - carrottransform.tools.logger - INFO - Headers in Person file: ['PersonID', 'sex', 'date_of_birth', 'ethnicity']
-2025-11-24 10:44:36,772 - carrottransform.tools.logger - INFO - Processing data...
-2025-11-24 10:44:36,772 - carrottransform.tools.logger - INFO - Streaming input file: Symptoms.csv
-2025-11-24 10:44:36,799 - carrottransform.tools.logger - INFO - Streaming input file: covid19_antibody.csv
-2025-11-24 10:44:36,837 - carrottransform.tools.logger - INFO - Streaming input file: Demographics.csv
-2025-11-24 10:44:36,903 - carrottransform.tools.logger - INFO - person_id stats: total loaded 1000, reject count 0
-2025-11-24 10:44:36,903 - carrottransform.tools.logger - INFO - TARGET: condition_occurrence: output count 400
-2025-11-24 10:44:36,903 - carrottransform.tools.logger - INFO - TARGET: measurement: output count 1000
-2025-11-24 10:44:36,903 - carrottransform.tools.logger - INFO - TARGET: observation: output count 400
-2025-11-24 10:44:36,903 - carrottransform.tools.logger - INFO - TARGET: person: output count 1000
-2025-11-24 10:44:36,906 - carrottransform.tools.logger - INFO - V2 processing completed successfully in 0.20648 secs
+ ~/Desktop/carrot-transform-0.6.0 ------------------------------------------------------------------------------------------------------------------------------------------------------------- 03:15:32 PM 
+> uv run -m carrottransform.cli.subcommands.run_v2 folder \
+   --input-dir carrottransform/examples/test/inputs \
+   --person-file carrottransform/examples/test/inputs/patients.csv \
+   --rules-file carrottransform/examples/test/rules/rules_2Dec2025_V2.json \
+   --output-dir build \
+   --omop-ddl-file carrottransform/config/OMOPCDM_postgresql_5.4_ddl.sql
+2025-12-03 15:15:35,375 - carrottransform.tools.logger - INFO - Detected v2.json format, using direct v2 parser...
+2025-12-03 15:15:35,375 - carrottransform.tools.logger - INFO - Loaded v2 mapping rules from: carrottransform/examples/test/rules/rules_2Dec2025_V2.json in 0.00634 secs
+2025-12-03 15:15:35,438 - carrottransform.tools.logger - INFO - person_id stats: total loaded 200, reject count 1
+2025-12-03 15:15:35,468 - carrottransform.tools.logger - INFO - Processing data...
+2025-12-03 15:15:35,468 - carrottransform.tools.logger - INFO - Streaming input file: patients.csv
+2025-12-03 15:15:35,472 - carrottransform.tools.logger - WARNING -  couldn't be normalised to ISO 8601 date format
+2025-12-03 15:15:35,498 - carrottransform.tools.logger - INFO - TARGET: condition_occurrence: output count 200
+2025-12-03 15:15:35,498 - carrottransform.tools.logger - INFO - TARGET: person: output count 200
+2025-12-03 15:15:35,504 - carrottransform.tools.logger - INFO - V2 processing completed successfully in 0.13464 secs
+
+ ~/Desktop/carrot-transform-0.6.0 ------------------------------------------------------------------------------------------------------------------------------------------------------------- 03:15:35 PM 
+> 
+
 ```
 
-### 10.4 Understanding the Output
+### Understanding the Output
 
-After the transformation completes, check your output directory. You should see files like:
+After the transformation completes, check your build directory. You should see files like:
 
 ```
 transform_output/
-├── PERSON.tsv
-├── OBSERVATION_PERIOD.tsv
-├── VISIT_OCCURRENCE.tsv
-├── CONDITION_OCCURRENCE.tsv
-├── DRUG_EXPOSURE.tsv
-├── PROCEDURE_OCCURRENCE.tsv
-├── MEASUREMENT.tsv
-├── OBSERVATION.tsv
-├── metadata.json
-└── transformation.log
+├── condition_occurrence.tsv
+├── person_ids.tsv
+├── person.tsv
+├── summary_mapstream.tsv
 ```
 
 **What each file contains:**
 
-- **PERSON.tsv**: Patient demographic information (age, gender, race, ethnicity)
-- **OBSERVATION_PERIOD.tsv**: Time periods during which the person was observed
-- **VISIT_OCCURRENCE.tsv**: Healthcare visits and encounters
-- **CONDITION_OCCURRENCE.tsv**: Diagnoses and conditions
-- **DRUG_EXPOSURE.tsv**: Medications and drug exposures
-- **PROCEDURE_OCCURRENCE.tsv**: Medical procedures performed
-- **MEASUREMENT.tsv**: Clinical measurements (lab results, vital signs, etc.)
-- **OBSERVATION.tsv**: Other clinical observations
-- **metadata.json**: Information about the transformation process
-- **transformation.log**: Detailed log of the transformation execution
+- **person.tsv**: Patient demographic information (age, gender, race, ethnicity) in OMOP CDM format
+- **condition_occurrence.tsv**: Diagnoses and conditions mapped to OMOP CDM standard concept IDs
+- **person_ids.tsv**: Mapping of original person identifiers to OMOP person_id values
+- **summary_mapstream.tsv**: Summary statistics and mapping information from the transformation process
 
-### 10.5 Example Output: PERSON.tsv
+### The Output: person.tsv
 
-Here's what a transformed `PERSON.tsv` file might look like (this is example data showing the structure):
+Here's what the transformed `PERSON.tsv` file will look like. Please note for the purpose of documentation, the output has been truncated to 10 redords for the purposes of readability.
 
 ```tsv
-person_id	gender_concept_id	year_of_birth	month_of_birth	day_of_birth	birth_datetime	race_concept_id	ethnicity_concept_id	location_id	provider_id	care_site_id	person_source_value	gender_source_value	race_source_value	race_source_concept_id	ethnicity_source_value	ethnicity_source_concept_id
-1	8507	1985	5	15		8527	0			M		M		
-2	8532	1990	3	22		8527	0			F		F		
-3	8507	1978	11	8		8527	0			M		M		
+person_id	gender_concept_id	year_of_birth	month_of_birth	day_of_birth	birth_datetime	race_concept_id	ethnicity_concept_id	location_id	provider_id	care_site_id	person_source_value	gender_source_value	gender_source_concept_id	race_source_value	race_source_concept_id	ethnicity_source_value	ethnicity_source_concept_id
+1	8507	2002	8	11	2002-08-11 00:00:00	0	0					F	8507				
+2	8507	2002	10	25	2002-10-25 00:00:00	0	0					F	8507				
+3	8507	1990	2	24	1990-02-24 00:00:00	0	0					M	8507				
+4	8507	1966	2	11	1966-02-11 00:00:00	0	0					F	8507				
+5	8507	1963	10	10	1963-10-10 00:00:00	0	0					F	8507				
+6	8507	1984	4	3	1984-04-03 00:00:00	0	0					M	8507				
+7	8507	1960	7	4	1960-07-04 00:00:00	0	0					F	8507				
+8	8507	1951	12	30	1951-12-30 00:00:00	0	0					M	8507				
+9	8507	1970	8	19	1970-08-19 00:00:00	0	0					M	8507				
+10	8507	1969	8	22	1969-08-22 00:00:00	0	0					M	8507				
 ```
 
-**What this shows:**
-- **person_id**: Unique identifier for each person
-- **gender_concept_id**: Standard OMOP concept ID for gender (8507 = Male, 8532 = Female)
-- **year_of_birth, month_of_birth, day_of_birth**: Date of birth components
-- **race_concept_id**: Standard OMOP concept ID for race
-- **gender_source_value**: Original gender value from your source data (M, F)
-- The transformed data now uses standard OMOP concept IDs instead of your original values
-
-### 10.6 Example Output: CONDITION_OCCURRENCE.tsv
-
-Here's what a transformed `CONDITION_OCCURRENCE.tsv` file might look like:
-
-```tsv
-condition_occurrence_id	person_id	condition_concept_id	condition_start_date	condition_start_datetime	condition_end_date	condition_end_datetime	condition_type_concept_id	stop_reason	provider_id	visit_occurrence_id	visit_detail_id	condition_source_value	condition_source_concept_id	condition_status_source_value	condition_status_concept_id
-1	1	320128	2023-01-15	2023-01-15 00:00:00		2023-01-15	32020		1		I10			Active	
-2	2	440540	2023-02-20	2023-02-20 00:00:00		2023-02-20	32020		2		E11.9			Active	
-```
-
-**What this shows:**
-- **person_id**: Links to the person in the PERSON table
-- **condition_concept_id**: Standard OMOP concept ID for the condition (320128 = Hypertension, 440540 = Diabetes)
-- **condition_start_date**: When the condition was first recorded
-- **condition_source_value**: Original diagnosis code from your source data (I10, E11.9)
-- The transformation converted your original diagnosis codes to standard OMOP concept IDs
-
-### 10.7 How the Transformation Works
-
-Here's a simple example of how data flows through the transformation:
-
-**Your Original Data (patients.csv):**
-```csv
-PersonID,Date,Gender,DOB,Diagnosis
-1,2023-01-15,M,1985-05-15,I10
-2,2023-02-20,F,1990-03-22,E11.9
-```
-
-**Your Mapping Rules (from Carrot Mapper):**
-- `PersonID` → `person_id` in PERSON table
-- `Gender` → `gender_concept_id` (M → 8507, F → 8532)
-- `DOB` → `year_of_birth`, `month_of_birth`, `day_of_birth`
-- `Diagnosis` → `condition_concept_id` in CONDITION_OCCURRENCE table (I10 → 320128, E11.9 → 440540)
-- `Date` → `condition_start_date`
-
-**Transformed Output (OMOP CDM format):**
-- **PERSON.tsv**: Contains person demographics with standard concept IDs
-- **CONDITION_OCCURRENCE.tsv**: Contains conditions with standard concept IDs and proper date formatting
-
+It is iportant to go through the build folder to see the output of the files and interact to undertsand how the data was transformed and data accuracy.
 The transformation applies all the mapping rules you created in Carrot Mapper to convert your source data into the standardized OMOP CDM format.
 
-## Step 11: Verify Your Results
-
-### 11.1 Check Output Files
-
-1. Navigate to your output directory
-2. Verify that the expected OMOP CDM table files were created
-3. Open a few files to check that data looks correct
-
-### 11.2 Review Sample Records
-
-- Open `PERSON.tsv` and verify person records look correct
-- Check that dates are in the correct format (YYYY-MM-DD)
-- Verify that concept IDs are present (not just source values)
-- Look at a few records from other tables to ensure transformations worked
-
-### 11.3 Check the Log File
-
-Review `transformation.log` for any warnings or errors. The log will show:
-- Which files were processed
-- How many records were generated for each table
-- Any issues encountered during transformation
 
 ## What's Next?
 
