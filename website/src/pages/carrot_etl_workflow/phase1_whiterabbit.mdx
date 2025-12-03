@@ -125,7 +125,6 @@ Use these recommended settings for the tutorial:
 - **Max distinct values**: Set to 1,000 (sufficient for our data)
 - **Numeric stats**: ✅ Check this box (useful for analysis)
 
-##Execute the Data Scan
 
 **Select Files to Scan**
 
@@ -174,7 +173,6 @@ Use these recommended settings for the tutorial:
   **Note:** The scan process may take a few minutes depending on your system performance. WhiteRabbit will analyze each file and generate detailed statistics about the data structure and content.
 </Callout>
 
-##Review the Scan Results
 
 **Open the Scan Report**
 
@@ -183,44 +181,13 @@ Use these recommended settings for the tutorial:
 
 **Examine the Report Structure**
 
-The scan report contains several tabs as described in the [official WhiteRabbit documentation](https://ohdsi.github.io/WhiteRabbit/WhiteRabbit.html):
-
-**Field Overview Tab:**
-- **Column A**: Table name
-- **Column B**: Column name  
-- **Column C**: Column description (populated by user, not WhiteRabbit)
-- **Column D**: Data type
-- **Column E**: Maximum length of values (characters/digits)
-- **Column F**: Total number of rows (returns -1 for text files)
-- **Column G**: Number of rows scanned
-- **Column H**: Number of empty rows
-- **Column I**: Count of unique values (may show ≤ if upper limit)
-- **Column J**: Percentage of unique values (0% = constant, 100% = unique)
-
-**Table Overview Tab:**
-- **Column A**: Table name
-- **Column B**: Table description (populated by user, not WhiteRabbit)
-- **Column C**: Total number of rows (returns -1 for text files)
-- **Column D**: Number of rows scanned
-- **Column E**: Number of fields in the table
-- **Column F**: Number of empty fields
-
-**Individual Table Tabs:**
-- Each table has its own tab showing detailed field analysis
-- **Field names**: Source table columns across the top
-- **Value columns**: Each field generates two columns:
-  - First column: Distinct values (above min cell count)
-  - Second column: Frequency count for each value
-- **Truncation indicator**: "List truncated..." appears when unique values exceed max distinct values setting
+The scan report contains several tabs as described in the [official WhiteRabbit documentation](https://ohdsi.github.io/WhiteRabbit/WhiteRabbit.html).
+Please note it is important to read the official white rabbit docs to understand the format of the data we get as output from white rabbit
 
 ## Prepare for Next Phase
 
-**Document Your Findings**
-
-Before moving to Phase 2, note:
-- Any data quality issues you discovered
-- Field mappings that seem straightforward
-- Fields that might need special transformation rules
+Let us prepare our `ScanReport.xlsx` before moving to the next phase. 
+You may copy the file to your docs folder or any other folder that will be easilyy accesible when we move to the carrot mapper phase.
 
 </Steps>
 

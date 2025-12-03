@@ -15,19 +15,6 @@ import { Steps } from "nextra/components";
 - **Python-based**: Can be run from source or installed using pip
 - **OMOP CDM Output**: Transforms your source data into the standardized OMOP Common Data Model format
 
-**What Carrot Transform does:**
-- Takes your mapping rules from Carrot Mapper
-- Reads your original data files (CSV, SAS, database tables)
-- Applies all the transformations you specified in the mapping rules
-- Creates new files in the standard OMOP CDM format
-- Validates the transformed data against OMOP CDM standards
-
-**Why this step is important:**
-- This is where your data actually gets converted from its current format to the standard OMOP CDM format
-- It ensures your data follows all the OMOP CDM rules and standards
-- It creates the final output that researchers can use for analysis
-- It maintains data privacy by running locally within your environment
-
 <Callout type="info">
   **Data Security**: Carrot Transform is designed to run locally within your environment, ensuring that sensitive healthcare data never leaves your secure infrastructure.
 </Callout>
