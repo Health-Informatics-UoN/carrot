@@ -29,53 +29,65 @@ Carrot Transform uses these inputs to actually transform your data into OMOP CDM
 
 <Steps>
 
-## Download and Set Up Carrot Transform
+## Installation
 
-**Download Carrot Transform**
-
-Download the latest release of Carrot Transform from GitHub:
-
-1. Go to [https://github.com/Health-Informatics-UoN/carrot-transform](https://github.com/Health-Informatics-UoN/carrot-transform)
-2. Download the latest release
-3. Extract the files to a location on your computer (e.g., `~/Documents/carrot-transform/`)
-
-**Install uv**
-
-Carrot Transform uses `uv` to manage dependencies and run the tool. Install `uv` by following the [installation guide](https://carrot.ac.uk/transform/development#using-uv).
-
-Once `uv` is installed, navigate to the carrot-transform directory you downloaded:
+Carrot-Transform is available on PyPI, so you can install it with:
 
 ```bash
-cd ~/Documents/carrot-transform
+pip install carrot-transform
 ```
 
-## Execute Data Transformation with Sample Data
+If you are working with the source code, refer to the [Development Notes](/transform/development)
+
+## Running Carrot-Transform
+
+To execute Carrot-Transform, run:
+
+```
+carrot-transform [command] [options]
+```
+
+For example, you can get the version number with:
+
+```
+carrot-transform -v
+```
+
+There are many mandatory and optional arguments for Carrot Transform. In the quick start, we will demonstrate the mandatory arguments on a test case included in the repository.
+
+Transform will read the CSV files in the local directory in the basic examples below. For details about how to read data from a database, see the [Database Connection](/transform/db_connection) section.
+
+### Version 1 Process
+
+V1 process of Transform will take the V1 JSON from Mapper as rules file.
+
+To run the V1 process, enter the following (as one command):
 
 In this step, you'll use the files you've created in the previous phases to transform your data. Let's walk through a real example using the sample data.
 Let us note that since we have V1 and V2 rules, they are transnformed abit differently. For us to transform V1 rules, we use the command below:
 
 ```bash
-uv run -m carrottransform.cli.subcommands.run mapstream \
-    --input-dir carrottransform/examples/test/inputs \
-    --person-file carrottransform/examples/test/inputs/patients.csv \
-    --rules-file carrottransform/examples/test/rules/rules_2Dec2025_V1.json \
-    --output-dir build \
-    --omop-ddl-file carrottransform/config/OMOPCDM_postgresql_5.3_ddl.sql
+carrot-transform run mapstream \
+  --input-dir @carrot/examples/test/inputs \
+  --rules-file @carrot/examples/test/rules/rules_2Dec2025_V1.json \
+  --person-file carrottransform/examples/test/inputs/patients.csv \
+  --output-dir carrottransform/examples/test/test_output \
+  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql
+
 ```
 
-**Prepare Your Files**
+### Version 2 Process
 For this example, we shall make use of the JSON V2 file we downloded from carrot mapper. You can also find it [here →](/sample-data/sample-data.zip)
 
-### Run the Transformation
 
 **Were going to run this command:**
 ```bash
-uv run -m carrottransform.cli.subcommands.run_v2 folder \
-   --input-dir carrottransform/examples/test/inputs \
-   --person-file carrottransform/examples/test/inputs/patients.csv \
-   --rules-file carrottransform/examples/test/rules/rules_2Dec2025.json \
-   --output-dir build \
-   --omop-ddl-file carrottransform/config/OMOPCDM_postgresql_5.4_ddl.sql
+carrot-transform run_v2 folder \
+  --input-dir @carrot/examples/test/inputs \
+  --rules-file @carrot/examples/test/rules/rules_2Dec2025_V2.json\
+  --person-file carrottransform/examples/test/inputs/patients.csv \
+  --output-dir carrottransform/examples/test/test_output \
+  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql
 ```
 
 **What each argument does:**
@@ -103,12 +115,12 @@ When you run the command, Carrot Transform will:
 **Expected Console Output:**
 ```
  ~/Desktop/carrot-transform-0.6.0 ------------------------------------------------------------------------------------------------------------------------------------------------------------- 03:15:32 PM 
-> uv run -m carrottransform.cli.subcommands.run_v2 folder \
-   --input-dir carrottransform/examples/test/inputs \
-   --person-file carrottransform/examples/test/inputs/patients.csv \
-   --rules-file carrottransform/examples/test/rules/rules_2Dec2025_V2.json \
-   --output-dir build \
-   --omop-ddl-file carrottransform/config/OMOPCDM_postgresql_5.4_ddl.sql
+> carrot-transform run_v2 folder \
+  --input-dir @carrot/examples/test/inputs \
+  --rules-file @carrot/examples/test/rules/rules_2Dec2025_V2.json \
+  --person-file @carrot/examples/test/inputs/patients.csv \
+  --output-dir carrottransform/examples/test/test_output \
+  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql
 2025-12-03 15:15:35,375 - carrottransform.tools.logger - INFO - Detected v2.json format, using direct v2 parser...
 2025-12-03 15:15:35,375 - carrottransform.tools.logger - INFO - Loaded v2 mapping rules from: carrottransform/examples/test/rules/rules_2Dec2025_V2.json in 0.00634 secs
 2025-12-03 15:15:35,438 - carrottransform.tools.logger - INFO - person_id stats: total loaded 200, reject count 1
@@ -118,7 +130,6 @@ When you run the command, Carrot Transform will:
 2025-12-03 15:15:35,498 - carrottransform.tools.logger - INFO - TARGET: condition_occurrence: output count 200
 2025-12-03 15:15:35,498 - carrottransform.tools.logger - INFO - TARGET: person: output count 200
 2025-12-03 15:15:35,504 - carrottransform.tools.logger - INFO - V2 processing completed successfully in 0.13464 secs
-
  ~/Desktop/carrot-transform-0.6.0 ------------------------------------------------------------------------------------------------------------------------------------------------------------- 03:15:35 PM 
 > 
 
@@ -129,7 +140,7 @@ When you run the command, Carrot Transform will:
 After the transformation completes, check your build directory. You should see files like:
 
 ```
-transform_output/
+test_output/
 ├── condition_occurrence.tsv
 ├── person_ids.tsv
 ├── person.tsv
