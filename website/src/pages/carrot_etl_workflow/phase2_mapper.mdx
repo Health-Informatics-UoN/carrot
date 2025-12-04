@@ -7,9 +7,9 @@ import { Steps } from "nextra/components";
 
 ## What is Carrot Mapper?
 
-**Carrot Mapper** is a webapp which allows the user to use the metadata (as output by WhiteRabbit) from a dataset to produce mapping rules to the OMOP standard, in the JSON format. These can be ingested by Carrot Transform to perform the mapping of the contents of the dataset to OMOP.
+**Carrot Mapper** is a web app which allows the user to use the metadata (as output by WhiteRabbit) from a dataset to produce mapping rules to the OMOP standard, in the JSON format. These can be ingested by Carrot Transform to perform the mapping of the contents of the dataset to OMOP.
 
-Carrot Mapper provides automated mapping from a selection of vocabularies, reuse of mapping rules across datasets, and manual mapping rule generation. It also provides a number of helpful features to support and encourage standardised mappings across datasets.
+Carrot Mapper provides automated mapping from a selection of vocabularies, reuse of mapping rules across datasets, and manual mapping rule generation. It also provides a number of helpful features to support and encourage standardized mappings across datasets.
 
 **What Carrot Mapper does:**
 - Takes your scan report from WhiteRabbit
@@ -138,7 +138,7 @@ On the scan report detail page, you'll see the CSV files from your data. For thi
 
 ### Concept Reuse Configuration
 
-During this process, you will see a check box asking the following:
+During this process, you will see a checkbox asking the following:
 
 **"Do you want to trigger the reuse of existing concepts?"**
 
@@ -232,8 +232,8 @@ Once you've configured the CSV file:
 Carrot Mapper provides AI-powered suggestions based on Athena to help you quickly map your data values to OMOP concepts. Below is how we can achieve it:
 
 We first navigate into a field that we need to do the mapping, in this case we shall use the Gender as an example. When we navigate inside data, we shall find two rows, `F` and `M`.
-`F` menans "Female" and `M` means "Male". At this stage, we shall navigate to the column that says `AI Suggestions` and click on the `Suggestion` button. Lets beging with `M` row.
-After clicking the suggestions button, we get a drop down list with domains for us to select from as seen below.
+`F` means "Female" and `M` means "Male". At this stage, we shall navigate to the column that says `AI Suggestions` and click on the `Suggestion` button. Let's begin with `M` row.
+After clicking the suggestions button, we get a drop-down list with domains for us to select from as seen below.
 
 <div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
   <figure style={{ margin: "0" }}>
@@ -265,10 +265,10 @@ After clicking the suggestions button, we get a drop down list with domains for 
 
 Since we are mapping gender, we shall select the gender domain for this mapping.
 Once we click that, a modal will pop up with suggestions on the best OMOP concept to select from the AI suggestions.
-From the modal, we see that we have an accuracy score which guides us on the best OMOP concept to select from the modal. Before selecting the concept, please vefiry if the concept name matches what we expect. In this case our concept name must be male. 
-We then click add and mapper will apply the OMOP concept we selected. After selecting, we shall see a green toast message confirming the successful addintion `OMOP Concept successfully added.`
-A blue concept tag appers on the table row under the concept column showing the mapped OMOP concept. Incase we wanted to change the OMOP concept, the blue concept tag has an `X` button that
-we can use to remove the concept and we can now be able to add another one.
+From the modal, we see that we have an accuracy score which guides us on the best OMOP concept to select from the modal. Before selecting the concept, please verify if the concept name matches what we expect. In this case our concept name must be male. 
+We then click add and mapper will apply the OMOP concept we selected. After selecting, we shall see a green toast message confirming the successful addition `OMOP Concept successfully added.`
+A blue concept tag appears on the table row under the concept column showing the mapped OMOP concept. In case we wanted to change the OMOP concept, the blue concept tag has an `X` button that
+we can use to remove the concept, and we can now be able to add another one.
 
 <div style={{ 
   display: "flex", 
@@ -411,7 +411,7 @@ Once the auto-mapping is done, you can check out the rules it created and see ho
   </figure>
 </div>
 
-Now below lets see how to view our mapping diagram whihc is based on the rules generated
+Now below let's see how to view our mapping diagram which is based on the rules generated
 
 1. **Click "View Map Diagram"** - it's at the top left of the Rules tab
 2. **See your mappings visually** - this shows a diagram of how your source data connects to the OMOP CDM structure

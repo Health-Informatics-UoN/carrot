@@ -21,7 +21,7 @@ import { Steps } from "nextra/components";
 
 ## Overview
 
-The final phase of the Carrot ETL workflow focuses on executing the data transformation process. This phase uses data from from the previous phase.
+The final phase of the Carrot ETL workflow focuses on executing the data transformation process. This phase uses data from the previous phase.
 In this case, we shall make use of JSON or CSV files we downloaded from carrot mapper.
 
 
@@ -31,7 +31,7 @@ Carrot Transform uses these inputs to actually transform your data into OMOP CDM
 
 ## Installation
 
-Carrot-Transform is available on PyPI, so you can install it with:
+Carrot-Transform is available on PyPi, so you can install it with:
 
 ```bash
 pip install carrot-transform
@@ -64,7 +64,7 @@ V1 process of Transform will take the V1 JSON from Mapper as rules file.
 To run the V1 process, enter the following (as one command):
 
 In this step, you'll use the files you've created in the previous phases to transform your data. Let's walk through a real example using the sample data.
-Let us note that since we have V1 and V2 rules, they are transnformed abit differently. For us to transform V1 rules, we use the command below:
+Let's note that since we have V1 and V2 rules, they are transformed differently. For us to transform V1 rules, we use the command below:
 
 ```bash
 carrot-transform run mapstream \
@@ -77,10 +77,10 @@ carrot-transform run mapstream \
 ```
 
 ### Version 2 Process
-For this example, we shall make use of the JSON V2 file we downloded from carrot mapper. You can also find it [here →](/sample-data/sample-data.zip)
+For this example, we shall make use of the JSON V2 file we downloaded from carrot mapper. You can also find it [here →](/sample-data/sample-data.zip)
 
 
-**Were going to run this command:**
+**We're going to run this command:**
 ```bash
 carrot-transform run_v2 folder \
   --input-dir @carrot/examples/test/inputs \
@@ -156,7 +156,7 @@ test_output/
 
 ### The Output: person.tsv
 
-Here's what the transformed `person.tsv` file will look like. Please note for the purpose of documentation, the output has been truncated to 10 redords for the purposes of readability.
+Here's what the transformed `person.tsv` file will look like. Please note for the purpose of documentation, the output has been truncated to 10 records for the purposes of readability.
 
 ```tsv
 person_id	gender_concept_id	year_of_birth	month_of_birth	day_of_birth	birth_datetime	race_concept_id	ethnicity_concept_id	location_id	provider_id	care_site_id	person_source_value	gender_source_value	gender_source_concept_id	race_source_value	race_source_concept_id	ethnicity_source_value	ethnicity_source_concept_id
@@ -172,7 +172,7 @@ person_id	gender_concept_id	year_of_birth	month_of_birth	day_of_birth	birth_date
 10	8507	1969	8	22	1969-08-22 00:00:00	0	0					M	8507				
 ```
 
-It is iportant to go through the build folder to see the output of the files and interact to undertsand how the data was transformed and data accuracy.
+It is important to go through the build folder to see the output of the files and interact to understand how the data was transformed and data accuracy.
 The transformation applies all the mapping rules you created in Carrot Mapper to convert your source data into the standardized OMOP CDM format.
 
 
