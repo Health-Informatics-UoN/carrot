@@ -156,9 +156,84 @@ During this process, you will see a checkbox asking the following:
 
 #### Auto-Mapping Process
 
+For us to better understand the auto-mapping process, here is a small example using files in this [repository](https://github.com/Health-Informatics-UoN/carrot/tree/631f3334d1420c85737107e35043532033610fde/example%20files).
+
+The files contain a sample Scan report and data dictionary. We shall upload both files and configure the Person ID and Date Event fields as we did under [Begin Data Mapping](#begin-data-mapping).
+After that, we shall see the spinning orange circles in the “Jobs Progress” column. 
+This may take sometime since auto-mapping is taking place. Please note that auto-mapping is dependent on existence of similar scan reports in the same dataset. 
+
+The data dictionary helps in speeding up the mapping process by adding OMOP Concepts to fields and values in your Scan Report based on vocabulary mappings you define.
+After, this, we shall head to the rules tab and see the generated rules. Once we have the rules, we shall see the mapping diagram and the mapping rules JSON V1, V2 and CSV files.
+
+<div style={{ 
+  display: "flex", 
+  gap: "24px", 
+  justifyContent: "center", 
+  alignItems: "flex-start",
+  marginTop: "24px", 
+  marginBottom: "32px",
+  flexWrap: "wrap"
+}}>
+  <figure style={{ margin: "0", flex: "1", minWidth: "650px", maxWidth: "70%" }}>
+    <img 
+      src="/docs/Auto-mapping.png" 
+      alt="Auto-mapping process" 
+      width="100%"
+      height="auto"
+      style={{ 
+        width: "100%",
+        border: "3px solid #007acc", 
+        borderRadius: "16px",
+        padding: "12px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+        backgroundColor: "#ffffff"
+      }} 
+    />
+    <figcaption style={{ 
+      marginTop: "16px", 
+      fontStyle: "italic", 
+      color: "#333",
+      fontSize: "16px",
+      fontWeight: "600",
+      textAlign: "center"
+    }}>
+      Figure: Auto-mapping process
+    </figcaption>
+  </figure>
+  <figure style={{ margin: "0", flex: "1", minWidth: "650px", maxWidth: "70%" }}>
+    <img 
+      src="/docs/Auto-mapped.png" 
+      alt="Rules generated after auto-mapping" 
+      width="100%"
+      height="auto"
+      style={{ 
+        width: "100%",
+        border: "3px solid #007acc", 
+        borderRadius: "16px",
+        padding: "12px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+        backgroundColor: "#ffffff"
+      }} 
+    />
+    <figcaption style={{ 
+      marginTop: "16px", 
+      fontStyle: "italic", 
+      color: "#333",
+      fontSize: "16px",
+      fontWeight: "600",
+      textAlign: "center"
+    }}>
+      Figure: Rules generated after auto-mapping
+    </figcaption>
+  </figure>
+</div>
+
+
+Since we have seen the detailed example of how auto-mapping works, let's go back to our tutorial and continue where we left off after step number 4 [Concept Reuse Configuration](#concept-reuse-configuration).
+
 Once you've configured the patients.csv file:
-- The system automatically starts mapping it
-- It uses the field settings you just configured
+- The system automatically starts the mapping process
+- It uses the field settings you just configured namely `Person ID` and `Date Event` and `Do you want to trigger the reuse of existing concepts?` checkbox
 - The process looks at your data and suggests OMOP CDM mappings
 - You can review and tweak these suggestions later
 
