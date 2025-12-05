@@ -45,7 +45,11 @@ The second phase of the Carrot ETL workflow focuses on using Carrot Mapper to cr
    - Required permissions and access
 
 <Callout type="info">
-  **Data Dictionary (Optional):** A data dictionary is not mandatory for the upload process. If you have a data dictionary that matches your scan report, you can upload it to provide additional context about your data fields. However, for this tutorial, we'll proceed without a data dictionary to demonstrate the upload process.
+  **Data Dictionary (Optional):** A data dictionary is not mandatory for the upload process. If you have a data dictionary that matches your scan report, you can upload it to provide additional context about your data fields. 
+  However, for this tutorial, we'll proceed without a data dictionary to demonstrate the upload process.
+
+  It is important to note that when we use a data dictionary, it automatically adds OMOP Concepts to fields and values in your Scan Report based on vocabulary mappings you define, which speeds up the mapping process. Additionally, it improves your data by populating the "Value description" column with helpful contextual information—for example, indicating that "F" means "Female" and "M" means "Male"—making it easier to understand and verify your data values during manual mapping.
+  
 </Callout>
 
 <div style={{ textAlign: "center", marginTop: "24px", marginBottom: "32px" }}>
@@ -152,7 +156,7 @@ During this process, you will see a checkbox asking the following:
 
 #### Auto-Mapping Process
 
-Once you've configured the CSV file:
+Once you've configured the patients.csv file:
 - The system automatically starts mapping it
 - It uses the field settings you just configured
 - The process looks at your data and suggests OMOP CDM mappings
