@@ -24,6 +24,8 @@ For example, you can get the version number with:
 carrot-transform -v
 ```
 
+There are many mandatory and optional arguments for Carrot Transform. In the quick start, we will demonstrate the mandatory arguments on a test case (taken from carrot-CDM) included in the repository.
+Enter the following (as one command):
 There are many mandatory and optional arguments for Carrot Transform. In the quick start, we will demonstrate the mandatory arguments on a test case included in the repository.
 
 Transform will read the CSV files in the local directory in the basic examples below. For details about how to read data from a database, see the [Database Connection](/transform/db_connection) section.
@@ -68,25 +70,31 @@ carrot-transform run_v2 folder \
 
 ### Arguments
 
-#### Required Arguments
+## Arguments
 
-| Flag            | Description                                      |
-| --------------- | ------------------------------------------------ |
-| `--input-dir`   | Directory containing input files                 |
-| `--rules-file`  | JSON file defining mapping rules                 |
-| `--person-file` | CSV file (or table name) with person IDs and DOB |
-| `--output-dir`  | Directory to write OMOP-format TSV files         |
+All of the program arguments can be specified as command-line parameters.
+Some of the arguments can be passed through environment variables - potentially useful for containerised usage.
+The following tables describe the parameters available, the command line flag for them, any environment variable and any default values.
+
+### Required Arguments
+
+| Command Line Flag | Environment Variable | Description |
+|-------------------|----------------------|-------------|
+| `--input-dir`     | `INPUT_DIR`          | Directory containing input files |
+| `--rules-file`    | `RULES_FILE`         | JSON file with mapping rules |
+| `--person-file`   | `PERSON_FILE`        | CSV file (or table name) with person IDs and DOB |
+| `--output-dir`    | `OUTPUT_DIR`         | Directory for OMOP-format TSV files |
 
 #### Optional Arguments
 
-| Flag                     | Default | Description                                                         |
-| ------------------------ | ------- | ------------------------------------------------------------------- |
-| `--write-mode`           | `w`     | Set to `w` (overwrite) or `a` (append) for output files             |
-| `--saved-person-id-file` | None    | Path to a file to save and share `person_id` state                  |
-| `--use-input-person-ids` | `N`     | Use input person IDs (`Y`) or replace with new integers (`N`)       |
-| `--last-used-ids-file`   | None    | Path to a file tracking last used IDs (tab-separated format)        |
-| `--log-file-threshold`   | `0`     | Change output limit for log files                                   |
-| `--input-db-url`         | None    | SQLAlchemy connection string for database input (Version 1 Process) |
+| Command Line Flag        | Environment Variable | Default | Description |
+|--------------------------|----------------------|---------|-------------|
+| `--write-mode`           |                      | `w`     | Set to `w` (overwrite) or `a` (append) for output files |
+| `--saved-person-id-file` |                      | None    | Path to a file to save and share `person_id` state |
+| `--use-input-person-ids` |                      | `N`     | Use input person IDs (`Y`) or replace with new integers (`N`) |
+| `--last-used-ids-file`   |                      | None    | Path to a file tracking last used IDs (tab-separated format) |
+| `--log-file-threshold`   |                      | `0`     | Change output limit for log files |
+| `--input-db-url`         | `INPUT_DB_URL`       | None    | SQLAlchemy connection string for database input. |
 
 ### Additional Information
 
@@ -114,7 +122,7 @@ Carrot Transform uses a single Person ID file (or table), which must be specifie
 
 #### OMOP Configuration (Choose One Approach)
 
-| Approach            | Required Arguments                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Specify Files**   | `--omop-ddl-file` (DDL statements for OMOP tables. The version 5.4 of OMOP CDM can be downloaded from [here](https://github.com/Health-Informatics-UoN/carrot-transform/blob/main/carrottransform/config/OMOPCDM_postgresql_5.4_ddl.sql)) |
-| **Specify Version** | `--omop-version` (e.g., `5.4`, which will automatically find `carrottransform/config/config.json` and `carrottransform/config/OMOPCDM_postgresql_XX_ddl.sql`)                                                                                                                                                                                                                                                                       |
+| Approach            | Command Line Flag    | Environment Variable | Description |
+|---------------------|----------------------|----------------------|-------------|
+| **Specify Files**   | `--omop-ddl-file`    | `OMOP_DDL_FILE`      | `--omop-ddl-file` (DDL statements for OMOP tables. The version 5.4 of OMOP CDM can be downloaded from [here](https://github.com/Health-Informatics-UoN/carrot-transform/blob/main/carrottransform/config/OMOPCDM_postgresql_5.4_ddl.sql)) |
+| **Specify Version** | `--omop-version`     |                      | `--omop-version` (e.g., `5.4`, which will automatically find `carrottransform/config/config.json` and `carrottransform/config/OMOPCDM_postgresql_XX_ddl.sql`) |
