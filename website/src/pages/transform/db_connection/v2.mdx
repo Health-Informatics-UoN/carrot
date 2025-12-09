@@ -1,0 +1,75 @@
+# Database connection in Version 2 Process
+
+There are two ways to read the input data in Version 2 Process:
+
+1. Read from a CSV file. More information can be found [here](/transform/quickstart#version-2-process).
+2. Read from a database using [SQLAlchemy](https://www.sqlalchemy.org/). The current supported databases are [PostgreSQL](https://www.postgresql.org/) and [Trino](https://trino.io/).
+
+## Presiquites
+
+### Database
+
+Currently, Transform only supports reading data from PostgreSQL directly, and has been tested with Trino with PostgreSQL as the underlying database/catalog.
+
+So, if you are using Trino, please configure its authentication (password will be required for connection) and its catalog to work with PostgreSQL.
+
+### Input Data
+
+Please refer to our [Data standards](/standards) when preparing the input data. The standards for CSVs files are the same as for tables in your database.
+
+## Getting Started
+
+### Basic Example
+
+This example shows how to process data in tables from a PostgreSQL database named `postgres` in the schema `test_schema_transform`.
+Please use your own credentials when running the command.
+
+```bash copy
+carrot-transform run_v2 db \
+  --db-type postgres \
+  --username postgres \
+  --password postgres \
+  --host localhost \
+  --port 5432 \
+  --db-name postgres \
+  --schema test_schema_transform \
+  --rules-file carrottransform/examples/test/rules/v2-db-conn.json \
+  --person-table demographics \
+  --output-dir carrottransform/examples/test/outputs \
+  --omop-ddl-file carrottransform/config/OMOPCDM_postgresql_5.4_ddl.sql \
+  --omop-config-file carrottransform/config/config.json
+```
+
+## Required Arguments
+
+| Flag                 | Description                                                                                                                                                                                                                                           |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--db-type`          | The type of database to connect to. Choices are `postgres` or `trino`                                                                                                                                                                                 |
+| `--username`         | The username for the database                                                                                                                                                                                                                         |
+| `--password`         | The password for the database                                                                                                                                                                                                                         |
+| `--host`             | The host of the database                                                                                                                                                                                                                              |
+| `--port`             | The port of the database                                                                                                                                                                                                                              |
+| `--db-name`          | Name of the Database (or Catalog in Trino)                                                                                                                                                                                                            |
+| `--schema`           | Database's (or Catalog's) schema which holds the input tables for processing                                                                                                                                                                          |
+| `--person-table`     | Name of the table which holds the person IDs (in the first column), DOB, and other demographic information                                                                                                                                            |
+| `--rules-file`       | The local directory path to the JSON file defining mapping rules                                                                                                                                                                                      |
+| `--output-dir`       | The local directory path to write the output OMOP-format TSV files                                                                                                                                                                                    |
+| `--omop-ddl-file`    | The local directory path to the DDL statements for OMOP tables. The version 5.4 of OMOP CDM can be downloaded from [here](https://github.com/Health-Informatics-UoN/carrot-transform/blob/main/carrottransform/config/OMOPCDM_postgresql_5.4_ddl.sql) |
+| `--omop-config-file` | The local directory path to the overriding JSON config. The file can be downloaded from [here](https://github.com/Health-Informatics-UoN/carrot-transform/blob/main/carrottransform/config/config.json)                                               |
+
+You can find more details about the arguments in DB Connection of the V2 process by the command:
+
+```bash copy
+carrot-transform run_v2 db --help
+```
+
+## Workflow
+
+When the command is executed, Transform will:
+
+1. Form the connection string to the create an SQLAlchemy engine based on the DB type and the provided credentials
+2. Test the connection to the database
+3. Process the data in the tables in the specified schema according to the mapping rules
+4. Write the output data to the output directory
+
+The output data will be in the OMOP-format TSV files stored in the local output directory.

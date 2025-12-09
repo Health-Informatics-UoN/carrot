@@ -1,0 +1,199 @@
+import { Callout } from "nextra/components";
+import HighlightedText from '@/components/HighlightedText';
+import { Steps } from "nextra/components";
+
+
+# Phase 3: Data Execution and Validation
+
+## What is Carrot Transform?
+
+**Carrot Transform** is a Python command-line tool that executes the transformation of data to the OMOP CDM, using the mapping rules generated with Carrot Mapper.
+
+**Key Features:**
+- **Local Deployment**: Runs within your data partner's environment next to the data, ensuring data security and privacy
+- **Command Line Tool**: Can be easily integrated into data pipelines and automated workflows
+- **Python-based**: Can be run from source or installed using pip
+- **OMOP CDM Output**: Transforms your source data into the standardized OMOP Common Data Model format
+
+<Callout type="info">
+  **Data Security**: Carrot Transform is designed to run locally within your environment, ensuring that sensitive healthcare data never leaves your secure infrastructure.
+</Callout>
+
+## Overview
+
+The final phase of the Carrot ETL workflow focuses on executing the data transformation process. This phase uses data from the previous phase.
+In this case, we shall make use of JSON or CSV files we downloaded from Carrot Mapper.
+
+
+Carrot Transform uses these inputs to actually transform your data into OMOP CDM format.
+
+<Steps>
+
+## Installation
+
+Carrot-Transform is available on PyPi, so you can install it with:
+
+```bash
+pip install carrot-transform
+```
+
+If you are working with the source code, refer to the [Development Notes](/transform/development)
+
+## Running Carrot-Transform
+
+To execute Carrot-Transform, run:
+
+```
+carrot-transform [command] [options]
+```
+
+For example, you can get the version number with:
+
+```
+carrot-transform -v
+```
+
+There are many mandatory and optional arguments for Carrot Transform. In the quick start, we will demonstrate the mandatory arguments on a test case included in the repository.
+
+Transform will read the CSV files in the local directory in the basic examples below. For details about how to read data from a database, see the [Database Connection](/transform/db_connection) section.
+
+### Version 1 Process
+
+V1 process of Transform will take the V1 JSON from Mapper as rules file.
+
+To run the V1 process, enter the following (as one command):
+
+In this step, you'll use the files you've created in the previous phases to transform your data. Let's walk through a real example using the sample data.
+Let's note that since we have V1 and V2 rules, they are transformed differently. For us to transform V1 rules, we use the command below:
+
+```bash
+carrot-transform run mapstream \
+  --input-dir @carrot/examples/test/inputs \
+  --rules-file @carrot/examples/test/rules/rules_2Dec2025_V1.json \
+  --person-file carrottransform/examples/test/inputs/patients.csv \
+  --output-dir carrottransform/examples/test/test_output \
+  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql
+
+```
+
+### Version 2 Process
+For this example, we shall make use of the JSON V2 file we downloaded from carrot mapper. You can also find it [here →](/sample-data/sample-data.zip)
+
+
+**We're going to run this command:**
+```bash
+carrot-transform run_v2 folder \
+  --input-dir @carrot/examples/test/inputs \
+  --rules-file @carrot/examples/test/rules/rules_2Dec2025_V2.json\
+  --person-file carrottransform/examples/test/inputs/patients.csv \
+  --output-dir carrottransform/examples/test/test_output \
+  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql
+```
+
+**What each argument does:**
+- `run_v2 folder`: Runs the version 2 transformation process
+- `--input-dir`: Directory containing your source CSV files (from Phase 1)
+- `--rules-file`: The JSON V2 mapping rules file you downloaded from Carrot Mapper (from Phase 2)
+- `--person-file`: The CSV file containing person data
+- `--output-dir`: Where Carrot Transform will write the transformed OMOP CDM files
+- `--omop-version`: Specifies the OMOP CDM version to use (e.g., "5.4")
+
+<Callout type="info">
+  **Note:** Make sure you're in the carrot-transform directory when running this command. Adjust the file paths to match your actual file locations.
+</Callout>
+
+### What Happens During Transformation
+
+When you run the command, Carrot Transform will:
+
+1. **Load the mapping rules** - Reads your JSON rules file from Carrot Mapper
+2. **Read your source data** - Loads the CSV files from your input directory
+3. **Apply transformations** - Uses the mapping rules to convert your data fields to OMOP CDM format
+4. **Generate OMOP files** - Creates TSV (tab-separated values) files for each OMOP CDM table
+5. **Write output** - Saves all the transformed files to your output directory
+
+**Expected Console Output:**
+```
+ ~/Desktop/carrot-transform-0.6.0 ------------------------------------------------------------------------------------------------------------------------------------------------------------- 03:15:32 PM 
+> carrot-transform run_v2 folder \
+  --input-dir @carrot/examples/test/inputs \
+  --rules-file @carrot/examples/test/rules/rules_2Dec2025_V2.json \
+  --person-file @carrot/examples/test/inputs/patients.csv \
+  --output-dir carrottransform/examples/test/test_output \
+  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql
+2025-12-03 15:15:35,375 - carrottransform.tools.logger - INFO - Detected v2.json format, using direct v2 parser...
+2025-12-03 15:15:35,375 - carrottransform.tools.logger - INFO - Loaded v2 mapping rules from: carrottransform/examples/test/rules/rules_2Dec2025_V2.json in 0.00634 secs
+2025-12-03 15:15:35,438 - carrottransform.tools.logger - INFO - person_id stats: total loaded 200, reject count 1
+2025-12-03 15:15:35,468 - carrottransform.tools.logger - INFO - Processing data...
+2025-12-03 15:15:35,468 - carrottransform.tools.logger - INFO - Streaming input file: patients.csv
+2025-12-03 15:15:35,472 - carrottransform.tools.logger - WARNING -  couldn't be normalised to ISO 8601 date format
+2025-12-03 15:15:35,498 - carrottransform.tools.logger - INFO - TARGET: condition_occurrence: output count 200
+2025-12-03 15:15:35,498 - carrottransform.tools.logger - INFO - TARGET: person: output count 200
+2025-12-03 15:15:35,504 - carrottransform.tools.logger - INFO - V2 processing completed successfully in 0.13464 secs
+ ~/Desktop/carrot-transform-0.6.0 ------------------------------------------------------------------------------------------------------------------------------------------------------------- 03:15:35 PM 
+> 
+
+```
+
+### Understanding the Output
+
+After the transformation completes, check your build directory. You should see files like:
+
+```
+test_output/
+├── condition_occurrence.tsv
+├── person_ids.tsv
+├── person.tsv
+├── summary_mapstream.tsv
+```
+
+**What each file contains:**
+
+- **person.tsv**: Patient demographic information (age, gender, race, ethnicity) in OMOP CDM format
+- **condition_occurrence.tsv**: Diagnoses and conditions mapped to OMOP CDM standard concept IDs
+- **person_ids.tsv**: Mapping of original person identifiers to OMOP person_id values
+- **summary_mapstream.tsv**: Summary statistics and mapping information from the transformation process
+
+### The Output: person.tsv
+
+Here's what the transformed `person.tsv` file will look like. Please note for the purpose of documentation, the output has been truncated to 10 records for the purposes of readability.
+
+```tsv
+person_id	gender_concept_id	year_of_birth	month_of_birth	day_of_birth	birth_datetime	race_concept_id	ethnicity_concept_id	location_id	provider_id	care_site_id	person_source_value	gender_source_value	gender_source_concept_id	race_source_value	race_source_concept_id	ethnicity_source_value	ethnicity_source_concept_id
+1	8507	2002	8	11	2002-08-11 00:00:00	0	0					F	8507				
+2	8507	2002	10	25	2002-10-25 00:00:00	0	0					F	8507				
+3	8507	1990	2	24	1990-02-24 00:00:00	0	0					M	8507				
+4	8507	1966	2	11	1966-02-11 00:00:00	0	0					F	8507				
+5	8507	1963	10	10	1963-10-10 00:00:00	0	0					F	8507				
+6	8507	1984	4	3	1984-04-03 00:00:00	0	0					M	8507				
+7	8507	1960	7	4	1960-07-04 00:00:00	0	0					F	8507				
+8	8507	1951	12	30	1951-12-30 00:00:00	0	0					M	8507				
+9	8507	1970	8	19	1970-08-19 00:00:00	0	0					M	8507				
+10	8507	1969	8	22	1969-08-22 00:00:00	0	0					M	8507				
+```
+
+It is important to go through the build folder to see the output of the files and interact to understand how the data was transformed and data accuracy.
+The transformation applies all the mapping rules you created in Carrot Mapper to convert your source data into the standardized OMOP CDM format.
+
+
+## What's Next?
+
+Congratulations! You've successfully completed the Carrot ETL End-to-End Workflow. Your data has been transformed into OMOP CDM format and is ready for research use.
+
+**What you've accomplished:**
+- ✅ Profiled your data with WhiteRabbit
+- ✅ Created mappings with Carrot Mapper
+- ✅ Transformed your data with Carrot Transform
+- ✅ Generated OMOP CDM-compliant output files
+
+</Steps>
+
+**Additional Resources:**
+- [Troubleshooting and Best Practices](./troubleshooting)
+- [Additional Resources](./resources)
+- [Carrot Documentation](https://carrot.ac.uk/documentation)
+- [OHDSI Community](http://forums.ohdsi.org/)
+
+---
+
+**Next:** Review the [Troubleshooting Guide](./troubleshooting) if you encounter any issues, or explore [Additional Resources](./resources) for more information.

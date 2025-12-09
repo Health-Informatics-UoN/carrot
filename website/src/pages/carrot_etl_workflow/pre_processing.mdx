@@ -1,8 +1,11 @@
 import { Callout } from "nextra/components";
 import HighlightedText from '@/components/HighlightedText';
+import { Steps } from "nextra/components";
 
 
-## Stage 1: Data Pre-processing
+## Data Pre-processing
+
+<Steps>
 
 ### Select Data
 
@@ -71,12 +74,12 @@ import HighlightedText from '@/components/HighlightedText';
 
 
 
-### Data Anonymisation
+### Data Anonymization
 
 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "10px" }}>
   <div style={{ flex: "1" }}>
 
-  The anonymisation of data is paramount, it is critical that the following steps are carefully followed.
+  The anonymization of data is paramount, it is critical that the following steps are carefully followed.
 
 
 <Callout type="warning">
@@ -85,7 +88,7 @@ import HighlightedText from '@/components/HighlightedText';
 
 
 
-  1. **Define Data Anonymisation**
+  **Define Data Anonymisation**
   <div style={{ marginTop: "0px" }}>
   - Identify the Personally identifiable information (PII) / Personal Data: data attributes (**[see PII definition and description](#pii-section)**).
   - Locate and highlight the Direct-Identifier data.
@@ -94,7 +97,7 @@ import HighlightedText from '@/components/HighlightedText';
   </div>
 
 
-  2. **Anonymise dataset**
+  **Anonymise dataset**
   <div style={{ marginTop: "0px" }}>
   - It is the responsibility of the Data Owner to de-identify datasets!
   - <HighlightedText>Direct identifier data ‘must be removed’</HighlightedText> from each dataset – remove the row data from the columns, do not delete the columns.
@@ -108,7 +111,7 @@ import HighlightedText from '@/components/HighlightedText';
   <figure style={{ display: "inline-block", textAlign: "center", margin: "0 auto" }}>
     <img 
       src="/docs/Carrot-SOP/4.png" 
-      alt="Data Anonymisation during data pre-processing" 
+      alt="Data Anonymization during data pre-processing" 
       width="200"
       height="250"
       style={{ 
@@ -119,7 +122,7 @@ import HighlightedText from '@/components/HighlightedText';
       }} 
     />
     <figcaption style={{ marginTop: "8px", marginRight: "70px", fontStyle: "italic", color: "#666" }}>
-      Figure 4: Data Anonymisation
+      Figure 4: Data Anonymization
       during Data Pre-processing
     </figcaption>
   </figure>
@@ -131,7 +134,7 @@ import HighlightedText from '@/components/HighlightedText';
 <div id="pii-section">
   ### Personally Identifiable Information (PII) / Personal Data
 
-  This means any informaton relating to an identified or identifiable natural person (data subject); an identifiable natural person is one who can be identified, **directly or indirectly**, in particular by reference to an identifier such as a name, an identification number, location data, an online identifier or to one or more factors specific to the physical, physiological, genetic, mental, economic, cultural or social identity of that natural person [Information Commissioner's Office](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/personal-information-what-is-it/what-is-personal-data/what-is-personal-data/).
+  This means any information relating to an identified or identifiable natural person (data subject); an identifiable natural person is one who can be identified, **directly or indirectly**, in particular by reference to an identifier such as a name, an identification number, location data, an online identifier or to one or more factors specific to the physical, physiological, genetic, mental, economic, cultural or social identity of that natural person [Information Commissioner's Office](https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/personal-information-what-is-it/what-is-personal-data/what-is-personal-data/).
 
   <figure style={{ textAlign: "center", margin: "15px auto" }}>
     <img 
@@ -312,3 +315,4 @@ import HighlightedText from '@/components/HighlightedText';
   </div>
 
 </div>
+</Steps>
