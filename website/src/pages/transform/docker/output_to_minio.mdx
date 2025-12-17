@@ -1,0 +1,220 @@
+import { Callout } from "nextra/components";
+import { Steps } from "nextra/components";
+
+
+# Transforming Data from Postgres to MinIO with Docker
+
+This guide shows you how to use Carrot-Transform with Docker to read data from a PostgreSQL database and write the transformed OMOP CDM files directly to MinIO (S3-compatible object storage) using the V2 transformation process.
+
+<Steps>
+
+### Prerequisites
+
+Before running the transformation, ensure you have:
+
+- Docker installed and running
+- Access to a PostgreSQL database with your source data
+- Access to a MinIO instance (or S3-compatible storage)
+- V2 mapping rules JSON file prepared in Carrot Mapper
+- MinIO credentials (access key and secret key)
+
+### Pull the Container Image
+
+If you haven't already, pull the Carrot-Transform container image:
+
+```bash
+docker pull ghcr.io/health-informatics-uon/carrot/transform:edge
+```
+
+### Understanding the Workflow
+
+When transforming from Postgres to MinIO:
+
+1. **Source**: Data is read directly from PostgreSQL tables using SQLAlchemy
+2. **Transformation**: Mapping rules are applied to convert data to OMOP CDM format
+3. **Destination**: Transformed files are written directly to MinIO buckets using S3-compatible paths
+
+The `--output-dir` parameter accepts S3/MinIO paths in the format: `s3://bucket-name/path/` or `s3://endpoint/bucket-name/path/`
+
+### Basic Example: Postgres to MinIO
+
+This example reads data from a PostgreSQL database and writes the transformed OMOP CDM files to MinIO:
+
+```bash
+docker run --rm \
+  -e AWS_ACCESS_KEY_ID=minioadmin \
+  -e AWS_SECRET_ACCESS_KEY=minioadmin \
+  ghcr.io/health-informatics-uon/carrot/transform:edge \
+  uv run -m carrottransform.cli.command run_v2 db \
+    --db-type postgres \
+    --username postgres \
+    --password your_password \
+    --host your-postgres-host \
+    --port 5432 \
+    --db-name your_database \
+    --schema your_schema \
+    --rules-file /app/carrottransform/examples/test/rules/v2.json \
+    --person-table demographics \
+    --output-dir s3://minio-endpoint:9000/omop-output/ \
+    --omop-version 5.4
+```
+
+### Example with MinIO Endpoint Configuration
+
+If your MinIO instance is running on a specific endpoint, you can configure it explicitly:
+
+```bash
+docker run --rm \
+  -e AWS_ACCESS_KEY_ID=minioadmin \
+  -e AWS_SECRET_ACCESS_KEY=minioadmin \
+  -e AWS_ENDPOINT_URL=http://minio:9000 \
+  ghcr.io/health-informatics-uon/carrot/transform:edge \
+  uv run -m carrottransform.cli.command run_v2 db \
+    --db-type postgres \
+    --username postgres \
+    --password your_password \
+    --host your-postgres-host \
+    --port 5432 \
+    --db-name your_database \
+    --schema your_schema \
+    --rules-file /app/carrottransform/examples/test/rules/v2.json \
+    --person-table demographics \
+    --output-dir s3://omop-bucket/output/ \
+    --omop-version 5.4
+```
+
+### Using Volume Mount for Rules File
+
+If your mapping rules file is on your local machine, mount it as a volume:
+
+```bash
+docker run --rm \
+  -v $(pwd)/rules:/app/rules \
+  -e AWS_ACCESS_KEY_ID=minioadmin \
+  -e AWS_SECRET_ACCESS_KEY=minioadmin \
+  -e AWS_ENDPOINT_URL=http://minio:9000 \
+  ghcr.io/health-informatics-uon/carrot/transform:edge \
+  uv run -m carrottransform.cli.command run_v2 db \
+    --db-type postgres \
+    --username postgres \
+    --password your_password \
+    --host your-postgres-host \
+    --port 5432 \
+    --db-name your_database \
+    --schema your_schema \
+    --rules-file /app/rules/v2.json \
+    --person-table demographics \
+    --output-dir s3://omop-bucket/output/ \
+    --omop-version 5.4
+```
+
+### Command Breakdown
+
+**Docker Environment Variables:**
+- `AWS_ACCESS_KEY_ID`: MinIO access key (e.g., `minioadmin`)
+- `AWS_SECRET_ACCESS_KEY`: MinIO secret key (e.g., `minioadmin`)
+- `AWS_ENDPOINT_URL`: Optional MinIO endpoint URL (e.g., `http://minio:9000`)
+
+**Transform Command Arguments:**
+- `run_v2 db`: Runs the V2 transformation process with database input
+- `--db-type postgres`: Specifies PostgreSQL as the source database
+- `--username`, `--password`, `--host`, `--port`, `--db-name`: PostgreSQL connection details
+- `--schema`: Database schema containing your source tables
+- `--rules-file`: Path to your V2 mapping rules JSON file
+- `--person-table`: Name of the table containing person demographics
+- `--output-dir`: MinIO/S3 path where transformed files will be written (format: `s3://bucket/path/`)
+- `--omop-version`: OMOP CDM version (e.g., `5.4`)
+
+<Callout type="info">
+  **MinIO Configuration**: When connecting to MinIO from Docker, use the MinIO service name or hostname (e.g., `minio:9000` for container networking, or `localhost:9000` if MinIO is running on your host machine with port mapping).
+</Callout>
+
+### Network Configuration
+
+If your PostgreSQL and MinIO services are running in Docker containers, you may need to use Docker networking. Here are common scenarios:
+
+**Using Docker Compose:**
+If Postgres and MinIO are in the same Docker Compose network, use service names:
+
+```bash
+docker run --rm \
+  --network your-compose-network \
+  -e AWS_ACCESS_KEY_ID=minioadmin \
+  -e AWS_SECRET_ACCESS_KEY=minioadmin \
+  -e AWS_ENDPOINT_URL=http://minio:9000 \
+  ghcr.io/health-informatics-uon/carrot/transform:edge \
+  uv run -m carrottransform.cli.command run_v2 db \
+    --db-type postgres \
+    --username postgres \
+    --password postgres \
+    --host postgres \
+    --port 5432 \
+    --db-name your_database \
+    --schema your_schema \
+    --rules-file /app/carrottransform/examples/test/rules/v2.json \
+    --person-table demographics \
+    --output-dir s3://omop-bucket/output/ \
+    --omop-version 5.4
+```
+
+**Connecting to Host Services:**
+If services are running on your host machine, use `host.docker.internal` (Mac/Windows) or `172.17.0.1` (Linux):
+
+```bash
+docker run --rm \
+  -e AWS_ACCESS_KEY_ID=minioadmin \
+  -e AWS_SECRET_ACCESS_KEY=minioadmin \
+  -e AWS_ENDPOINT_URL=http://host.docker.internal:9000 \
+  ghcr.io/health-informatics-uon/carrot/transform:edge \
+  uv run -m carrottransform.cli.command run_v2 db \
+    --db-type postgres \
+    --username postgres \
+    --password postgres \
+    --host host.docker.internal \
+    --port 5432 \
+    --db-name your_database \
+    --schema your_schema \
+    --rules-file /app/carrottransform/examples/test/rules/v2.json \
+    --person-table demographics \
+    --output-dir s3://omop-bucket/output/ \
+    --omop-version 5.4
+```
+
+### Expected Output
+
+After running the command, you will see log output similar to:
+
+```
+Building carrot-transform @ file:///app
+Built carrot-transform @ file:///app
+2025-12-17 16:30:00,000 - carrottransform.tools.logger - INFO - Detected v2.json format, using direct v2 parser...
+2025-12-17 16:30:00,000 - carrottransform.tools.logger - INFO - Loaded v2 mapping rules from: /app/carrottransform/examples/test/rules/v2.json
+2025-12-17 16:30:00,100 - carrottransform.tools.logger - INFO - Testing database connection...
+2025-12-17 16:30:00,150 - carrottransform.tools.logger - INFO - Database connection successful
+2025-12-17 16:30:00,200 - carrottransform.tools.logger - INFO - person_id stats: total loaded 1000, reject count 0
+2025-12-17 16:30:00,250 - carrottransform.tools.logger - INFO - Processing data...
+2025-12-17 16:30:05,000 - carrottransform.tools.logger - INFO - TARGET: condition_occurrence: output count 400
+2025-12-17 16:30:05,000 - carrottransform.tools.logger - INFO - TARGET: measurement: output count 1000
+2025-12-17 16:30:05,000 - carrottransform.tools.logger - INFO - TARGET: person: output count 1000
+2025-12-17 16:30:05,100 - carrottransform.tools.logger - INFO - V2 processing completed successfully
+```
+
+The transformed OMOP CDM files will be available in your MinIO bucket at the specified path.
+
+</Steps>
+
+## Verification
+
+After the transformation completes, you can verify the output files in MinIO:
+
+1. Access your MinIO console (typically at `http://localhost:9001` for local instances)
+2. Navigate to the bucket specified in your `--output-dir` parameter
+3. You should see OMOP CDM table files (e.g., `person.tsv`, `condition_occurrence.tsv`, `measurement.tsv`, etc.)
+
+## Additional Resources
+
+- [Quickstart Guide](/transform/quickstart) - For local installation and basic usage
+- [Running with Docker](/transform/docker/docker_run) - Basic Docker examples
+- [Database Connection V2](/transform/db_connection/v2) - More details on database connections
+- [Expected Output](/transform/expected_output) - Understanding the transformation results
+
