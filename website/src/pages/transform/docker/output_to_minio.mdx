@@ -14,17 +14,16 @@ In this phase, we shall see how to transform data from a PostgreSQL database to 
 Before running the transformation, ensure you have:
 
 - Docker installed and running
-- Have PostgreSQL running on your machine
 - Have V2 mapping rules JSON file prepared in Carrot Mapper
 
 
 ### Understanding the Workflow
 
-As we did in the previous phase, we shall run transform with version 2 of the JSON mapping rules. The only difference in this phase is that we can now read data from a PostgreSQL database and write the transformed OMOP CDM files to MinIO.
-First were going to need to create a directory on our host machine that will serve as our play ground for the transformation. Let us create a directory in our Desktop called transform.
-Inside transform, were going to create a file called docker-compose.yml. This file will contain the configuration for our Docker Compose setup.
+As we did in the previous phase, we shall run Transform with version 2 of the JSON mapping rules. The only difference in this phase is that we can now read data from a PostgreSQL database and write the transformed OMOP CDM files to MinIO.
+First we're going to need to create a directory on our host machine that will serve as our play ground for the transformation. Let us create a directory in our Desktop called transform.
+Inside Transform, were going to create a file called docker-compose.yml. This file will contain the configuration for our Docker Compose setup.
 
-The `docker-compose.yml` file will look like this and we shall place it in the transform directory:
+The `docker-compose.yml` file will look like this, and we shall place it in the transform directory:
 ```yaml copy
 name: carrot-transform
 
@@ -149,7 +148,7 @@ networks:
 ```
 
 
-Once we have the docker-compose.yml file, we shall then proceed to create a `Dockerfile` in the transform directory.
+Once we have the `docker-compose.yml` file, we shall then proceed to create a `Dockerfile` in the transform directory.
 The `Dockerfile` will look like this and we shall place it in the transform directory:
 ```dockerfile copy
 
