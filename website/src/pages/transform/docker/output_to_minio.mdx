@@ -29,10 +29,7 @@ name: carrot-transform
 
 services:
   transform:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: carrot-transform:base
+    image: ghcr.io/health-informatics-uon/carrot/transform:edge
     volumes:
       - ./build:/app/build
       - ./entrypoint.sh:/usr/local/bin/entrypoint.sh:ro
@@ -105,10 +102,7 @@ services:
 
   # Transform from Postgres → Filesystem → MinIO
   transform-postgres-minio:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: carrot-transform:base
+    image: ghcr.io/health-informatics-uon/carrot/transform:edge
     container_name: carrot-transform-pg-minio
     depends_on:
       postgres-seed:
@@ -148,34 +142,7 @@ networks:
 ```
 
 
-Once we have the `docker-compose.yml` file, we shall then proceed to create a `Dockerfile` in the transform directory.
-The `Dockerfile` will look like this and we shall place it in the transform directory:
-```dockerfile copy
-
-FROM astral/uv:bookworm-slim
-
-
-# RUN mkdir /app
-WORKDIR /app
-COPY README.md pyproject.toml uv.lock ./
-COPY carrottransform/ ./carrottransform/
-
-
-
-# run the sync command to pull in the dependencies during container creation
-RUN uv sync --python 3.10 --frozen
-
-# Pre-install MinIO client to avoid installing on every container run
-RUN apt-get update -qq && \
-    apt-get install -y -qq curl > /dev/null 2>&1 && \
-    curl -sSL https://dl.min.io/client/mc/release/linux-amd64/mc -o /usr/local/bin/mc && \
-    chmod +x /usr/local/bin/mc && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-```
-
-Once we have the Dockerfile, we shall then proceed to create a `entrypoint.sh` file in the transform directory.
+Once we have the `docker-compose.yml` file, we shall then proceed to create an `entrypoint.sh` file in the transform directory.
 The `entrypoint.sh` file will look like this and we shall place it in the transform directory:
 
 ```bash copy
@@ -263,7 +230,7 @@ EOSQL
 
     echo "Running transform from Postgres with OMOP version: $OMOP_VERSION"
 
-    # Run transform (MinIO client should be pre-installed in image)
+    # Run transform
     uv run -m carrottransform.cli.command run_v2 db \
       --db-type "$DB_TYPE" \
       --username "$DB_USER" \
@@ -276,6 +243,28 @@ EOSQL
       --rules-file "$RULES_FILE" \
       --output-dir "$OUTPUT_DIR" \
       --omop-version "${OMOP_VERSION}"
+
+    # Install MinIO client if not already installed
+    if ! command -v mc &> /dev/null; then
+      echo "Installing MinIO client..."
+
+      MC_BIN="/usr/local/bin/mc"
+      MC_URL="https://dl.min.io/client/mc/release/linux-amd64/mc"
+
+      uv run python - <<EOF
+import urllib.request
+import ssl
+
+ctx = ssl._create_unverified_context()
+with urllib.request.urlopen("$MC_URL", context=ctx) as r:
+    data = r.read()
+
+with open("$MC_BIN", "wb") as f:
+    f.write(data)
+EOF
+
+      chmod +x "$MC_BIN"
+    fi
 
     # Configure MinIO client and sync files
     mc alias set myminio "$MINIO_ENDPOINT" "$MINIO_ACCESS_KEY" "$MINIO_SECRET_KEY"
