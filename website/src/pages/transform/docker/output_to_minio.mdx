@@ -244,25 +244,33 @@ EOSQL
       --output-dir "$OUTPUT_DIR" \
       --omop-version "${OMOP_VERSION}"
 
-    # Install MinIO client if not already installed
+    # Install MinIO client if it's not already available
+    # First check if mc is already installed
     if ! command -v mc &> /dev/null; then
       echo "Installing MinIO client..."
 
+      # Where we'll put the binary and where to get it from
       MC_BIN="/usr/local/bin/mc"
       MC_URL="https://dl.min.io/client/mc/release/linux-amd64/mc"
 
+      # Download using Python's urllib since the base image might not have curl
+      # We create an unverified SSL context just in case there are certificate issues
       uv run python - <<EOF
 import urllib.request
 import ssl
 
+# Create SSL context without verification (handles cert issues)
 ctx = ssl._create_unverified_context()
+# Fetch the binary from MinIO's official releases
 with urllib.request.urlopen("$MC_URL", context=ctx) as r:
     data = r.read()
 
+# Save it to the installation location
 with open("$MC_BIN", "wb") as f:
     f.write(data)
 EOF
 
+      # Make it executable so we can run it
       chmod +x "$MC_BIN"
     fi
 
