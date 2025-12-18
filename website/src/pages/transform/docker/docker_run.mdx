@@ -12,7 +12,7 @@ Carrot-Transform is available as a Docker container image, which makes it easy t
 
 The container image is published to GitHub Container Registry. Pull it with:
 
-```bash
+```bash copy
 docker pull ghcr.io/health-informatics-uon/carrot/transform:edge
 ```
 
@@ -40,7 +40,7 @@ The following example shows how to run the V1 transformation process using Docke
 
 Run V1 with a volume mount so you can access the output files on your host machine:
 
-```bash
+```bash copy
 docker run --rm -v $(pwd)/output:/app/output \
   ghcr.io/health-informatics-uon/carrot/transform:edge \
   uv run -m carrottransform.cli.command run mapstream \
@@ -90,7 +90,7 @@ You will now be able to see the output files in the `output` directory on your h
 The following examples show how to run the V2 transformation process using Docker. V2 process of Transform uses the `run_v2 folder` command and takes V2 JSON mapping rules from Carrot Mapper.
 This example runs the transform without mounting any volumes. Output files will be written inside the container and will be lost when the container exits:
 
-```bash
+```bash copy
 docker run --rm \
   ghcr.io/health-informatics-uon/carrot/transform:edge \
   uv run -m carrottransform.cli.command run_v2 folder \
@@ -127,7 +127,7 @@ Installed 1 package in 2ms
 Let us now run it with a volume mount so we can access the output files on our host machine:
 
 
-```bash
+```bash copy
 docker run --rm -v $(pwd)/output:/app/build \
   ghcr.io/health-informatics-uon/carrot/transform:edge \
   uv run -m carrottransform.cli.command run_v2 folder \
