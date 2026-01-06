@@ -28,7 +28,6 @@ For a specific version, check available tags at the [container registry](https:/
 
 Before running the container, it's helpful to understand the Docker flags used:
 
-- **`--rm`**: Automatically removes the container after it exits, keeping your system clean
 - **`-v`**: Mounts a volume (directory) from your host machine into the container
   - Format: `-v <host-path>:<container-path>`
   - This allows the container to read from and write to files on your machine
@@ -45,7 +44,7 @@ The following example shows how to run the V1 transformation process using Docke
 Run V1 with a volume mount so you can access the output files on your host machine:
 
 ```bash copy
-docker run --rm -v $(pwd)/output:/app/output \
+docker run -v $(pwd)/output:/app/output \
   ghcr.io/health-informatics-uon/carrot/transform:edge \
   uv run -m carrottransform.cli.command run mapstream \
     --inputs /app/carrottransform/examples/test/inputs \
@@ -95,7 +94,7 @@ The following examples show how to run the V2 transformation process using Docke
 This example runs the transform without mounting any volumes. Output files will be written inside the container and will be lost when the container exits:
 
 ```bash copy
-docker run --rm \
+docker run \
   ghcr.io/health-informatics-uon/carrot/transform:edge \
   uv run -m carrottransform.cli.command run_v2 folder \
     --input-dir /app/carrottransform/examples/test/inputs \
@@ -132,7 +131,7 @@ Let us now run it with a volume mount so we can access the output files on our h
 
 
 ```bash copy
-docker run --rm -v $(pwd)/output:/app/build \
+docker run -v $(pwd)/output:/app/build \
   ghcr.io/health-informatics-uon/carrot/transform:edge \
   uv run -m carrottransform.cli.command run_v2 folder \
     --input-dir /app/carrottransform/examples/test/inputs \
@@ -199,6 +198,24 @@ You will now be able to see the output files in the `output` directory on your h
 
 At this point, you have successfully run the transform with Docker. You can now use the output files in the `output` directory on your host machine.
 You can go ahead and customize this to use your own files. To do this, edit the input and output directories in the command to point to your own files.
+
+### Clean up
+
+```bash copy
+docker ps -a
+```
+
+This will list all containers. To remove a container, use:
+
+```bash copy
+docker rm -f <container_id>
+```
+
+To remove the images, run:
+
+```bash copy
+docker rmi -f ghcr.io/health-informatics-uon/carrot/transform:edge
+```
 
 </Steps>
 
