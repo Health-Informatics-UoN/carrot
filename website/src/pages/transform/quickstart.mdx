@@ -59,18 +59,22 @@ carrot-transform run v2 \
 
 ### Arguments
 
+All of the required program arguments can be specified as command-line parameters.
+Some of the arguments can be passed through environment variables - potentially useful for containerised usage.
+The following tables describe the parameters available, the command line flag for them, any environment variable and any default values.
+
 #### Required Arguments
 
-| Flag            | Description                                      |
-| --------------- | ------------------------------------------------ |
-| `--inputs` | Directory or SQLAlchemy connection to read inputs from |
-| `--rules-file` | JSON file defining mapping rules                 |
-| `--person` | CSV file or table name with person IDs and DOB |
-| `--output` | Directory or MinIOto write OMOP-format TSV files       |
+| Command Line Flag | Environment Variable | Description                                           |
+| ----------------- | -------------------- | ----------------------------------------------------- |
+| `--inputs`        | `INPUTS`             |Directory or SQLAlchemy connection to read inputs from |
+| `--rules-file`    | `RULES_FILE`         | JSON file defining mapping rules                      |
+| `--person`        | `PERSON`             | CSV file or table name with person IDs and DOB        |
+| `--output`        | `OUTPUT`             | Directory or MinIOto write OMOP-format TSV files      |
 
 #### Optional Arguments
 
-These are not all supported on both versions.
+These are not all supported on both versions and cannot be set through environment variables.
 
 | Flag                     | Default | Description                                                         |
 | ------------------------ | ------- | ------------------------------------------------------------------- |
