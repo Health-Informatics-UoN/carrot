@@ -1,3 +1,4 @@
+
 # Carrot-Transform Quick Start Guide
 
 ## Installation
@@ -28,75 +29,69 @@ carrot-transform -v
 
 There are many mandatory and optional arguments for Carrot Transform. In the quick start, we will demonstrate the mandatory arguments on a test case included in the repository.
 
-Transform will read the CSV files in the local directory in the basic examples below. For details about how to read data from a database, see the [Database Connection](/transform/db_connection) section.
+Transform will read the CSV files in the local directory according to the basic examples below. For details about how to read data from a database, see the [Database Connection](/transform/db_connection) section.
 
-### Version 1 Process
+### Version 1 and Version 2 Process
 
-V1 process of Transform will take the V1 JSON from Mapper as rules file.
+Depending on wether you have a Version 1 or Version 2 rules file, you'll need to use `v1` or `v2` when invoking the command.
 
-To run the V1 process, enter the following (as one command):
 
-#### Basic Example
-
-To process a test dataset included in the repository, run:
+To process a **`v1`** test dataset included in the repository, run:
 
 ```bash
-carrot-transform run mapstream \
-  --input-dir @carrot/examples/test/inputs \
+carrot-transform run v1 \
+ --inputs @carrot/examples/test/inputs \
   --rules-file @carrot/examples/test/rules/v1.json \
-  --person-file @carrot/examples/test/inputs/Demographics.csv \
-  --output-dir carrottransform/examples/test/test_output \
-  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql
+ --person Demographics \
+  --output carrottransform_test_output
 ```
-
-### Version 2 Process
-
-V2 process of Transform will take the V2 JSON from Mapper as rules file.
 
 To run the V2 process, enter the following (as one command):
 
-#### Basic Example
-
-To process a test dataset included in the repository, run:
-
 ```bash
-carrot-transform run_v2 folder \
-  --input-dir @carrot/examples/test/inputs \
+carrot-transform run v2 \
+ --inputs @carrot/examples/test/inputs \
   --rules-file @carrot/examples/test/rules/v2.json \
-  --person-file @carrot/examples/test/inputs/Demographics.csv \
-  --output-dir carrottransform/examples/test/test_output \
-  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql
+ --person-file @carrot/examples/test/inputs/Demographics.csv \
+  --person Demographics \
+ --output carrottransform_test_output
 ```
 
 ### Arguments
 
+All of the required program arguments can be specified as command-line parameters.
+Some of the arguments can be passed through environment variables - potentially useful for containerised usage.
+The following tables describe the parameters available, the command line flag for them, any environment variable and any default values.
+
 #### Required Arguments
 
-| Flag            | Description                                      |
-| --------------- | ------------------------------------------------ |
-| `--input-dir`   | Directory containing input files                 |
-| `--rules-file`  | JSON file defining mapping rules                 |
-| `--person-file` | CSV file (or table name) with person IDs and DOB |
-| `--output-dir`  | Directory to write OMOP-format TSV files         |
+| Command Line Flag | Environment Variable | Description                                           |
+| ----------------- | -------------------- | ----------------------------------------------------- |
+| `--inputs`        | `INPUTS`             |Directory or SQLAlchemy connection to read inputs from |
+| `--rules-file`    | `RULES_FILE`         | JSON file defining mapping rules                      |
+| `--person`        | `PERSON`             | CSV file or table name with person IDs and DOB        |
+| `--output`        | `OUTPUT`             | Directory or MinIOto write OMOP-format TSV files      |
 
 #### Optional Arguments
 
+These are not all supported on both versions and cannot be set through environment variables.
+
 | Flag                     | Default | Description                                                         |
 | ------------------------ | ------- | ------------------------------------------------------------------- |
-| `--write-mode`           | `w`     | Set to `w` (overwrite) or `a` (append) for output files             |
+| `--write-mode` | `w` | Set to `w` (overwrite) or `a` (append) for output files             |
 | `--saved-person-id-file` | None    | Path to a file to save and share `person_id` state                  |
-| `--use-input-person-ids` | `N`     | Use input person IDs (`Y`) or replace with new integers (`N`)       |
-| `--last-used-ids-file`   | None    | Path to a file tracking last used IDs (tab-separated format)        |
-| `--log-file-threshold`   | `0`     | Change output limit for log files                                   |
-| `--input-db-url`         | None    | SQLAlchemy connection string for database input (Version 1 Process) |
+| `--use-input-person-ids` | `N` | Use input person IDs (`Y`) or replace with new integers (`N`)       |
+| `--last-used-ids-file` | None    | Path to a file tracking last used IDs (tab-separated format)        |
+| `--log-file-threshold` | `0` | Change output limit for log files                                   |
 
 ### Additional Information
 
 #### @carrot Alias
 
-The '@carrot' is an alias to the folder containing the carrot-transform module, which can be used with either installation method. When using your own files, use your file path, and omit this.
+The '@carrot' is an alias to the folder containing the carrot-transform module, which can be used with either installation method.
+When using your own files, use your file path, and omit this.
 
-The flag `--output-dir carrottransform/examples/test/test_output` will generate a set of output files in this directory:
+The flag `--output carrottransform/examples/test/test_output` will generate a set of output files in this directory:
 
 ```bash
 carrottransform/examples/test/test_output
@@ -106,7 +101,7 @@ If it doesn't exist, this directory should be created for you.
 
 #### Person ID File/Table
 
-Carrot Transform uses a single Person ID file (or table), which must be specified using `--person-file`.
+Carrot Transform uses a single Person ID file (or table), which must be specified using `--person`.
 
 - The first column must contain person IDs (these will be anonymized).
 - A column named `"date"` must hold each person's date of birth.
@@ -116,7 +111,9 @@ Carrot Transform uses a single Person ID file (or table), which must be specifie
 
 #### OMOP Configuration (Choose One Approach)
 
-| Approach            | Required Arguments                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Specify Files**   | `--omop-ddl-file` (DDL statements for OMOP tables. The version 5.4 of OMOP CDM can be downloaded from [here](https://github.com/Health-Informatics-UoN/carrot-transform/blob/main/carrottransform/config/OMOPCDM_postgresql_5.4_ddl.sql)) |
-| **Specify Version** | `--omop-version` (e.g., `5.4`, which will automatically find `carrottransform/config/config.json` and `carrottransform/config/OMOPCDM_postgresql_XX_ddl.sql`)                                                                                                                                                                                                                                                                       |
+| Argument | Default | Description |
+| ---- | ---- | ---- |
+| `--omop-ddl-file` | `@carrot/config/OMOPCDM_postgresql_5.4_ddl.sql` | DDL statements for OMOP tables.
+| | | (The version 5.4 of OMOP CDM can be downloaded from [here](https://github.com/Health-Informatics-UoN/carrot-transform/blob/main/carrottransform/config/OMOPCDM_postgresql_5.4_ddl.sql)) |
+| `--omop-config-file` | `@carrot/config/config.json` | specialised configuration to populate certain fields from eachother 
+| | | (... such as `???_datetime` becoming `???_date` as one would expect) |

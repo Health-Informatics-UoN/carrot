@@ -1,7 +1,50 @@
 # Database Connection
 
-Transform can read data directly from a database using SQLAlchemy.
+Instead of reading from `.csv` files, Carrot Transform can read directly from a database.
+It currently tests and supports reading from the following engines;
 
-For Version 1 Process, see [Database connection in Version 1 Process](/transform/db_connection/v1).
+- SQLite
+- PostgreSQL
+- Trino
 
-For Version 2 Process, see [Database connection in Version 2 Process](/transform/db_connection/v2).
+For all of these, the method is the same; you supply [the SQLAlchemy connection string](https://docs.sqlalchemy.org/en/21/core/connections.html) as the `--inputs` parameter.
+
+- All input tables must match the format expected by Carrot Transform.
+- The `--rules-file` must still point to a local file on disk.
+- The `--person` will be interpreted as a **table name**, not a **file name.**
+
+### Database Workflow
+
+
+The `person-file` parameter and Carrot-Mapper workflow should still be used, as if working with `.csv` files, but carrot-transform can read from a database.
+
+1. Extract/export some rows from the various tables
+
+- something like `SELECT column_name(s) FROM patients LIMIT 1000;` is written to `patients.csv`
+
+2. the usual [scan reports](https://carrot.ac.uk/mapper/user_guide/projects_datasets_scanreports) are performed on these subsets
+3. [when carrot-transform is invoked](https://carrot.ac.uk/transform/quickstart) instead of folder path, use the connection string as `--inputs` parameter.
+
+- the `--person` parameter should be the same; instead of `person_tablename.csv` it will read `SELECT * FROM person_tablename`
+- the `--rules-file` parameter needs to refer to a file on the disk as usual
+
+4. Carrot Transform will still write data to `--output` and otherwise operate as normal
+
+- The following parameters have undefined behaviour with this functionality
+  - `--write-mode`
+  - `--saved-person-id-file`
+  - `--use-input-person-ids`
+  - `--last-used-ids-file`
+
+### Basic Example
+
+This example shows how to use `v2` to process data in tables from a PostgreSQL database `test_transform` on host `24.36.48.50` port 5432 for the user `reading` with the password `s3cret`.
+
+```bash copy
+carrot-transform run v2 \
+    --rules-file carrottransform/examples/test/rules/v2-db-conn.json \
+    --inputs postgresql://reading:s3cret@24.36.48.50:5432/test_transform
+    --person demographics \
+    --output carrottransform/examples/test/outputs
+```
+
