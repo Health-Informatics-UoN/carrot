@@ -103,9 +103,10 @@ This need to be done after the PR is merged, and on the `[main]` branch; it crea
 - `λ git checkout main`
 - `λ git pull origin main`
 - `λ git tag -a "$NEW_VERSION" -m "Release $NEW_VERSION"`
-- `λ git push origin "$NEW_VERSION"`
-- `λ gh release create "$NEW_VERSION" --title "$NEW_VERSION" --notes "Release for $NEW_VERSION"`
+- `λ git push origin "v$NEW_VERSION"`
+- `λ gh release create "v$NEW_VERSION" --title "v$NEW_VERSION" --notes "Release for $NEW_VERSION"`
   > on debian `sudo apt get gh` will install it then `$ gh auth login` will walk you through setup
 
 </Steps>
+
 
