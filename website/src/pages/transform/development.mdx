@@ -73,23 +73,39 @@ If the commit has been tagged with a tag starting with `v...` then the project w
 <Steps>
 
 ### Prepare/update your local copy
-    - checkout `main`
-    - ensure your local `main` is up to date with the `main` on GitHub
+
+- checkout `main`
+- ensure your local `main` is up to date with the `main` on GitHub
+
 ### Increment the version number
-    - Increment the version number in the `pyproject.toml` file
+
+- Increment the version number in the `pyproject.toml` file
+    > this can be done with `$ uvx poetry version minor` for a *minor* release
+
 ### Create the branches and commits
-    - `λ set NEW_VERSION=` to whatever version number is in the file
-    - `λ echo $NEW_VERSION`
-    - `λ git checkout -b release/v$NEW_VERSION`
-    - `λ git add pyproject.toml`
-    - `λ git commit -m "Bump version to $NEW_VERSION"`
-    - `λ git push --set-upstream origin release/v$NEW_VERSION`
+
+- `λ set NEW_VERSION=` to whatever version number is in the file
+- `λ echo $NEW_VERSION`
+    > in bash this can be done `$ NEW_VERSION=$(uvx poetry version -s)`
+- `λ git checkout -b release/v$NEW_VERSION`
+- `λ git add pyproject.toml`
+- `λ git commit -m "Bump version to $NEW_VERSION"`
+- `λ git push --set-upstream origin release/v$NEW_VERSION`
+
 ### Check/submit the PR in question
-    - This needs to be done before the final steps
+
+- This needs to be done before the final steps
+
 ### Create a release
-    - `λ git tag -a "$NEW_VERSION" -m "Release $NEW_VERSION"`
-    - `λ git push origin "$NEW_VERSION"`
-    - `λ gh release create "$NEW_VERSION" --title "$NEW_VERSION" --notes "Release for $NEW_VERSION"`
-    - This is done after the PR is merged, and on the `[main]` branch; it creates the Docker image
+
+This need to be done after the PR is merged, and on the `[main]` branch; it creates the Docker image
+
+- `λ git checkout main`
+- `λ git pull origin main`
+- `λ git tag -a "$NEW_VERSION" -m "Release $NEW_VERSION"`
+- `λ git push origin "$NEW_VERSION"`
+- `λ gh release create "$NEW_VERSION" --title "$NEW_VERSION" --notes "Release for $NEW_VERSION"`
+  > on debian `sudo apt get gh` will install it then `$ gh auth login` will walk you through setup
 
 </Steps>
+
