@@ -30,8 +30,19 @@ We use `pytest` for testing.
 You can run all tests with:
 
 ```sh
+uv run pytest -m "not skipping"
+```
+
+This requires Docker as tests are run against MinIO, Trino and PostGreSQL database engines that need to be running in the background.
+This will take a long time.
+
+A shorter selection of tests can be run with just ...
+
+```sh
 uv run pytest
 ```
+
+... which won't use Docker and but will still perform some database tests with SQLite.
 
 ---
 
@@ -41,12 +52,10 @@ You can run the CLI directly like this:
 
 ```sh
 uv run -m carrottransform.cli.subcommands.run mapstream \
-    --input-dir carrottransform/examples/test/inputs \
-    --person-file carrottransform/examples/test/inputs/Demographics.csv \
+    --inputs carrottransform/examples/test/inputs \
+    --person Demographics \
     --rules-file carrottransform/examples/test/rules/rules_14June2021.json \
-    --output-dir build \
-    --omop-ddl-file carrottransform/config/OMOPCDM_postgresql_5.3_ddl.sql \
-    --omop-config-file carrottransform/config/omop.json
+    --output build
 ```
 
 > ⚠️ On Windows, you would need to replace `/` with `^` for line continuation in the terminal.
