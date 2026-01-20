@@ -65,49 +65,34 @@ If the commit has been tagged with a tag starting with `v...` then the project w
 
 ## Release
 
-> These instructions use `$NEW_VERSION` as a shell variable. 
-> If you're using Windows, then you may need to use `%NEW_VERSION%` to get substitution.
->
-> In addition the `$(uvx poetry version -s)` query thing probably won't work.
+The Carrot Transform release procedure is;
+- update version in `pyproject.toml`
+- merge that into `main`
+- tag it with `v?.?.?` and await the CI job
 
-<Steps>
+This can be done as follows ...
 
-### Prepare/update your local copy
-
-- checkout `main`
-- ensure your local `main` is up to date with the `main` on GitHub
-
-### Increment the version number
-
-- Increment the version number in the `pyproject.toml` file
-    > this can be done with `$ uvx poetry version minor` for a *minor* release
-
-### Create the branches and commits
-
-- `λ set NEW_VERSION=` to whatever version number is in the file
-- `λ echo $NEW_VERSION`
-    > in bash this can be done `$ NEW_VERSION=$(uvx poetry version -s)`
+- `λ git checkout main` to checkout the main branch
+- `λ git pull origin main` to ensure your local is up to date
+- `λ uvx poetry version minor` this will increment the minor version
+  - you can change **major** . **minor** . **patch** with this command
+  - you can also do the edits by hand if you like
+- `λ NEW_VERSION=$(uvx poetry version -s)` to read the version
+  - this will be different on Windows
+  - again, you can set the envar by hand
+  - ... or substitue the values below by hand ...
 - `λ git checkout -b release/v$NEW_VERSION`
+  - Windows `cmd` uses `%NAME%` for shell substitution; you'll need to do something different
 - `λ git add pyproject.toml`
 - `λ git commit -m "Bump version to $NEW_VERSION"`
 - `λ git push --set-upstream origin release/v$NEW_VERSION`
-
-### Check/submit the PR in question
-
-- This needs to be done before the final steps
-
-### Create a release
-
-This need to be done after the PR is merged, and on the `[main]` branch; it creates the Docker image
-
+- submit the PR and merge it with main
 - `λ git checkout main`
 - `λ git pull origin main`
-- `λ git tag -a "v$NEW_VERSION" -m "Release $NEW_VERSION"`
-- `λ git push origin "v$NEW_VERSION"`
-- `λ gh release create "v$NEW_VERSION" --title "v$NEW_VERSION" --notes "Release for $NEW_VERSION"`
-  > on debian `sudo apt get gh` will install it then `$ gh auth login` will walk you through setup
+- `λ git tag v$NEW_VERSION`
+- `λ git push origin v$NEW_VERSION`
 
-</Steps>
+
 
 
 
