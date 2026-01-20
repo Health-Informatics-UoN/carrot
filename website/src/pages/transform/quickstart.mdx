@@ -40,9 +40,9 @@ To process a **`v1`** test dataset included in the repository, run:
 
 ```bash
 carrot-transform run v1 \
- --inputs @carrot/examples/test/inputs \
+  --inputs @carrot/examples/test/inputs \
   --rules-file @carrot/examples/test/rules/v1.json \
- --person Demographics \
+  --person Demographics \
   --output carrottransform_test_output
 ```
 
@@ -50,11 +50,10 @@ To run the V2 process, enter the following (as one command):
 
 ```bash
 carrot-transform run v2 \
- --inputs @carrot/examples/test/inputs \
+  --inputs @carrot/examples/test/inputs \
   --rules-file @carrot/examples/test/rules/v2.json \
- --person-file @carrot/examples/test/inputs/Demographics.csv \
   --person Demographics \
- --output carrottransform_test_output
+  --output carrottransform_test_output
 ```
 
 ### Arguments
