@@ -51,7 +51,6 @@ services:
 
   frontend:
     image: ghcr.io/health-informatics-uon/carrot/frontend:${RELEASE_VERSION}
-    command: node server.js
     ports:
       - 3000:3000
     environment:
@@ -63,9 +62,6 @@ services:
       NODE_ENV: development
       BODY_SIZE_LIMIT: 20971520
       NEXT_PUBLIC_ENABLE_REUSE_TRIGGER_OPTION: true
-    volumes:
-      - /app/node_modules
-      - /app/.next
     depends_on:
       api:
         condition: service_healthy
