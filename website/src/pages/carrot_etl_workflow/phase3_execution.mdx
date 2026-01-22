@@ -67,8 +67,8 @@ To run the V1 process using OMOP 5.4, enter the following (as one command):
 ```bash
 carrot-transform run v1 \
   --inputs @carrot/examples/test/inputs \
-  --rules-file @carrot/examples/test/rules/rules_2Dec2025_V1.json \
-  --person patients \
+  --rules-file @carrot/examples/test/rules/v1.json \
+  --person demographics \
   --output carrottransform/examples/test/test_output \
   --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql
 ```
@@ -78,8 +78,8 @@ To run v2 using OMOP 5.4 use this command;
 ```bash
 carrot-transform run v2 \
   --inputs @carrot/examples/test/inputs \
-  --rules-file @carrot/examples/test/rules/rules_2Dec2025_V2.json\
-  --person patients \
+  --rules-file @carrot/examples/test/rules/v2.json\
+  --person demographics \
   --output carrottransform/examples/test/test_output \
   --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql
 ```
@@ -113,23 +113,29 @@ When you run the command, Carrot Transform will:
 
 **Expected Console Output:**
 ```
- ~/Desktop/carrot-transform-0.7.5 ------------------------------------------------------------------------------------------------------------------------------------------------------------- 03:15:32 PM 
-> carrot-transform run v2 \
+ ~/Desktop/carrot-transform-0.7.5 ------------------------------------------------------------------------------------------------------------------------------------------------------------- 16:28:09 PM 
+
+piter@pi5:~/Desktop/carrot-transform $ carrot-transform run v2 \
   --inputs @carrot/examples/test/inputs \
-  --rules-file @carrot/examples/test/rules/rules_2Dec2025_V2.json\
-  --person patients \
-  --output carrottransform/examples/test/test_output \
+  --rules-file @carrot/examples/test/rules/v2.json\
+  --person Demographics \
+  --output ./example_output \
   --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql
-2025-12-03 15:15:35,375 - carrottransform.tools.logger - INFO - Detected v2.json format, using direct v2 parser...
-2025-12-03 15:15:35,375 - carrottransform.tools.logger - INFO - Loaded v2 mapping rules from: carrottransform/examples/test/rules/rules_2Dec2025_V2.json in 0.00634 secs
-2025-12-03 15:15:35,438 - carrottransform.tools.logger - INFO - person_id stats: total loaded 200, reject count 1
-2025-12-03 15:15:35,468 - carrottransform.tools.logger - INFO - Processing data...
-2025-12-03 15:15:35,468 - carrottransform.tools.logger - INFO - Streaming input file: patients.csv
-2025-12-03 15:15:35,472 - carrottransform.tools.logger - WARNING -  couldn't be normalised to ISO 8601 date format
-2025-12-03 15:15:35,498 - carrottransform.tools.logger - INFO - TARGET: condition_occurrence: output count 200
-2025-12-03 15:15:35,498 - carrottransform.tools.logger - INFO - TARGET: person: output count 200
-2025-12-03 15:15:35,504 - carrottransform.tools.logger - INFO - V2 processing completed successfully in 0.13464 secs
- ~/Desktop/carrot-transform-0.7.5 ------------------------------------------------------------------------------------------------------------------------------------------------------------- 03:15:35 PM 
+2026-01-22 16:28:09,145 - carrottransform.tools.logger - INFO - starting v2 with injected source and output
+2026-01-22 16:28:09,154 - carrottransform.tools.logger - INFO - Detected v2.json format, using direct v2 parser...
+2026-01-22 16:28:09,156 - carrottransform.tools.logger - INFO - Loaded v2 mapping rules from: /home/piter/Desktop/carrot-transform/.venv/lib/python3.10/site-packages/carrottransform/examples/test/rules/v2.json in 0.00428 secs
+2026-01-22 16:28:09,172 - carrottransform.tools.logger - INFO - person_id stats: total loaded 1000, reject count 0
+2026-01-22 16:28:09,172 - carrottransform.tools.logger - INFO - Processing data...
+2026-01-22 16:28:09,172 - carrottransform.tools.logger - INFO - Streaming input file: Symptoms.csv
+2026-01-22 16:28:09,213 - carrottransform.tools.logger - INFO - Streaming input file: covid19_antibody.csv
+2026-01-22 16:28:09,284 - carrottransform.tools.logger - INFO - Streaming input file: Demographics.csv
+2026-01-22 16:28:09,410 - carrottransform.tools.logger - INFO - TARGET: condition_occurrence: output count 400
+2026-01-22 16:28:09,411 - carrottransform.tools.logger - INFO - TARGET: measurement: output count 1000
+2026-01-22 16:28:09,411 - carrottransform.tools.logger - INFO - TARGET: observation: output count 400
+2026-01-22 16:28:09,411 - carrottransform.tools.logger - INFO - TARGET: person: output count 1000
+2026-01-22 16:28:09,411 - carrottransform.tools.logger - INFO - V2 processing completed successfully in 0.26021 secs
+
+ ~/Desktop/carrot-transform-0.7.5 ------------------------------------------------------------------------------------------------------------------------------------------------------------- 16:28:09 PM 
 > 
 
 ```
@@ -139,8 +145,10 @@ When you run the command, Carrot Transform will:
 After the transformation completes, check your build directory. You should see files like:
 
 ```
-test_output/
+example_output/
 ├── condition_occurrence.tsv
+├── measurement.tsv
+├── observation.tsv
 ├── person_ids.tsv
 ├── person.tsv
 ├── summary_mapstream.tsv
@@ -150,6 +158,8 @@ test_output/
 
 - **person.tsv**: Patient demographic information (age, gender, race, ethnicity) in OMOP CDM format
 - **condition_occurrence.tsv**: Diagnoses and conditions mapped to OMOP CDM standard concept IDs
+- **measurement.tsv**: Cooresponds to the OMOP CMD standard measurements table
+- **observation.tsv**: Cooresponds to the OMOP CMD standard observations table
 - **person_ids.tsv**: Mapping of original person identifiers to OMOP person_id values
 - **summary_mapstream.tsv**: Summary statistics and mapping information from the transformation process
 
