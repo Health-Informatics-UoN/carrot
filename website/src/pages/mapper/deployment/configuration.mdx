@@ -524,3 +524,81 @@ By default, Carrot will **automatically create the necessary resources such as `
 - **BUCKETS** = [ `scan-reports`, `data-dictionaries`, `rules-exports` ]
 
 - **QUEUES** = [ `rules-local`, `rules-exports-local`, `uploadreports-local` ]
+
+## AI Recommendations (Lettuce & Unison)
+
+Carrot Mapper can use external AI services to search for OMOP concepts when mapping scan report values. Two providers are supported: Lettuce and Unison. This document describes how the feature works and how to configure it.
+
+## Overview
+
+For us to make use of the AI powered concept search feature, we need to either head to `scanreports/scanreports_id/tables/table_id/` or `scanreports/scanreports_id/tables/table_id/fields/field_id/` and click on the `Suggestions` button.
+This will open a modal with a list of AI suggestions.
+We click the `Suggestion` button to get a list of Domains from the AI service. We select the Suitable Domain, which will then open a modal with a list of OMOP concepts.
+We select the most suitable OMOP concept guided by the Accuracy/Score and click the "Add" button. The OMOP concept will be added to the field.
+
+
+**Environment variables**
+
+<Table>
+  <thead>
+    <Tr>
+      <Th>Variable</Th>
+      <Th>Required</Th>
+      <Th>Description</Th>
+    </Tr>
+  </thead>
+  <tbody>
+    <Tr>
+      <Td>`NEXT_PUBLIC_ENABLE_AI_RECOMMENDATION`</Td>
+      <Td>Yes (to show the feature)</Td>
+      <Td>Set to "true" to show the AI Suggestions column and button.</Td>
+    </Tr>
+    <Tr>
+      <Td>`NEXT_PUBLIC_RECOMMENDATION_SERVICE`</Td>
+      <Td>Yes (when AI recommendations are enabled)</Td>
+      <Td>Which provider to use: "lettuce" or "unison".</Td>
+    </Tr>
+    <Tr>
+      <Td>`RECOMMENDATION_SERVICE_BASE_URL`</Td>
+      <Td>Yes</Td>
+      <Td>Base URL of the recommendation API (e.g. Unison: https://api.hyperunison.com/api/public/suggester/generate).</Td>
+    </Tr>
+    <Tr>
+      <Td>`RECOMMENDATION_SERVICE_API_KEY`</Td>
+      <Td>Yes</Td>
+      <Td>API key for the service. Used as query parameter for Unison and as Bearer token for Lettuce.</Td>
+    </Tr>
+  </tbody>
+</Table>
+
+`NEXT_PUBLIC_*` variables are exposed to the browser; the API key and base URL are only used in server-side code (Next.js server actions).
+
+**Provider-specific behaviour**
+
+**Unison**
+
+- **URL:** Request is `GET {RECOMMENDATION_SERVICE_BASE_URL}/{queryValue}?apiKey={RECOMMENDATION_SERVICE_API_KEY}&domain={domainId}`.
+- **Auth:** API key is sent as the `apiKey` query parameter.
+- **Query:** Unison can be queried by concept name or concept code (exact match); concept code is typically tried first, then concept name.
+
+**Lettuce**
+
+- **URL:** Request is `GET {RECOMMENDATION_SERVICE_BASE_URL}/{queryValue}?domain={domainId}`.
+- **Auth:** API key is sent as `Authorization: Bearer {RECOMMENDATION_SERVICE_API_KEY}`.
+
+
+**Example: Docker Compose**
+
+The `docker-compose.yml` includes an example for Unison:
+
+```yaml
+environment:
+  - NEXT_PUBLIC_ENABLE_AI_RECOMMENDATION=true
+  - NEXT_PUBLIC_RECOMMENDATION_SERVICE=unison
+  - RECOMMENDATION_SERVICE_BASE_URL=https://api.hyperunison.com/api/public/suggester/generate
+  - RECOMMENDATION_SERVICE_API_KEY=unison-api-key
+```
+
+For Lettuce you would set `NEXT_PUBLIC_RECOMMENDATION_SERVICE=lettuce`, `RECOMMENDATION_SERVICE_BASE_URL` to your Lettuce endpoint, and `RECOMMENDATION_SERVICE_API_KEY` to your Lettuce API key.
+
+To enable AI Recommendations, (Lettuce/Unison) feature, set `NEXT_PUBLIC_ENABLE_AI_RECOMMENDATION=true`, and configure the four variables in the above docker-compose.yml file.
