@@ -537,36 +537,47 @@ We click the `Suggestion` button to get a list of Domains from the AI service. W
 We select the most suitable OMOP concept guided by the Accuracy/Score and click the "Add" button. The OMOP concept will be added to the field.
 
 
-**Environment variables**
+**Frontend Environment variables**
 
 <Table>
   <thead>
     <Tr>
-      <Th>Variable</Th>
-      <Th>Required</Th>
+      <Th>Key</Th>
       <Th>Description</Th>
     </Tr>
   </thead>
   <tbody>
     <Tr>
-      <Td>`NEXT_PUBLIC_ENABLE_AI_RECOMMENDATION`</Td>
-      <Td>Yes (to show the feature)</Td>
-      <Td>Set to "true" to show the AI Suggestions column and button.</Td>
+      <Td>
+        <Mandatory>`NEXT_PUBLIC_ENABLE_AI_RECOMMENDATION`</Mandatory>
+      </Td>
+      <Td>
+        Set to "true" to show the AI Suggestions column and button. Any other value (or unset) hides the feature.
+      </Td>
     </Tr>
     <Tr>
-      <Td>`NEXT_PUBLIC_RECOMMENDATION_SERVICE`</Td>
-      <Td>Yes (when AI recommendations are enabled)</Td>
-      <Td>Which provider to use: "lettuce" or "unison".</Td>
+      <Td>
+        <Mandatory>`NEXT_PUBLIC_RECOMMENDATION_SERVICE`</Mandatory>
+      </Td>
+      <Td>
+        Required when AI recommendations are enabled. Which provider to use: "lettuce" or "unison".
+      </Td>
     </Tr>
     <Tr>
-      <Td>`RECOMMENDATION_SERVICE_BASE_URL`</Td>
-      <Td>Yes</Td>
-      <Td>Base URL of the recommendation API (e.g. Unison: https://api.hyperunison.com/api/public/suggester/generate).</Td>
+      <Td>
+        <Mandatory>`RECOMMENDATION_SERVICE_BASE_URL`</Mandatory>
+      </Td>
+      <Td>
+        Base URL of the recommendation API (e.g. Unison: https://api.hyperunison.com/api/public/suggester/generate).
+      </Td>
     </Tr>
     <Tr>
-      <Td>`RECOMMENDATION_SERVICE_API_KEY`</Td>
-      <Td>Yes</Td>
-      <Td>API key for the service. Used as query parameter for Unison and as Bearer token for Lettuce.</Td>
+      <Td>
+        <Mandatory>`RECOMMENDATION_SERVICE_API_KEY`</Mandatory>
+      </Td>
+      <Td>
+        API key for the service. Used as query parameter for Unison and as Bearer token for Lettuce.
+      </Td>
     </Tr>
   </tbody>
 </Table>
@@ -601,4 +612,4 @@ environment:
 
 For Lettuce you would set `NEXT_PUBLIC_RECOMMENDATION_SERVICE=lettuce`, `RECOMMENDATION_SERVICE_BASE_URL` to your Lettuce endpoint, and `RECOMMENDATION_SERVICE_API_KEY` to your Lettuce API key.
 
-To enable AI Recommendations, (Lettuce/Unison) feature, set `NEXT_PUBLIC_ENABLE_AI_RECOMMENDATION=true`, and configure the four variables in the above docker-compose.yml file.
+To enable AI Recommendations, (Lettuce/Unison) feature, set `NEXT_PUBLIC_ENABLE_AI_RECOMMENDATION=true`, and configure the four variables in the above `docker-compose.yml` file.
