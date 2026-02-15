@@ -400,8 +400,57 @@ Coming soon
         Credentials required to access the Airflow webserver and Airflow API.
       </Td>
     </Tr>
+    <Tr>
+      <Td>`EXECUTE_VALUES_PAGE_SIZE`</Td>
+      <Td>
+        Page size for bulk database inserts (Scan Report and Data Dictionary
+        uploads). Defaults to `1,000,000`. See Bulk Insert Batch Size below for
+        when to change it.
+      </Td>
+    </Tr>
   </tbody>
 </Table>
+
+### Bulk Insert Batch Size
+
+When we upload a Scan Report or Data Dictionary, the Airflow DAG bulk inserts rows into temporary tables (`temp_data_dictionary_*` and `temp_field_values_*`). `EXECUTE_VALUES_PAGE_SIZE` controls how many rows go into each batch. 
+Bigger batches mean fewer round-trips to the database while smaller batches mean more round-trips but less memory per insert.
+
+The default is 1,000,000, which usually means one batch per table. If you have 44,000 records and set the page size to 10, you'll get about 4,400 batches instead.
+
+#### Configuration
+
+It's an environment variable. Add it to the `airflow-scheduler` service in the `docker-compose.yml`:
+
+```yaml
+scheduler:
+    <<: *airflow-common
+    build:
+      context: app/airflow
+      dockerfile: Dockerfile
+      args:
+        AIRFLOW_COMPONENT: scheduler
+    environment:
+      <<: *airflow-common-env
+      ***other environment variables***
+
+      EXECUTE_VALUES_PAGE_SIZE: 1000000 # page size for bulk database inserts (execute_values)
+
+```
+
+If we don't set it, the default of 1,000,000 is used.
+
+#### When to change it
+
+In most cases, we don't need to change this setting. The default batch size is already optimized for most environments.
+If we start running into memory issues or database timeouts, which may happen with large scan reports, try lowering the batch size to 100,000 or 50,000.
+For slow or unreliable networks, use smaller batch sizes (like 1,000–10,000) to reduce the risk if one fails, and to make inserts less likely to time out.
+On machines with limited memory, sticking with a batch size between 1,000 and 10,000 can help keep your memory usage low, but it may result in more trips to the database.
+
+#### Code references
+
+- `app/airflow/dags/libs/settings.py` – reads the env var (default 1,000,000)
+- `app/airflow/dags/libs/SR_processing/db_services.py` – uses it for the bulk inserts
 
 ## Other services
 
@@ -613,3 +662,4 @@ environment:
 For Lettuce you would set `NEXT_PUBLIC_RECOMMENDATION_SERVICE=lettuce`, `RECOMMENDATION_SERVICE_BASE_URL` to your Lettuce endpoint, and `RECOMMENDATION_SERVICE_API_KEY` to your Lettuce API key.
 
 To enable AI Recommendations, (Lettuce/Unison) feature, set `NEXT_PUBLIC_ENABLE_AI_RECOMMENDATION=true`, and configure the four variables in the above `docker-compose.yml` file.
+
