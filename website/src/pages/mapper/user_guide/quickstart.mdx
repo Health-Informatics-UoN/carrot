@@ -161,6 +161,26 @@ Note that new rows have been added associated to the `F` and `M` values. These w
 
 You can also try _removing_ a Concept by pressing the grey `x` on the right of any Concept tag, then return to the Rules page to see that the associated Mapping Rules have been deleted.
 
+### Mapping the death table
+
+If you have a scan report table that holds death data and you want it to auto-map to the OMOP death table, you need to tell Carrot that this table is a death table. You do that by setting `death_table` to `true` for that table.
+If you don’t set it, Carrot won’t treat the table as a death table and auto-mapping will use the wrong destination table and fields.
+
+### How to set it
+
+To set a table as a death table in Django admin, edit the relevant scan report table entry, select `true` from the `death_table` dropdown, and then click save.
+
+### What Carrot does when it’s set
+
+Once a table is marked as a death table and you run auto-mapping (e.g. after setting Person ID and Date Event), Carrot will:
+
+- Create rules for the OMOP `death` table instead of `condition_occurrence`, `observation`, and so on.
+- Sets the `Destination Table` to `death` and the `Destination Field` to `cause_concept_id` (along with the related source fields).
+- Map the event date to `death_datetime`.
+
+When reusing concepts from other scan reports, Carrot only reuses death-related concepts from other tables that are also marked as death tables. It won’t mix death concepts into non-death tables or the other way around.
+
+
 ## Downloading Mapping Rules
 
 The final task in the simplest end-to-end process in Carrot Mapper is to download the Mapping Rules in a form that can be used as input to Carrot Transform (which will perform the transformations on the data).
