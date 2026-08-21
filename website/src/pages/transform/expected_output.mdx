@@ -1,6 +1,12 @@
+import { Callout } from "nextra/components";
+
 # Expected Output
 
-## `condition_occurence.tsv`
+<Callout type="info">
+  Carrot Transform writes one `.tsv` file per OMOP CDM target table referenced in your mapping rules, plus `person_ids.tsv` and a `summary_*.tsv` file. It only writes the tables your rules actually target — the tables below are examples, not an exhaustive list. See [Supported Tables](/mapper/supported_tables) for every target table Carrot can currently map to.
+</Callout>
+
+## `condition_occurrence.tsv`
 The condition_occurrence.tsv file is an OMOP CDM-formatted output file that contains diagnoses and conditions assigned to patients. These conditions are typically derived from clinical encounters, EHRs, claims data, or self-reported conditions.
 
 Examples of conditions stored in this table:
@@ -16,7 +22,7 @@ Examples of conditions stored in this table:
 | `condition_concept_id`         | The OMOP standardized concept ID for the condition. |
 | `condition_start_date`         | The date when the condition started. |
 | `condition_start_datetime`     | The full timestamp of when the condition started. |
-| `condition_end_date`           | The date** when the condition ended (if applicable). |
+| `condition_end_date`           | The date when the condition ended (if applicable). |
 | `condition_end_datetime`       | The full timestamp when the condition ended. |
 | `condition_type_concept_id`    | OMOP concept ID indicating how the condition was recorded (e.g., EHR, claims data). |
 | `condition_status_concept_id`  | OMOP concept ID indicating the status of the condition (e.g., active, resolved). |
@@ -235,5 +241,38 @@ The rules file defines how the fields from the input person.tsv map to OMOP conc
 }
 ```
 
-## `summary.tsv`
+## `death.tsv`
+The `death.tsv` file is an OMOP CDM-formatted output file recording that a person has died, and (where known) the date and cause.
+
+### Column description
+| Column Name                  | Description |
+|-------------------------------|-------------|
+| `person_id`                   | The person who died (links to the `person` table). |
+| `death_date`                  | The date of death. |
+| `death_datetime`               | The full timestamp of death, if known. |
+| `death_type_concept_id`        | OMOP concept ID indicating how the death was recorded (e.g., EHR, death certificate). |
+| `cause_concept_id`             | The OMOP standardized concept ID for the cause of death, if known. |
+| `cause_source_value`           | The original, non-standard value for the cause of death from the source data. |
+| `cause_source_concept_id`      | The concept ID corresponding to the source cause-of-death value before OMOP mapping. |
+
+Unlike the other tables on this page, `death` has no surrogate ID column (`death_id`) — a person can only appear once, so `person_id` is the key.
+
+## `summary_*.tsv`
+
+Alongside the OMOP tables, Carrot Transform writes a `summary_<dataset>.tsv` file with one row per source-field/target-field/concept combination it processed, letting you audit exactly how many records went in and out at each step.
+
+### Column description
+| Column Name       | Description |
+|--------------------|-------------|
+| `dsname`           | The dataset name, taken from the mapping rules file. |
+| `source`           | The source table (or `all`, for a rolled-up total row). |
+| `source_field`     | The source field (or `all`). |
+| `target`           | The target OMOP table (or `all`). |
+| `concept_id`       | The destination concept ID this row's counts apply to (or `all`). |
+| `additional`       | Extra context for the row, such as a birth year when counts are broken down by year. |
+| `incount`          | Number of source records considered. |
+| `invalid_persid`   | Number of records rejected for an unrecognised `person_id`. |
+| `invalid_date`     | Number of records rejected for an invalid date. |
+| `invalid_source`   | Number of records rejected for another source-data reason. |
+| `outcount`         | Number of output records written. |
 

@@ -1,0 +1,48 @@
+import { Callout } from "nextra/components";
+
+# Scope
+
+This page explains, in one place, what Carrot is built to do, the shape of problem it targets, and where a different tool is a better fit. It's an overview of the ecosystem rather than a how-to — for step-by-step instructions see the [Mapper](/mapper) and [Transform](/transform) docs, or the [end-to-end tutorial](/carrot_etl_workflow).
+
+## The problem Carrot targets
+
+Carrot converts tabular health data into the [OMOP Common Data Model](https://www.ohdsi.org/data-standardization/), in settings where the people with OMOP mapping expertise are not the people who have access to the data — typically because the data sits inside a secure environment (a Trusted Research Environment, a data partner's own infrastructure) that can't be opened up just to let a mapping specialist look at it.
+
+That constraint is what shapes the whole design: Carrot splits **mapping** (deciding how source fields and values correspond to OMOP concepts and tables) from **execution** (applying that mapping to the actual data) into two separate tools, so the two can happen in two different places.
+
+- **Carrot Mapper** is where the mapping decisions get made, working only from a WhiteRabbit *Scan Report* — a structural and frequency profile of the source data, not the data itself. The output is a mapping rules JSON file. No patient-level data needs to leave the secure environment, or even be seen by whoever builds the mapping.
+- **Carrot Transform** is a local, offline command-line tool that a data partner runs inside their own secure environment, applying the rules JSON to their actual data to produce OMOP-formatted output. It never needs network access, and it's a plain CLI, so it drops into existing pipelines or scheduled jobs rather than requiring its own orchestration platform.
+
+Because the rules file is the only thing that crosses the boundary, it's also reusable: the same rules can be applied to a refreshed extract of the same dataset, reviewed and adjusted by an OMOP expert without them ever touching the data, or reused as a starting point for a structurally similar dataset at another site.
+
+## What source data Carrot expects
+
+Carrot targets **flat, tabular, batch data** — see [Data Standards](/standards) for the full specification, summarised here:
+
+- One CSV file (or, when reading from a database, one table) per source table.
+- A single demographics/person file with one row per individual, containing an identifier, sex, and date of birth as a minimum.
+- Every other file has exactly one identifying column and one event-date column, plus whatever data columns are relevant to that date. In OMOP terms, each source table maps to *at most two* date-linked destination fields (see the `m_date_field_mapper` behaviour in [Mapping Rules](/mapper/dev_guide/mapping_rules)) — there's no support for a source row contributing to several different event dates in the same target table.
+- Dates in ISO-8601, measurements in metric units, UTF-8 CSVs — see [Data Standards](/standards) for the complete list.
+
+This is deliberately a narrower shape than "arbitrary relational database": Carrot doesn't join across source tables, doesn't run arbitrary SQL, and doesn't handle deeply normalised source schemas without pre-flattening them into this per-table, per-event-date CSV shape first. If your source data needs that kind of restructuring, that work happens upstream of Carrot, during [pre-processing](/carrot_etl_workflow/pre_processing).
+
+## What OMOP output Carrot produces
+
+Carrot Transform targets OMOP CDM 5.3 by default (5.4 is also bundled and selectable), and can currently write to the following target tables: `person`, `measurement`, `condition_occurrence`, `observation`, `drug_exposure`, `device_exposure`, `procedure_occurrence`, `specimen`, and `death` — see [Supported Tables](/mapper/supported_tables) for the current, authoritative list, since it grows over time.
+
+Each mapping rule is a fairly direct correspondence: a source field or value maps to a destination field or OMOP concept, is linked to a `person_id` and a date, and (for `concept_id` fields) a term mapping. Carrot doesn't currently support the kind of business logic a hand-written ETL might — computing a derived value from several source columns, applying conditional logic, or deduplicating/reconciling conflicting records across source tables. It only writes the tables and fields your mapping rules actually reference — it isn't a generator that stubs out every OMOP table regardless of whether you mapped anything to it.
+
+## Where Carrot fits, and where it doesn't
+
+Carrot's strength is specifically the mapping/execution split described above: it's the right tool when your bottleneck is *"the person who knows OMOP can't see the data, and the person who has the data doesn't know OMOP"*, and your source data can be expressed as flat, per-table CSVs.
+
+<Callout type="info">
+  If your situation looks different, a different tool is likely a better fit:
+</Callout>
+
+- **Your OMOP expert already has (or can get) direct access to the data**, and the transformation needs real SQL — multi-table joins, window functions, complex derivations, dbt-style tests and lineage. A SQL/dbt-based approach, such as [Delphyne](https://github.com/OHDSI/Delphyne) or a hand-written dbt project against the OMOP CDM, gives you that expressiveness, at the cost of needing to write and maintain SQL rather than authoring mapping rules through Carrot Mapper's UI.
+- **You need incremental or streaming loads.** Carrot Transform is a batch tool — each run reads a full input snapshot and writes a full output; it doesn't track deltas between runs.
+- **You need deep OMOP tables beyond the current list** — e.g. `visit_occurrence`, `note`, `cost` — Carrot Mapper doesn't yet generate rules for these (see [Supported Tables](/mapper/supported_tables)).
+- **You need data-quality profiling or vocabulary curation**, rather than mapping and transformation. WhiteRabbit's own analysis output, [Achilles](https://github.com/OHDSI/Achilles), and Athena's vocabulary browser sit upstream and alongside Carrot for those needs, respectively.
+
+None of this is a permanent ceiling — the target-table list and rule complexity have both grown over time (`death` support, for instance, is a recent addition) — but it's the accurate picture of what's supported today, rather than an aspirational one.

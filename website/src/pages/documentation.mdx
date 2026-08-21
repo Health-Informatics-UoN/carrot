@@ -2,7 +2,7 @@ import { Callout } from "nextra/components";
 
 # Welcome to Carrot Documentation
 
-Carrot is an toolset for mapping and transforming health data to the [OMOP Common Data Model](https://www.ohdsi.org/data-standardization/), in a secure way enabling collaboration and reusability.
+Carrot is a toolset for mapping and transforming health data to the [OMOP Common Data Model](https://www.ohdsi.org/data-standardization/), in a secure way enabling collaboration and reusability.
 
 Carrot consists of two tools: [Carrot Mapper](mapper) for generating mapping rules, and [Carrot Transform](transform) for transforming the data using those rules.
 
@@ -15,6 +15,10 @@ This approach enables wider collaboration and sharing of mapping rules, in a saf
 Carrot uses [OHDSI WhiteRabbit](https://www.ohdsi.org/analytic-tools/whiterabbit-for-etl-design/) as the recommended metadata profiling tool. 
 
 At a glance, the diagram below shows the functions of Carrot Mapper (steps 3-5) and Carrot Transform (step 6) in the process of transforming data to OMOP CDM.
+
+<Callout>
+  Not sure if Carrot is the right fit for your data or use case? See [Scope](scope) for what Carrot targets, and where a different tool may serve you better.
+</Callout>
 
 <Callout>
   The Carrot tools depend on a set of [data standards](standards).

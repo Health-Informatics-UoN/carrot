@@ -28,4 +28,4 @@ This document outlines security and infrastructure recommendations for deploying
 - Container health checks and external monitoring should be used to ensure Carrot Mapper is running as expected.
 
 ## Data Access
-- Database credentials used by Carrot Mapper should be limited to the minimum required permissions, only read-only (select) access to the OMOP CDM database schema is required.
+- Database credentials used by Carrot Mapper should be limited to the minimum required permissions. Only read-only (select) access is required to the `omop` schema (vocabularies); Carrot Mapper needs read/write access to its own `mapping` schema (scan reports, mapping rules, etc.). See [Internal data structures](/mapper/dev_guide/data_structures) for the schema split.

@@ -33,7 +33,7 @@ Transform will read the CSV files in the local directory according to the basic 
 
 ### Version 1 and Version 2 Process
 
-Depending on wether you have a Version 1 or Version 2 rules file, you'll need to use `v1` or `v2` when invoking the command.
+Depending on whether you have a Version 1 or Version 2 rules file, you'll need to use `v1` or `v2` when invoking the command.
 
 
 To process a **`v1`** test dataset included in the repository, run:
@@ -69,16 +69,14 @@ The following tables describe the parameters available, the command line flag fo
 | `--inputs`        | `INPUTS`             |Directory or SQLAlchemy connection to read inputs from |
 | `--rules-file`    | `RULES_FILE`         | JSON file defining mapping rules                      |
 | `--person`        | `PERSON`             | CSV file or table name with person IDs and DOB        |
-| `--output`        | `OUTPUT`             | Directory or MinIOto write OMOP-format TSV files      |
+| `--output`        | `OUTPUT`             | Directory or MinIO to write OMOP-format TSV files      |
 
 #### Optional Arguments
 
-These are not all supported on both versions and cannot be set through environment variables.
+These only apply to the `v1` process (the `mapstream`/`v1` command) and cannot be set through environment variables.
 
 | Flag                     | Default | Description                                                         |
 | ------------------------ | ------- | ------------------------------------------------------------------- |
-| `--write-mode` | `w` | Set to `w` (overwrite) or `a` (append) for output files             |
-| `--saved-person-id-file` | None    | Path to a file to save and share `person_id` state                  |
 | `--use-input-person-ids` | `N` | Use input person IDs (`Y`) or replace with new integers (`N`)       |
 | `--last-used-ids-file` | None    | Path to a file tracking last used IDs (tab-separated format)        |
 | `--log-file-threshold` | `0` | Change output limit for log files                                   |
@@ -112,7 +110,6 @@ Carrot Transform uses a single Person ID file (or table), which must be specifie
 
 | Argument | Default | Description |
 | ---- | ---- | ---- |
-| `--omop-ddl-file` | `@carrot/config/OMOPCDM_postgresql_5.4_ddl.sql` | DDL statements for OMOP tables.
-| | | (The version 5.4 of OMOP CDM can be downloaded from [here](https://github.com/Health-Informatics-UoN/carrot-transform/blob/main/carrottransform/config/OMOPCDM_postgresql_5.4_ddl.sql)) |
+| `--omop-ddl-file` | `@carrot/config/OMOPCDM_postgresql_5.3_ddl.sql` | DDL statements for OMOP tables. The bundled 5.4 DDL can be used instead by passing `--omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql` (see the [file here](https://github.com/Health-Informatics-UoN/carrot-transform/blob/main/carrottransform/config/OMOPCDM_postgresql_5.4_ddl.sql)) |
 | `--omop-config-file` | `@carrot/config/config.json` | specialised configuration to populate certain fields from eachother 
 | | | (... such as `???_datetime` becoming `???_date` as one would expect) |

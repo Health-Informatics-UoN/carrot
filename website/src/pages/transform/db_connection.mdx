@@ -22,8 +22,8 @@ The `person-file` parameter and Carrot-Mapper workflow should still be used, as 
 
 - something like `SELECT column_name(s) FROM patients LIMIT 1000;` is written to `patients.csv`
 
-2. the usual [scan reports](https://carrot.ac.uk/mapper/user_guide/projects_datasets_scanreports) are performed on these subsets
-3. [when carrot-transform is invoked](https://carrot.ac.uk/transform/quickstart) instead of folder path, use the connection string as `--inputs` parameter.
+2. the usual [scan reports](/mapper/user_guide/projects_datasets_scanreports) are performed on these subsets
+3. [when carrot-transform is invoked](/transform/quickstart) instead of folder path, use the connection string as `--inputs` parameter.
 
 - the `--person` parameter should be the same; instead of `person_tablename.csv` it will read `SELECT * FROM person_tablename`
 - the `--rules-file` parameter needs to refer to a file on the disk as usual
@@ -43,7 +43,7 @@ This example shows how to use `v2` to process data in tables from a PostgreSQL d
 ```bash copy
 carrot-transform run v2 \
     --rules-file carrottransform/examples/test/rules/v2-db-conn.json \
-    --inputs postgresql://reading:s3cret@24.36.48.50:5432/test_transform
+    --inputs postgresql://reading:s3cret@24.36.48.50:5432/test_transform \
     --person demographics \
     --output carrottransform/examples/test/outputs
 ```

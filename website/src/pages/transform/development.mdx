@@ -66,10 +66,8 @@ uv run -m carrottransform.cli.subcommands.run mapstream \
 
 ## Deploying to PyPI and CI / GitHub Actions
 
-[The CI file](.github/workflows/uv-workflow.yml) uses [GitHub actions](https://github.com/Health-Informatics-UoN/carrot-transform/actions) to test the project and (when appropriate) [deploy to PyPI.](https://pypi.org/project/carrot-transform/)
-When the CI job runs, it tests and assembles the project.
-If the commit being examined is against the `main` branch, then, the project will be deployed to PyPI Test.
-If the commit has been tagged with a tag starting with `v...` then the project will be deployed to PyPI Main.
+[GitHub Actions](https://github.com/Health-Informatics-UoN/carrot-transform/actions) test the project on every push, and [the PyPI publish workflow](https://github.com/Health-Informatics-UoN/carrot-transform/blob/main/.github/workflows/pypi.publish.yml) builds and (when appropriate) [deploys to PyPI](https://pypi.org/project/carrot-transform/).
+The publish workflow only runs when a commit is tagged with a tag starting with `v...`, and publishes that build to both TestPyPI and PyPI at once.
 
 
 ## Release

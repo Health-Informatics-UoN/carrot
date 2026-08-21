@@ -1,0 +1,51 @@
+import { Callout } from "nextra/components";
+
+# Troubleshooting and Best Practices
+
+Common issues encountered while working through this tutorial (or any Carrot ETL workflow), and how to resolve them.
+
+## WhiteRabbit
+
+**WhiteRabbit won't launch, or fails partway through a scan.**
+
+WhiteRabbit only works reliably from installation and working-folder paths made up of ASCII characters. Avoid spaces, accents, or non-Latin characters in the paths you extract WhiteRabbit and your source data to. See [Phase 1](/carrot_etl_workflow/phase1_whiterabbit).
+
+## Carrot Mapper
+
+**A Scan Report's "Upload Status" stays as "Upload in Progress" indefinitely.**
+
+Not all errors can be caught before upload — some only surface once the file is processed in the background. If the status hasn't changed after 30 minutes, treat it as failed: double-check your Scan Report and Data Dictionary files against the [Data Standards](/standards), then re-upload. If the problem persists, report it to your administrator with a copy of the file. See [User Quickstart](/mapper/user_guide/quickstart#uploading-a-first-scan-report).
+
+**`Job Progress` shows "Not Started or No data yet".**
+
+This almost always means `Person ID` and `Date Event` haven't been set on that table yet — mapping rules can't be generated until both are set. See [Setting Person ID and Date Event](/mapper/user_guide/quickstart#setting-person-id-and-date-event-for-each-table).
+
+**The Data Dictionary upload is rejected.**
+
+The file must be CSV with exactly the columns `csv_file_name`, `field_name`, `code`, `value` — including a trailing empty `value` column on vocabulary rows. See [Data Standards: Data Dictionary File](/standards#data-dictionary-file).
+
+## Carrot Transform
+
+**`carrot-transform: command not found`.**
+
+Install with `pip install carrot-transform`, or if running from source, use `uv run carrot-transform ...` from within the cloned repository. See [Quickstart](/transform/quickstart#installation).
+
+**Some records are missing from the output, but the run reports "successfully completed".**
+
+Check the console log for `reject count` and `couldn't be normalised to ISO 8601 date format` warnings — Carrot Transform silently excludes records with an unrecognised `person_id` or an invalid/blank date rather than failing the whole run. Check the `invalid_persid`, `invalid_date`, and `invalid_source` columns in the `summary_*.tsv` output file to see exactly where records were dropped. See [Expected Output](/transform/expected_output).
+
+**A `--person` argument error, e.g. `'Demographics.csv' is not a valid person file/table name`.**
+
+`--person` must be just the file/table name, with no path and no `.csv` extension — e.g. `--person patients` for a file named `patients.csv`. That file must sit in the same `--inputs` directory as your other source CSVs (or, for database sources, be a table name — see [Database Connection](/transform/db_connection)).
+
+**Some OMOP tables I expected are missing from the output.**
+
+Carrot Transform only writes a `.tsv` file for target tables actually referenced in your mapping rules — it isn't an exhaustive dump of every OMOP table. If a table is missing, check whether your Carrot Mapper rules mapped anything to it. See [Expected Output](/transform/expected_output).
+
+**Running via Docker, but the `output` folder on my host machine stays empty.**
+
+The host-side path in `-v $(pwd)/output:/app/output` must match whatever container-side path you pass to `--output`. If they don't match, the container writes its output somewhere that isn't mounted, and it's lost when the container exits. See [Running Carrot Transform with Docker](/transform/docker/docker_run).
+
+<Callout type="info">
+  Didn't find your issue here? Check the [Additional Resources](/carrot_etl_workflow/resources) page, or open a [GitHub Discussion](https://github.com/Health-Informatics-UoN/carrot/discussions).
+</Callout>

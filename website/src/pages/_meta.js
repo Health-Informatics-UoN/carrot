@@ -8,6 +8,7 @@ export default {
     },
     description: "Carrot Documentation",
   },
+  scope: "Scope",
   standards: "Data Standards",
   mapper: "Carrot Mapper",
   transform: "Carrot Transform",

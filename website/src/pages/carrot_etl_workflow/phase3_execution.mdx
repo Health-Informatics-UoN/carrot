@@ -53,7 +53,7 @@ For example, you can get the version number with:
 carrot-transform -v
 ```
 
-There are many mandatory and optional arguments for Carrot Transform. In the quick start, we will demonstrate the mandatory arguments on a test case included in the repository.
+There are many mandatory and optional arguments for Carrot Transform. Below, we'll demonstrate the mandatory arguments using the sample data and mapping rules from this tutorial.
 
 Transform will read the CSV files in the local directory in the basic examples below. For details about how to read data from a database, see the [Database Connection](/transform/db_connection) section.
 
@@ -62,43 +62,27 @@ Transform will read the CSV files in the local directory in the basic examples b
 Both Version 1 `v1` and `v2` Version 2 take the same basic parameters as of `0.7.0`.
 Transform will take the appropriate JSON from Mapper as rules file, some input source, an output target, and the name of the person table or `.csv` file.
 
-To run the V1 process using OMOP 5.4, enter the following (as one command):
+The commands below assume you're in the folder where you extracted the tutorial's [sample data](/carrot_etl_workflow#sample-data-overview), and that you've renamed the Mapping Rules JSON V2 file you downloaded from Carrot Mapper in Phase 2 to `rules_v2.json` (Carrot Mapper's default download name includes the dataset name and a timestamp, which is unwieldy on the command line).
 
-```bash
-carrot-transform run v1 \
-  --inputs @carrot/examples/test/inputs \
-  --rules-file @carrot/examples/test/rules/v1.json \
-  --person demographics \
-  --output carrottransform/examples/test/test_output \
-  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql
-```
+To run v2, enter the following (as one command):
 
-To run v2 using OMOP 5.4 use this command;
-
-```bash
+```bash copy
 carrot-transform run v2 \
-  --inputs @carrot/examples/test/inputs \
-  --rules-file @carrot/examples/test/rules/v2.json\
-  --person demographics \
-  --output carrottransform/examples/test/test_output \
-  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql
+  --inputs WhiteRabbit_sample_input_csv \
+  --rules-file CarrotTransform_input_sample_files/rules_v2.json \
+  --person patients \
+  --output output
 ```
-
-The difference is the `run **v1**` or `run **v2**` and which `.json` file is used.
-
-
-
 
 **What each argument does:**
-- `run_v2 folder`: Runs the version 2 transformation process
-- `--inputs`: Here, it's a directory containing your source CSV files (from Phase 1)
+- `run v2`: Runs the version 2 transformation process
+- `--inputs`: A directory containing your source CSV files (from Phase 1) — here, the `patients.csv` file from `WhiteRabbit_sample_input_csv`
 - `--rules-file`: The JSON V2 mapping rules file you downloaded from Carrot Mapper (from Phase 2)
-- `--person`: The name of the CSV file containing person data (without extensions)
+- `--person`: The name of the CSV file containing person data, without its `.csv` extension — for this tutorial that's `patients` (from `patients.csv`)
 - `--output`: Where Carrot Transform will write the transformed OMOP CDM files
-- `--omop-ddl-file`: Specifies to use the OMOP 5.4 definitions.
 
 <Callout type="info">
-  **Note:** Make sure you're in the carrot-transform directory when running this command. Adjust the file paths to match your actual file locations.
+  **Note:** Adjust the file paths to match your actual file locations. If you'd rather run against OMOP 5.4 instead of Carrot Transform's default of 5.3, add `--omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql`. The V1 process (`run v1`) takes the same arguments, pointed at the V1 rules JSON instead.
 </Callout>
 
 ### What Happens During Transformation
@@ -112,43 +96,33 @@ When you run the command, Carrot Transform will:
 5. **Write output** - Saves all the transformed files to your output directory
 
 **Expected Console Output:**
-```
- ~/Desktop/carrot-transform-0.7.5 ------------------------------------------------------------------------------------------------------------------------------------------------------------- 16:28:09 PM 
 
-piter@pi5:~/Desktop/carrot-transform $ carrot-transform run v2 \
-  --inputs @carrot/examples/test/inputs \
-  --rules-file @carrot/examples/test/rules/v2.json\
-  --person Demographics \
-  --output ./example_output \
-  --omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql
-2026-01-22 16:28:09,145 - carrottransform.tools.logger - INFO - starting v2 with injected source and output
-2026-01-22 16:28:09,154 - carrottransform.tools.logger - INFO - Detected v2.json format, using direct v2 parser...
-2026-01-22 16:28:09,156 - carrottransform.tools.logger - INFO - Loaded v2 mapping rules from: /home/piter/Desktop/carrot-transform/.venv/lib/python3.10/site-packages/carrottransform/examples/test/rules/v2.json in 0.00428 secs
-2026-01-22 16:28:09,172 - carrottransform.tools.logger - INFO - person_id stats: total loaded 1000, reject count 0
-2026-01-22 16:28:09,172 - carrottransform.tools.logger - INFO - Processing data...
-2026-01-22 16:28:09,172 - carrottransform.tools.logger - INFO - Streaming input file: Symptoms.csv
-2026-01-22 16:28:09,213 - carrottransform.tools.logger - INFO - Streaming input file: covid19_antibody.csv
-2026-01-22 16:28:09,284 - carrottransform.tools.logger - INFO - Streaming input file: Demographics.csv
-2026-01-22 16:28:09,410 - carrottransform.tools.logger - INFO - TARGET: condition_occurrence: output count 400
-2026-01-22 16:28:09,411 - carrottransform.tools.logger - INFO - TARGET: measurement: output count 1000
-2026-01-22 16:28:09,411 - carrottransform.tools.logger - INFO - TARGET: observation: output count 400
-2026-01-22 16:28:09,411 - carrottransform.tools.logger - INFO - TARGET: person: output count 1000
-2026-01-22 16:28:09,411 - carrottransform.tools.logger - INFO - V2 processing completed successfully in 0.26021 secs
-
- ~/Desktop/carrot-transform-0.7.5 ------------------------------------------------------------------------------------------------------------------------------------------------------------- 16:28:09 PM 
-> 
+The exact dataset name and record counts depend on your own Scan Report and mapping rules, but for this tutorial's sample data you should see something close to:
 
 ```
+2026-08-21 15:19:14,622 - carrottransform.tools.logger - INFO - starting v2 with injected source and output
+2026-08-21 15:19:14,645 - carrottransform.tools.logger - INFO - Detected v2.json format, using direct v2 parser...
+2026-08-21 15:19:14,649 - carrottransform.tools.logger - INFO - Loaded v2 mapping rules from: CarrotTransform_input_sample_files/rules_v2.json in 0.00686 secs
+2026-08-21 15:19:14,655 - carrottransform.tools.logger - INFO - person_id stats: total loaded 200, reject count 1
+2026-08-21 15:19:14,655 - carrottransform.tools.logger - INFO - Processing data...
+2026-08-21 15:19:14,655 - carrottransform.tools.logger - INFO - Streaming input file: patients.csv
+2026-08-21 15:19:14,656 - carrottransform.tools.logger - WARNING -  couldn't be normalised to ISO 8601 date format
+2026-08-21 15:19:14,664 - carrottransform.tools.logger - INFO - TARGET: condition_occurrence: output count 200
+2026-08-21 15:19:14,664 - carrottransform.tools.logger - INFO - TARGET: person: output count 200
+2026-08-21 15:19:14,665 - carrottransform.tools.logger - INFO - V2 processing completed successfully in 0.02287 secs
+```
+
+<Callout type="info">
+  **Note:** The reject count and the "couldn't be normalised to ISO 8601 date format" warning are expected here — one row in the sample `patients.csv` has a blank `BIRTHDATE`, so that record is excluded rather than transformed. Carrot Transform only produces the target tables your mapping rules reference — this sample's rules only map to `person` and `condition_occurrence`, so that's all you'll see, even though Carrot supports more OMOP tables (see [Supported Tables](/mapper/supported_tables)).
+</Callout>
 
 ### Understanding the Output
 
-After the transformation completes, check your build directory. You should see files like:
+After the transformation completes, check your output directory. You should see files like:
 
 ```
-example_output/
+output/
 ├── condition_occurrence.tsv
-├── measurement.tsv
-├── observation.tsv
 ├── person_ids.tsv
 ├── person.tsv
 ├── summary_mapstream.tsv
@@ -158,10 +132,12 @@ example_output/
 
 - **person.tsv**: Patient demographic information (age, gender, race, ethnicity) in OMOP CDM format
 - **condition_occurrence.tsv**: Diagnoses and conditions mapped to OMOP CDM standard concept IDs
-- **measurement.tsv**: Cooresponds to the OMOP CMD standard measurements table
-- **observation.tsv**: Cooresponds to the OMOP CMD standard observations table
 - **person_ids.tsv**: Mapping of original person identifiers to OMOP person_id values
 - **summary_mapstream.tsv**: Summary statistics and mapping information from the transformation process
+
+<Callout type="info">
+  A dataset with richer mapping rules — covering measurements, observations, drug exposures, and so on — will produce the matching `.tsv` file for each target table referenced. See [Expected Output](/transform/expected_output) for the full set of tables Carrot Transform can produce and their column layouts.
+</Callout>
 
 ### The Output: person.tsv
 
@@ -181,7 +157,7 @@ person_id	gender_concept_id	year_of_birth	month_of_birth	day_of_birth	birth_date
 10	8507	1969	8	22	1969-08-22 00:00:00	0	0					M	8507				
 ```
 
-It is important to go through the build folder to see the output of the files and interact to understand how the data was transformed and data accuracy.
+It is important to go through the output folder to see the output of the files and interact to understand how the data was transformed and data accuracy.
 The transformation applies all the mapping rules you created in Carrot Mapper to convert your source data into the standardized OMOP CDM format.
 
 
