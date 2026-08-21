@@ -1,0 +1,26 @@
+import { Callout } from "nextra/components";
+
+# API Reference
+
+Carrot Mapper exposes a public REST API, which you can build against directly, independent of the Carrot Mapper frontend.
+
+<Callout type="info">
+  The API is stable and versioned. The current version is `v2`.
+</Callout>
+
+The full schema, including every endpoint, request/response shape, and authentication requirement, is published as interactive Redoc documentation, generated directly from the API:
+
+**[api.carrot.ac.uk/api/v2/schema/redoc](https://api.carrot.ac.uk/api/v2/schema/redoc/)**
+
+## What you can do with the API
+
+The API covers the same functionality as the Carrot Mapper frontend, including:
+
+- Managing Projects, Datasets, and Scan Reports
+- Reading and updating mapping rules and concepts
+- Exporting mapping rules
+
+## Related
+
+- [Internal data structures](/mapper/dev_guide/data_structures) for background on the underlying data model the API exposes.
+- [Mapping rules](/mapper/dev_guide/mapping_rules) for the shape of the mapping rules the API produces.
