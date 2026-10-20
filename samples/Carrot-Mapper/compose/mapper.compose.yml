@@ -3,9 +3,9 @@ name: carrot-mapper-sample-compose
 x-airflow-common: &airflow-common
   depends_on:
     db:
-      condition: service_started
-    minio:
-      condition: service_started
+      condition: service_healthy
+    rustfs:
+      condition: service_healthy
     api:
       condition: service_healthy
   environment: &airflow-common-env
@@ -19,7 +19,7 @@ x-airflow-common: &airflow-common
     AIRFLOW__API__AUTH_BACKEND: airflow.api.auth.backend.basic_auth
     AIRFLOW_CONN_POSTGRES_DB_CONN: postgresql+psycopg2://postgres:postgres@db:5432/postgres
     STORAGE_TYPE: minio
-    AIRFLOW_VAR_MINIO_ENDPOINT: http://minio:9000
+    AIRFLOW_VAR_MINIO_ENDPOINT: http://rustfs:9000
     AIRFLOW_VAR_MINIO_ACCESS_KEY: minioadmin
     AIRFLOW_VAR_MINIO_SECRET_KEY: minioadmin
 
@@ -35,13 +35,19 @@ services:
       POSTGRES_USER: postgres
     volumes:
       - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "localhost", "-U", "postgres", "-d", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   omop-lite:
     image: ghcr.io/health-informatics-uon/omop-lite
     volumes:
       - ./vocabs:/vocabs
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       DB_PASSWORD: postgres
       DB_NAME: postgres
@@ -83,7 +89,7 @@ services:
       - SECRET_KEY=secret
       - SIGNING_KEY=secret
       - STORAGE_TYPE=minio
-      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ENDPOINT=rustfs:9000
       - MINIO_ACCESS_KEY=minioadmin
       - MINIO_SECRET_KEY=minioadmin
       - WORKER_SERVICE_TYPE=airflow
@@ -106,23 +112,26 @@ services:
     depends_on:
       omop-lite:
         condition: service_completed_successfully
+      rustfs:
+        condition: service_healthy
 
-  minio:
-    image: minio/minio
+  rustfs:
+    image: rustfs/rustfs:1.0.3-glibc
     restart: always
-    command: server /data --console-address ":9001"
+    command: /data
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "9000:9000" # S3 API
+      - "9001:9001" # Web console
     environment:
-      MINIO_ROOT_USER: "minioadmin"
-      MINIO_ROOT_PASSWORD: "minioadmin"
-      MINIO_BROWSER: "on"
-      MINIO_DOMAIN: "minio"
+      RUSTFS_ACCESS_KEY: "minioadmin"
+      RUSTFS_SECRET_KEY: "minioadmin"
+      RUSTFS_ADDRESS: ":9000"
+      RUSTFS_CONSOLE_ADDRESS: ":9001"
+      RUSTFS_CONSOLE_ENABLE: "true"
     volumes:
-      - minio_data:/data
+      - rustfs_data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health/ready"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -147,4 +156,4 @@ services:
 
 volumes:
   db_data:
-  minio_data:
+  rustfs_data:
