@@ -1,157 +1,221 @@
-import { Callout, Steps, Tabs } from "nextra/components";
+import { Callout, Steps } from "nextra/components";
 
 # Developer Quickstart
 
-This page will guide you through getting Carrot running locally.
+This page will guide you through getting Carrot running locally for development.
 
-Start by cloning [the Carrot Mapper repository](https://github.com/Health-Informatics-UoN/carrot-mapper)
+In development, `docker compose` only runs the **supporting services** (Postgres, blob storage, OMOP Lite, Keycloak and Airflow). The **API** (Django) and the **frontend** (Next.js) are run from source, so you get fast reload and a normal debugger.
+
+Start by cloning [the Carrot Mapper repository](https://github.com/Health-Informatics-UoN/carrot-mapper).
+
+<Callout type="info">
+  For how to contribute (issues, code style, pull requests and releases), see the
+  repository's [`CONTRIBUTING.md`](https://github.com/Health-Informatics-UoN/carrot-mapper/blob/main/CONTRIBUTING.md).
+</Callout>
 
 ## Prerequisites
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- Vocabularies downloaded from [Athena](https://athena.ohdsi.org/). The guide for downloading can be found [here](https://github.com/OHDSI/Vocabulary-v5.0/wiki/General-Structure,-Download-and-Use).
+- [uv](https://docs.astral.sh/uv/) for the Python API (the API requires Python `3.11`, which `uv` will install for you)
+- [Node.js](https://nodejs.org/) and `npm` for the frontend
+- _(Optional)_ Vocabularies downloaded from [Athena](https://athena.ohdsi.org/), only if you need real vocabularies (see [below](#omop-schema-and-vocabs-setting)).
+
+## Services
+
+The [`docker-compose.yml`](https://github.com/Health-Informatics-UoN/carrot-mapper/blob/main/docker-compose.yml) in the root directory defines the following services:
+
+| Service       | Description                                                                                                       | Port(s)                   |
+| ------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `db`          | Postgres 18. Holds Carrot's data, the `omop` schema, and separate `airflow` and `keycloak` databases.             | `5432`                    |
+| `omop-lite`   | One-shot container that creates the `omop` schema and loads vocabularies, then exits.                             | -                         |
+| `azurite`     | Azure Blob/Queue storage emulator (profile `azure`, the **default** for local development).                       | `10000`, `10001`, `10002` |
+| `rustfs`      | S3-compatible storage (profile `main`), used instead of Azurite when `STORAGE_TYPE=s3`.                           | `9000` (API), `9001` (console) |
+| `keycloak`    | Identity provider used by Airflow for authentication. Imports the `CARROT-MAPPER` realm from `realm-config/`.     | `8085`                    |
+| `airflow-api` | Airflow 3 API server (replaces the old `airflow-webserver`). Serves the Airflow UI and REST API.                  | `8080`                    |
+| `scheduler`   | Airflow scheduler, which also runs the DAG processor.                                                              | -                         |
 
 <Callout type="info">
-  For a quick start, we don't recommend downloading and importing all of the available vocabularies on Athena, which will make the Carrot installation slower. Instead, the list below suggests **minimum required vocabularies** for Carrot's quick start. 
+  The `airflow-api` and `scheduler` images are built locally from `app/airflow`, and `app/airflow/dags` is mounted
+  into them, so changes to the DAGs are picked up without rebuilding.
 </Callout>
-
-**Minimum Required Vocabularies**
-  <div>
-    For downloading the minimum required vocabularies, you can use the following:
-    <div>
-      - SNOMED CT
-      - RxNorm
-      - RxNorm Extension
-      - LOINC
-      - ICD10
-      - ICD10CM
-      - Gender
-      - Ethnicity
-      - OMOP Extension
-      - NHS Ethnic Category
-      - OPCS4
-      - UK BioBank
-    </div>
-  </div>
 
 ## Getting Started
 
-Below are steps to make Carrot up and running locally.
+For convenience, use **three separate terminals**:
+
+- **Terminal 1** at the root directory (Docker services)
+- **Terminal 2** at the `app/api` directory (Django API)
+- **Terminal 3** at the `app/next-client-app` directory (Next.js frontend)
 
 <Steps>
 
 ### OMOP schema and vocabs setting
 
-You need a pre-seeded OMOP CDM database inside the database of Carrot.
+Carrot needs an OMOP CDM schema with vocabularies inside its database. This is created by the [OMOP Lite](https://github.com/Health-Informatics-UoN/omop-lite) container (`omop-lite`) when the stack starts.
 
-To do this, add a folder named `vocabs` in the `root` directory of Carrot, then place there vocabulary files downloaded from Athena.
+By default (`SYNTHETIC_VOCABS=true`), OMOP Lite loads a small **synthetic** set of vocabularies, which is enough for most development work and requires no download.
 
-Thanks to [OMOP Lite](https://github.com/Health-Informatics-UoN/omop-lite) container, OMOP schema will be created and vocabularies will be loaded to Carrot's database, when the app's stack is running.
+If you need the real Athena vocabularies (for example, to test the auto-mapping functionality), do the following **before** starting the services:
 
-### Superuser Credentials setup
-A superuser needs to be created to access the Django admin dashboard and Carrot frontend.
-
-By default, the superuser credentials are:
-
-```
-Username: admin
-Password: admin
-```
-
-You can change those by doing the following steps:
-
-    - Locate the `docker-compose.yml` file in the `root` directory of Carrot.
-    - Change the following variables of the `api` service with your desired credentials:
-
-      ```yaml
-        - SUPERUSER_DEFAULT_USERNAME=<superuser_username>
-        - SUPERUSER_DEFAULT_PASSWORD=<superuser_password>
-        - SUPERUSER_DEFAULT_EMAIL=<superuser_email>
-      ```
-
-    - After the [Warm up](#warm-up) step is done, a superuser will be created automatically with the credentials you chose above.
-
+1. Set `SYNTHETIC_VOCABS=false` in the root `.env` file (created in the [next step](#start-the-database-and-load-vocabularies)).
+2. Create a folder named `vocabs` in the root directory and put the vocabulary files downloaded from Athena there. The guide for downloading can be found [here](https://github.com/OHDSI/Vocabulary-v5.0/wiki/General-Structure,-Download-and-Use).
 
 <Callout type="info">
-  Without the superuser credentials in the environment variables, no users will be created. However, you can still add a superuser later by doing it manually (using the command `python manage.py createsuperuser` on the `api` container) or automatically (using steps above, and then restarting the containers).
+  We don't recommend downloading all of the available vocabularies on Athena, as this makes loading much slower. The
+  **minimum required vocabularies** are: SNOMED CT, RxNorm, RxNorm Extension, LOINC, ICD10, ICD10CM, Gender, Ethnicity,
+  OMOP Extension, NHS Ethnic Category, OPCS4 and UK BioBank.
 </Callout>
 
-### Warm up
+### Start the database and load vocabularies
 
-At the `root` directory, run to command below to start the application stack using Docker compose.
+At **terminal 1** (root directory), create the `.env` file and start Postgres, OMOP Lite and the storage emulator:
 
 ```bash copy
-docker compose --profile main up -d
+cp .env.example .env
+docker compose up -d db omop-lite azurite
 ```
 
-**After running the `docker-compose`, Carrot runs the following containers below:**
+Wait for `omop-lite` to finish and **exit** before continuing. It is a one-shot container, and its run time depends on the size of the vocabularies you are loading. You can follow its progress with:
 
-- Database (`db`)
-- MinIO  (`minio`) (default admin credentials are: `Username : minioadmin` and `Password : minioadmin`)
-- Carrot's backend (`api`) 
-- Airflow services (`airflow-webserver` and `scheduler`)
-- Carrot's frontend (`frontend`).
-
-This process will be on the background and take some time, but you can always check it through Docker Desktop app.
-
-When all of containers, except `omop-lite`, are up and running successfully, Carrot's frontend and backend can be accessed through `http://localhost:3000/` and `http://localhost:8000/admin/` respectively.
-
-**However**, please complete the remaining steps, while containers are running, to make sure Carrot is running correctly.
-
-More details about Docker compose's configuration can be found [here](configuration).
+```bash copy
+docker compose logs -f omop-lite
+```
 
 <Callout type="info">
-
-The `omop-lite` container, whose task is creating `omop` schema on `db` and install vocabularies there, will be shut down automatically after successfully done its jobs. The execution time for `omop-lite` may vary depending of the size of the Vocabs folder.
-
+  On first start, Postgres runs `init-pg/init-pg.sql`, which creates the separate `airflow` and `keycloak` databases. No
+  manual schema creation is needed for Airflow.
 </Callout>
+
+### Bootstrap and run the API
+
+At **terminal 2** (`app/api`), install dependencies, set up the database and start the Django dev server:
+
+```bash copy
+uv sync
+uv run manage.py migrate
+uv run manage.py automatic_seeding_data
+uv run manage.py default_super_user
+uv run manage.py automatic_queue_and_containers_creation
+uv run manage.py runserver
+```
+
+- `migrate` creates Carrot's tables.
+- `automatic_seeding_data` seeds the reference data Carrot needs.
+- `default_super_user` creates the superuser from `SUPERUSER_DEFAULT_USERNAME`, `SUPERUSER_DEFAULT_PASSWORD` and `SUPERUSER_DEFAULT_EMAIL` in `.env` (`admin` / `admin` by default).
+- `automatic_queue_and_containers_creation` creates the storage queues and blob containers.
 
 <Callout type="info">
-
-Docker will mount the `app/api` and `app/next-client-app` directories to its environment, so any changes in the code of the backend or frontend will be reflected in the running application.
-
+  There is no separate `app/api/.env`. `python-dotenv` walks up from `app/api` looking for a `.env`, so the root `.env`
+  covers the API too.
 </Callout>
+
+### Bring up the rest of the stack
+
+At **terminal 1**, start the remaining services (Keycloak and Airflow):
+
+```bash copy
+docker compose up -d
+```
+
+The `.env` file sets `COMPOSE_PROFILES=azure`, so a plain `docker compose up` starts Azurite as the storage service. Airflow waits for both `db` and `keycloak` to be healthy before starting, so this can take a minute or two on first run.
+
+### Run the frontend
+
+At **terminal 3** (`app/next-client-app`), create the frontend `.env` and start the Next.js dev server:
+
+```bash copy
+cp .env.example .env
+npm install
+npm run dev
+```
+
+The frontend `.env` points at the API running from source on `http://localhost:8000`.
 
 ### First instances creation
 
-Create some first instances in Carrot app by logging to Django Admin panel `http://localhost:8000/admin/`.
+Create some first instances in Carrot by logging in to the Django Admin panel at `http://localhost:8000/admin/` with the [default credentials](#default-login-details).
 
-1. You can **log in to the Admin Panel** using the [superuser credentials](#superuser-credentials-setup) you configured earlier.
-2. Once logged in, you will be presented with the Django Admin panel.
-3. Following this order, fill out the required information to create new instance of `Data Partner`, `Dataset` and `Project`.
+Following this order, fill out the required information to create new instances of `Data Partner`, `Dataset` and `Project`.
 
 ### Check-in
 
-You should now be able to access Carrot by logging in at `http://localhost:3000/` using your admin credentials created at step 3.
+You should now be able to log in to Carrot at `http://localhost:3000/` with the superuser credentials. After logging in, you will be presented with the `Projects` page.
 
-After log in, you will be presented with `Projects` page.
-
-Try using Carrot by steps in the [user quickstart](/mapper/user_guide/quickstart) to see if Carrot is running correctly. If you can successfully upload a new scan report, create mapping rules, and finally can export the Mapping rules JSON. That's a sign that you have successfully install and run Carrot locally.
+Try using Carrot by following the [user quickstart](/mapper/user_guide/quickstart). If you can upload a new scan report, create mapping rules, and export the mapping rules JSON, Carrot is running correctly.
 
 <Callout emoji="🎉">Congratulations on your first Carrot running!</Callout>
 
 </Steps>
 
-Since now on, to run Carrot locally, you can just run
+## Default login details
 
-```bash copy
-docker compose --profile main up -d
-```
+| Service            | URL                           | Username       | Password      | Notes                                                       |
+| ------------------ | ----------------------------- | -------------- | ------------- | ----------------------------------------------------------- |
+| Django Admin (API) | `http://localhost:8000/admin` | `admin`        | `admin`       | Default superuser. Add more users from here.                |
+| Frontend           | `http://localhost:3000`       | `admin`        | `admin`       | Same default superuser as the API.                          |
+| Airflow            | `http://localhost:8080`       | `carrot-admin` | `password123` | Airflow authenticates through Keycloak.                     |
+| Keycloak           | `http://localhost:8085`       | `admin`        | `admin`       | Keycloak admin. Add more users here to give Airflow access. |
 
-and access `http://localhost:3000/`.
-
-To stop the application, run:
-
-```bash copy
-docker compose --profile main down
-```
-_Optional:_ There is another service, which is Azurite storage, that can be used in Carrot Mapper. To activate this service, run the command below instead to at step 4 - [Warm up](#warm-up) 
-
-```bash copy
-STORAGE_TYPE=azure docker compose --profile azure up -d
-```
-<Callout type='warning'>
-**Note:** Changing the mode of starting the compose stack is not recommended, because this may cause the conflicts in storage.
+<Callout type="info">
+  Airflow 3 uses Keycloak (`KeycloakAuthManager`) instead of basic auth, so Airflow users and roles are managed in
+  Keycloak, in the `CARROT-MAPPER` realm defined in `realm-config/Carrot-Mapper.json`. Keycloak is reached at
+  `http://keycloak.localtest.me:8085`, a hostname that always resolves to `127.0.0.1`, so no hosts file changes are needed.
 </Callout>
 
-**What next?** Explore and try using Carrot with [user quickstart](/mapper/user_guide/quickstart).
+## Day-to-day development
+
+Once the schema and migrations already exist in the `db` volume, the start-up order no longer matters. Just run:
+
+```bash copy
+# Terminal 1 (root)
+docker compose up -d
+
+# Terminal 2 (app/api)
+uv run manage.py runserver
+
+# Terminal 3 (app/next-client-app)
+npm run dev
+```
+
+To stop the Docker services, run at the root directory:
+
+```bash copy
+docker compose down
+```
+
+<Callout type="warning">
+  `docker compose down -v` also removes the `db_data_pg18` volume, which deletes Carrot's data and the loaded
+  vocabularies. You will need to repeat the setup steps afterwards.
+</Callout>
+
+## Using S3 storage instead of Azurite
+
+Local development uses Azurite by default. To use the S3-compatible `rustfs` service instead, instead of commands in step 2, run these commands at the root directory:
+
+```bash
+cp .env.s3.example .env
+docker compose up -d db omop-lite rustfs
+```
+
+Then restart the stack. The `rustfs` console is available at `http://localhost:9001` (`s3admin` / `s3admin`).
+
+<Callout type="warning">
+  Switching storage type on an existing setup is not recommended, as files already uploaded to one storage service won't
+  be available in the other.
+</Callout>
+
+## Upgrading from Airflow 2 setups
+
+If you set up Carrot locally before the upgrade to Airflow 3, note the following breaking changes:
+
+- `airflow-webserver` has been replaced by `airflow-api`, and the scheduler now also runs the DAG processor.
+- Airflow authentication moved from basic auth to Keycloak. Airflow's admin user is no longer created at start-up.
+- Airflow metadata now lives in a separate `airflow` database rather than an `airflow` schema in the `postgres` database.
+- `AIRFLOW_BASE_URL` is now the bare host (e.g. `http://localhost:8080`), without the `/api/v1/` suffix.
+- Storage connections are provided through `AIRFLOW_CONN_WASB_CONN` / `AIRFLOW_CONN_S3_CONN` environment variables. The `AIRFLOW_VAR_WASB_*` / `AIRFLOW_VAR_S3_*` variables are no longer used.
+- New variables are required in `.env`: `AIRFLOW_OPENID_CLIENT_SECRET`, `AIRFLOW_API_SECRET_KEY`, `AIRFLOW_API_AUTH_JWT_SECRET`, `KEYCLOAK_HOSTNAME`, `KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD` and `KEYCLOAK_STARTUP_COMMAND`.
+- The database volume is now `db_data_pg18` (Postgres 18).
+
+The simplest way to migrate is to re-copy `.env.example` to `.env` (re-applying any custom values) and follow this guide from the start.
+
+**What next?** Explore and try using Carrot with the [user quickstart](/mapper/user_guide/quickstart).
