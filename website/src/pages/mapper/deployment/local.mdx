@@ -51,15 +51,32 @@ wget -O realm-config/Carrot-Mapper.json https://raw.githubusercontent.com/Health
 
 ### Environment configuration
 
-For your convenience, the compose file is already configured with enough environment variables to run Carrot Mapper. For the reference, please see the [Configuration section](/mapper/deployment/configuration).
+All the settings you are likely to change are collected in a sample `.env` file. Download it next to `mapper.compose.yml` and copy it to `.env`:
 
-The following variables can be set when running `docker compose`, without editing the file:
+```bash copy
+wget https://raw.githubusercontent.com/Health-Informatics-UoN/carrot/refs/heads/main/samples/Carrot-Mapper/compose/.env.example
+cp .env.example .env
+```
 
-| Variable            | Default                              | Description                                                                 |
-| ------------------- | ------------------------------------ | --------------------------------------------------------------------------- |
-| `RELEASE_VERSION`   | _(required)_                         | The Carrot Mapper image version to deploy, for example `5.0.3`.             |
-| `SYNTHETIC_VOCABS`  | `true`                               | Set to `false` to load your own vocabularies from the `vocabs` folder.      |
-| `KEYCLOAK_HOSTNAME` | `http://keycloak.localtest.me:8085`  | URL of Keycloak, used by both the browser and Airflow. See the note below. |
+Docker Compose reads `.env` automatically. Every variable has a default in the compose file except `RELEASE_VERSION`, which must be set. The main variables are:
+
+| Variable                                   | Default                             | Description                                                                                       |
+| ------------------------------------------ | ----------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `RELEASE_VERSION`                          | _(required)_                        | The Carrot Mapper image version to deploy, `5.0.0` or later.                                      |
+| `FRONTEND_URL`                             | `http://localhost:3000`             | URL users open the frontend on.                                                                   |
+| `AIRFLOW_URL`                              | `http://localhost:8080`             | URL users open Airflow on.                                                                        |
+| `KEYCLOAK_HOSTNAME`                        | `http://keycloak.localtest.me:8085` | URL of Keycloak, used by both the browser and Airflow. See the note below.                        |
+| `SYNTHETIC_VOCABS`                         | `true`                              | Set to `false` to load your own vocabularies from the `vocabs` folder.                            |
+| `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` | `postgres`                 | Database credentials, shared by Carrot, Airflow, Keycloak and OMOP Lite.                          |
+| `SUPERUSER_DEFAULT_USERNAME`, `SUPERUSER_DEFAULT_PASSWORD`, `SUPERUSER_DEFAULT_EMAIL` | `admin`, `admin`, `admin@carrot.com` | The Carrot superuser created on first start.         |
+| `SECRET_KEY`, `SIGNING_KEY`, `NEXTAUTH_SECRET` | -                               | Secrets for the API and frontend.                                                                 |
+| `S3_ACCESS_KEY`, `S3_SECRET_KEY`           | `s3admin`                           | RustFS storage credentials, shared by RustFS, the API and Airflow.                                |
+| `AIRFLOW_ADMIN_USERNAME`, `AIRFLOW_ADMIN_PASSWORD` | `carrot-admin`, `password123` | Keycloak user the API uses to trigger Airflow DAGs.                                               |
+| `AIRFLOW_OPENID_CLIENT_SECRET`             | -                                   | Secret of the `CARROT-AIRFLOW` Keycloak client. Must match `realm-config/Carrot-Mapper.json`.     |
+| `KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD`        | `admin`                             | Password of the Keycloak `admin` user.                                                            |
+| `KEYCLOAK_STARTUP_COMMAND`                 | `start-dev`                         | Use `start` (which requires HTTPS) for production.                                                |
+
+See the comments in `.env.example` for the full list. For what each variable does in the services, see the [Configuration section](/mapper/deployment/configuration).
 
 <Callout type="info">
   `keycloak.localtest.me` always resolves to `127.0.0.1`, so the default only works when you open Airflow in a browser on
@@ -68,8 +85,15 @@ The following variables can be set when running `docker compose`, without editin
 </Callout>
 
 <Callout type="warning">
-  The sample uses default passwords and secrets, and runs Keycloak in development mode (`start-dev`). It is meant for
-  local or trial deployments only. Change all credentials and secrets before exposing it to other users.
+  Changing `AIRFLOW_ADMIN_USERNAME`, `AIRFLOW_ADMIN_PASSWORD` or `AIRFLOW_OPENID_CLIENT_SECRET` in `.env` does not change
+  Keycloak. Update the matching user or client in Keycloak (or in `realm-config/Carrot-Mapper.json` before the first
+  start) as well.
+</Callout>
+
+<Callout type="warning">
+  The defaults are meant for local or trial deployments only. Change all passwords and secrets in `.env` before exposing
+  Carrot Mapper to other users. Database credentials are also used inside connection URIs, so URL-encode any special
+  characters in `POSTGRES_PASSWORD`.
 </Callout>
 
 ### OMOP CDM configuration
@@ -80,7 +104,7 @@ By default, Carrot Mapper uses a synthetic OMOP CDM database, which is loaded in
 
 - Create a folder named `vocabs` in the same directory as the `mapper.compose.yml` file.
 - Download the desired vocabularies from [Athena](https://athena.ohdsi.org/) and place them in the `vocabs` folder.
-- Set `SYNTHETIC_VOCABS=false` when starting the stack (see the next step).
+- Set `SYNTHETIC_VOCABS=false` in your `.env` file.
 
 ### Run Carrot Mapper
 
@@ -91,16 +115,10 @@ To run Carrot, you need to specify the release version of the Carrot Mapper appl
   set of services and will not work with it.
 </Callout>
 
-At the directory containing the `mapper.compose.yml` file, run the command with the release version specified, for example `5.0.3`:
+Set `RELEASE_VERSION` in your `.env` file, then run this command in the directory containing `mapper.compose.yml`:
 
 ```bash copy
-RELEASE_VERSION=<release-version> docker compose -f mapper.compose.yml up -d
-```
-
-To load your own vocabularies instead of the synthetic ones:
-
-```bash copy
-RELEASE_VERSION=<release-version> SYNTHETIC_VOCABS=false docker compose -f mapper.compose.yml up -d
+docker compose -f mapper.compose.yml up -d
 ```
 
 The command will pull and start the following services:
@@ -124,7 +142,7 @@ docker compose -f mapper.compose.yml logs -f omop-lite
 
 ### Log in
 
-After the services are up and running, you can access Carrot Mapper with the default credentials below:
+After the services are up and running, you can access Carrot Mapper with the credentials below (these are the defaults; use your own values if you changed them in `.env`):
 
 | Service            | URL                           | Username       | Password      |
 | ------------------ | ----------------------------- | -------------- | ------------- |
@@ -160,7 +178,7 @@ docker compose -f mapper.compose.yml down
 
 Your data is kept in the `db_data_pg18` and `s3_data` volumes. Running `down -v` also deletes these volumes, which removes all of Carrot's data and the loaded vocabularies.
 
-To upgrade to a newer release, run `up -d` again with the new `RELEASE_VERSION`. Database migrations run automatically when the `api` service starts.
+To upgrade to a newer release, change `RELEASE_VERSION` in `.env` and run `up -d` again. Database migrations run automatically when the `api` service starts.
 
 <Callout type="warning">
   If you deployed a Carrot Mapper version earlier than 5.0.0 with the old sample compose file, don't reuse that setup.
@@ -175,5 +193,5 @@ When deploying Carrot Mapper, follow these best practices to ensure stability an
 - Use Tagged Versions: We tag each container image with a version number upon release, for example `5.0.3`. Always deploy a specific tagged version rather than latest to avoid unintended updates.
 - Check Available Versions: You can find a list of available version tags in the [container registry](https://github.com/orgs/Health-Informatics-UoN/packages?repo_name=carrot-mapper).
 - Environment Configuration: Ensure your deployment environment (for example database connections, API endpoints, Keycloak hostname) is correctly configured via environment variables.
-- Change Default Secrets: Replace the default passwords and secrets in the compose file (database, Django, NextAuth, Airflow, Keycloak and RustFS) before sharing the deployment with others.
+- Change Default Secrets: Replace the default passwords and secrets in `.env` (database, Django, NextAuth, Airflow, Keycloak and RustFS) before sharing the deployment with others. Keep `.env` out of version control.
 - Monitor and Log: Use logging and monitoring tools to track service health and quickly diagnose issues.
