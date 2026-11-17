@@ -1,102 +1,181 @@
+# Sample Docker Compose for running Carrot Mapper from the published images.
+#
+# For full deployment instructions, see https://carrot.ac.uk/mapper/deployment/local
+#
+# Configuration: copy .env.example to .env (in this directory) and edit it.
+# Docker Compose reads .env automatically; every value has a default except RELEASE_VERSION.
+
 name: carrot-mapper-sample-compose
 
 x-airflow-common: &airflow-common
   depends_on:
     db:
-      condition: service_started
-    minio:
-      condition: service_started
+      condition: service_healthy
+    keycloak:
+      condition: service_healthy
+    rustfs:
+      condition: service_healthy
     api:
       condition: service_healthy
   environment: &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
-    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:postgres@db:5432/postgres?options=-csearch_path%3Dairflow
-    AIRFLOW__DATABASE__SQL_ALCHEMY_SCHEMA: airflow
+    # Airflow metadata lives in its own `airflow` database (created by init-pg below).
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/airflow
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__API__SECRET_KEY: ${AIRFLOW_API_SECRET_KEY:-test-airflow-secret-key}
+    AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW_API_AUTH_JWT_SECRET:-Bdta/xfhDGy5yGPLHe5rfA==}
     AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "False"
     AIRFLOW__WEBSERVER__WEB_SERVER_PORT: 8080
-    AIRFLOW__WEBSERVER__SECRET_KEY: secret
-    AIRFLOW__API__AUTH_BACKEND: airflow.api.auth.backend.basic_auth
-    AIRFLOW_CONN_POSTGRES_DB_CONN: postgresql+psycopg2://postgres:postgres@db:5432/postgres
-    STORAGE_TYPE: minio
-    AIRFLOW_VAR_MINIO_ENDPOINT: http://minio:9000
-    AIRFLOW_VAR_MINIO_ACCESS_KEY: minioadmin
-    AIRFLOW_VAR_MINIO_SECRET_KEY: minioadmin
+    AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_API_SECRET_KEY:-test-airflow-secret-key}
+    # Airflow 3 authenticates users through Keycloak (realm CARROT-MAPPER, client CARROT-AIRFLOW).
+    AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.keycloak.auth_manager.keycloak_auth_manager.KeycloakAuthManager
+    AIRFLOW__KEYCLOAK_AUTH_MANAGER__CLIENT_ID: CARROT-AIRFLOW
+    # Must match the CARROT-AIRFLOW client secret in realm-config/Carrot-Mapper.json.
+    AIRFLOW__KEYCLOAK_AUTH_MANAGER__CLIENT_SECRET: ${AIRFLOW_OPENID_CLIENT_SECRET:-QXFtCMyTjwYzCK07qGTp9s95n5u5eVyB}
+    AIRFLOW__KEYCLOAK_AUTH_MANAGER__REALM: CARROT-MAPPER
+    AIRFLOW__KEYCLOAK_AUTH_MANAGER__SERVER_URL: ${KEYCLOAK_HOSTNAME:-http://keycloak.localtest.me:8085}
+    AIRFLOW_CONN_POSTGRES_DB_CONN: postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-postgres}
+    # Storage connection must be provided up front (Airflow 3 tasks can't create connections at runtime).
+    AIRFLOW_CONN_S3_CONN: '{"conn_type": "aws", "extra": {"endpoint_url": "http://rustfs:9000", "aws_access_key_id": "${S3_ACCESS_KEY:-s3admin}", "aws_secret_access_key": "${S3_SECRET_KEY:-s3admin}"}}'
+    STORAGE_TYPE: s3
+
+configs:
+  init-pg:
+    content: |
+      CREATE DATABASE airflow;
+      CREATE DATABASE keycloak;
 
 services:
   db:
-    image: postgres:14
+    image: postgres:18
     restart: always
     ports:
       - 5432:5432
     environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+    configs:
+      - source: init-pg
+        target: /docker-entrypoint-initdb.d/init-pg.sql
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_data_pg18:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 30s
+      start_period: 30s
+      retries: 10
 
   omop-lite:
-    image: ghcr.io/health-informatics-uon/omop-lite
+    image: ghcr.io/health-informatics-uon/omop-lite:0.7.0
     volumes:
       - ./vocabs:/vocabs
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
-      DB_PASSWORD: postgres
-      DB_NAME: postgres
+      DB_USER: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      DB_NAME: ${POSTGRES_DB:-postgres}
       SCHEMA_NAME: omop
       DATA_DIR: vocabs
-      SYNTHETIC: true
+      SYNTHETIC: ${SYNTHETIC_VOCABS:-true}
+      SYNTHETIC_NUMBER: 1000
 
-  frontend:
-    image: ghcr.io/health-informatics-uon/carrot/frontend:${RELEASE_VERSION}
-    ports:
-      - 3000:3000
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.7.0
+    restart: always
     environment:
-      BACKEND_URL: http://api:8000
-      BACKEND_ORIGIN: localhost:8000
-      NEXTAUTH_URL: http://localhost:3000/
-      NEXTAUTH_SECRET: verycomplexsecretkey
-      NEXTAUTH_BACKEND_URL: http://api:8000/api/
-      NODE_ENV: development
-      BODY_SIZE_LIMIT: 20971520
-      NEXT_PUBLIC_ENABLE_REUSE_TRIGGER_OPTION: true
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://db/keycloak
+      KC_DB_USERNAME: ${POSTGRES_USER:-postgres}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      # Browsers and Airflow must reach Keycloak on the same URL. keycloak.localtest.me always
+      # resolves to 127.0.0.1; on a remote VM, set KEYCLOAK_HOSTNAME to a URL users can reach.
+      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME:-http://keycloak.localtest.me:8085}
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: true
+      KC_LOG_LEVEL: info
+      KC_METRICS_ENABLED: true
+      KC_HEALTH_ENABLED: true
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_BOOTSTRAP_ADMIN_PASSWORD:-admin}
+    # `start-dev` is for local use only; use `start` with HTTPS in production.
+    command: ["${KEYCLOAK_STARTUP_COMMAND:-start-dev}", "--import-realm", "--metrics-enabled=true"]
     depends_on:
-      api:
+      db:
         condition: service_healthy
+    ports:
+      - 8085:8080
+    volumes:
+      - ./realm-config:/opt/keycloak/data/import
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "exec 3<>/dev/tcp/0.0.0.0/9000; echo -e \"GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n\" >&3; grep -q '\"status\": \"UP\"' <&3; exec 3<&- 3>&-",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+      start_interval: 5s
+
+  rustfs:
+    image: rustfs/rustfs:1.0.3-glibc
+    restart: always
+    command: /data
+    ports:
+      - "9000:9000" # S3 API
+      - "9001:9001" # Web console
+    environment:
+      RUSTFS_ACCESS_KEY: ${S3_ACCESS_KEY:-s3admin}
+      RUSTFS_SECRET_KEY: ${S3_SECRET_KEY:-s3admin}
+      RUSTFS_ADDRESS: ":9000"
+      RUSTFS_CONSOLE_ADDRESS: ":9001"
+      RUSTFS_CONSOLE_ENABLE: "true"
+    volumes:
+      - s3_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   api:
-    image: ghcr.io/health-informatics-uon/carrot/backend:${RELEASE_VERSION}
+    image: ghcr.io/health-informatics-uon/carrot/backend:${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
     ports:
       - 8000:8000
     environment:
-      - FRONTEND_URL=http://frontend:3000
-      - ALLOWED_HOSTS=['localhost', '127.0.0.1','api']
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      - ALLOWED_HOSTS=['localhost', '127.0.0.1', 'api']
       - DB_ENGINE=django.db.backends.postgresql
       - DB_HOST=db
       - DB_PORT=5432
-      - DB_NAME=postgres
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - DEBUG=True
-      - SECRET_KEY=secret
-      - SIGNING_KEY=secret
-      - STORAGE_TYPE=minio
-      - MINIO_ENDPOINT=minio:9000
-      - MINIO_ACCESS_KEY=minioadmin
-      - MINIO_SECRET_KEY=minioadmin
+      - DB_NAME=${POSTGRES_DB:-postgres}
+      - DB_USER=${POSTGRES_USER:-postgres}
+      - DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - DB_STATEMENT_TIMEOUT=120s
+      - DEBUG=${DEBUG:-True}
+      - SECRET_KEY=${SECRET_KEY:-secret}
+      - SIGNING_KEY=${SIGNING_KEY:-secret}
+      - STORAGE_TYPE=s3
+      - S3_ENDPOINT=http://rustfs:9000
+      - S3_ACCESS_KEY=${S3_ACCESS_KEY:-s3admin}
+      - S3_SECRET_KEY=${S3_SECRET_KEY:-s3admin}
       - WORKER_SERVICE_TYPE=airflow
-      - AIRFLOW_BASE_URL=http://airflow-webserver:8080/api/v1/
+      # Bare host only - the API adds /auth/token and /api/v2/... itself.
+      - AIRFLOW_BASE_URL=http://airflow-api:8080
       - AIRFLOW_AUTO_MAPPING_DAG_ID=auto_mapping
       - AIRFLOW_SCAN_REPORT_PROCESSING_DAG_ID=scan_report_processing
       - AIRFLOW_RULES_EXPORT_DAG_ID=rules_export
-      - AIRFLOW_ADMIN_USERNAME=admin
-      - AIRFLOW_ADMIN_PASSWORD=admin
-      - DATA_UPLOAD_MAX_MEMORY_SIZE=10485760
-      - SUPERUSER_DEFAULT_PASSWORD=admin
-      - SUPERUSER_DEFAULT_EMAIL=admin@carrot.com
-      - SUPERUSER_DEFAULT_USERNAME=admin
+      # A Keycloak user in the CARROT-MAPPER realm, used to get a JWT from Airflow.
+      - AIRFLOW_ADMIN_USERNAME=${AIRFLOW_ADMIN_USERNAME:-carrot-admin}
+      - AIRFLOW_ADMIN_PASSWORD=${AIRFLOW_ADMIN_PASSWORD:-password123}
+      - DATA_UPLOAD_MAX_MEMORY_SIZE=${DATA_UPLOAD_MAX_MEMORY_SIZE:-31457280}
+      - SUPERUSER_DEFAULT_USERNAME=${SUPERUSER_DEFAULT_USERNAME:-admin}
+      - SUPERUSER_DEFAULT_PASSWORD=${SUPERUSER_DEFAULT_PASSWORD:-admin}
+      - SUPERUSER_DEFAULT_EMAIL=${SUPERUSER_DEFAULT_EMAIL:-admin@carrot.com}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 10s
@@ -104,47 +183,70 @@ services:
       retries: 5
       start_period: 30s
     depends_on:
+      db:
+        condition: service_healthy
+      rustfs:
+        condition: service_healthy
       omop-lite:
         condition: service_completed_successfully
 
-  minio:
-    image: minio/minio
-    restart: always
-    command: server /data --console-address ":9001"
+  frontend:
+    image: ghcr.io/health-informatics-uon/carrot/frontend:${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - 3000:3000
     environment:
-      MINIO_ROOT_USER: "minioadmin"
-      MINIO_ROOT_PASSWORD: "minioadmin"
-      MINIO_BROWSER: "on"
-      MINIO_DOMAIN: "minio"
-    volumes:
-      - minio_data:/data
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      BACKEND_URL: http://api:8000
+      BACKEND_ORIGIN: localhost:8000
+      NEXTAUTH_URL: ${FRONTEND_URL:-http://localhost:3000}/
+      # next-auth reads both; keep them set to the same value.
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-verycomplexsecretkey}
+      AUTH_SECRET: ${NEXTAUTH_SECRET:-verycomplexsecretkey}
+      NEXTAUTH_BACKEND_URL: http://api:8000/api/
+      NODE_ENV: production
+      NEXT_PUBLIC_BODY_SIZE_LIMIT: ${DATA_UPLOAD_MAX_MEMORY_SIZE:-31457280}
+      NEXT_PUBLIC_ENABLE_REUSE_TRIGGER_OPTION: true
+    depends_on:
+      api:
+        condition: service_healthy
 
-  airflow-webserver:
+  airflow-api:
     <<: *airflow-common
-    image: ghcr.io/health-informatics-uon/carrot/airflow-webserver:${RELEASE_VERSION}
+    image: ghcr.io/health-informatics-uon/carrot/airflow-api:${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
     ports:
       - "8080:8080"
     environment:
       <<: *airflow-common-env
-      AIRFLOW_ADMIN_USERNAME: admin
-      AIRFLOW_ADMIN_PASSWORD: admin
+      AIRFLOW__API__PORT: 8080
+      AIRFLOW__API__BASE_URL: ${AIRFLOW_URL:-http://localhost:8080}
+    # Lets the container resolve keycloak.localtest.me to the host's published Keycloak port.
+    extra_hosts:
+      - "keycloak.localtest.me:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/v2/monitor/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
+  # Runs both the Airflow scheduler and the DAG processor.
   scheduler:
     <<: *airflow-common
-    image: ghcr.io/health-informatics-uon/carrot/airflow-scheduler:${RELEASE_VERSION}
+    image: ghcr.io/health-informatics-uon/carrot/airflow-scheduler:${RELEASE_VERSION:?Set RELEASE_VERSION in .env}
     environment:
       <<: *airflow-common-env
       AIRFLOW__CORE__EXECUTE_TASKS_NEW_PYTHON_INTERPRETER: True
+      AIRFLOW__CORE__EXECUTION_API_SERVER_URL: "http://airflow-api:8080/execution/"
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+      AIRFLOW__DAG_PROCESSOR__PRINT_STATS_INTERVAL: "0"
+      AIRFLOW__DAG_PROCESSOR__PARSING_PROCESSES: "1"
+      AIRFLOW__DAG_PROCESSOR__MIN_FILE_PROCESS_INTERVAL: "30"
       AIRFLOW_DEBUG_MODE: False
+      AIRFLOW_DAGRUN_TIMEOUT: 60 # Timeout for each DAG run in minutes
+      TEMP_TABLE_CLEANUP_DELAY: 60 # Delay between cleanup attempts on failure
+      AIRFLOW_VAR_JSON_VERSION: v2
+      # Set to True to include the search recommendations task in the auto_mapping DAG.
+      SEARCH_ENABLED: False
 
 volumes:
-  db_data:
-  minio_data:
+  db_data_pg18:
+  s3_data:
