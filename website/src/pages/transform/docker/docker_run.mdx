@@ -13,17 +13,17 @@ Carrot-Transform is available as a Docker container image, which makes it easy t
 The container image is published to GitHub Container Registry. Pull it with:
 
 ```bash copy
-docker pull ghcr.io/health-informatics-uon/carrot/transform:latest
+docker pull ghcr.io/health-informatics-uon/carrot/transform:edge
 ```
 
 The following tags are published:
 
 | Tag | Description |
 | --- | --- |
-| `latest` | The most recent stable release |
+| `edge` | The latest commit on the `main` branch - potentially unstable |
 | `<major>.<minor>.<patch>` (e.g. `1.2.3`) | A specific release |
 | `<major>.<minor>` / `<major>` (e.g. `1.2` / `1`) | The most recent release within that minor or major version |
-| `edge` | The latest commit on the `main` branch - potentially unstable |
+| `latest` | The most recent stable release |
 
 <Callout type="warning">
   **Version Pinning**: We recommend that you pin to a specific version of Transform for production use to ensure consistent behavior and avoid unexpected changes from updates.
@@ -36,7 +36,7 @@ For a specific version, check available tags at the [container registry](https:/
 Every example on this page follows the same pattern:
 
 ```bash
-docker run [docker options] ghcr.io/health-informatics-uon/carrot/transform:latest \
+docker run [docker options] ghcr.io/health-informatics-uon/carrot/transform:edge \
   carrot-transform [command] [options]
 ```
 
@@ -63,7 +63,7 @@ Run V1 with a volume mount so you can access the output files on your host machi
 
 ```bash copy
 docker run --rm -v $(pwd)/output:/output \
-  ghcr.io/health-informatics-uon/carrot/transform:latest \
+  ghcr.io/health-informatics-uon/carrot/transform:edge \
   carrot-transform run v1 \
     --inputs @carrot/examples/test/inputs \
     --rules-file @carrot/examples/test/rules/v1.json \
@@ -105,7 +105,7 @@ The following example shows how to run the V2 transformation process using Docke
 
 ```bash copy
 docker run --rm -v $(pwd)/output:/output \
-  ghcr.io/health-informatics-uon/carrot/transform:latest \
+  ghcr.io/health-informatics-uon/carrot/transform:edge \
   carrot-transform run v2 \
     --inputs @carrot/examples/test/inputs \
     --rules-file @carrot/examples/test/rules/v2.json \
@@ -176,7 +176,7 @@ docker run --rm \
   -v $(pwd)/data:/data \
   -v $(pwd)/rules:/rules \
   -v $(pwd)/output:/output \
-  ghcr.io/health-informatics-uon/carrot/transform:latest \
+  ghcr.io/health-informatics-uon/carrot/transform:edge \
   carrot-transform run v2 \
     --inputs /data \
     --rules-file /rules/rules.json \
@@ -205,7 +205,7 @@ docker rm -f <container_id>
 To remove the images, run:
 
 ```bash copy
-docker rmi -f ghcr.io/health-informatics-uon/carrot/transform:latest
+docker rmi -f ghcr.io/health-informatics-uon/carrot/transform:edge
 ```
 
 </Steps>
