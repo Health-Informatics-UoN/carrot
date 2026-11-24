@@ -18,6 +18,42 @@ Validation of `ScanReportConcept` occurs when they themselves are created. Their
 
 These are requirements for building the mapping rules
 
+## Table roles
+
+Each `ScanReportTable` has a `table_role`, set on its **Edit Table** page, which
+changes how its rules are built:
+
+| Role       | Rules built from its Concepts                                                                                                                                                         |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `standard` | As described below: each Concept's domain gives its `destination_table`.                                                                                                              |
+| `death`    | Concepts are recognised as causes of death in the `death` table, and the Date Event maps to its death date.                                                                          |
+| `note`     | None, except for value-mapped fields (below). Each row is a `note` record, built from the table's field mappings.                                                                    |
+| `note_nlp` | Each Concept gives `note_nlp` rules (`nlp_datetime`, `note_nlp_concept_id`, `note_nlp_source_concept_id`), plus the usual rules in its domain's table if the domain has one.         |
+
+`ScanReportTable.type_concept` (optional) is written to the `*_type_concept_id`
+field of every record built from the table, e.g. 32858 (NLP) for NLP-derived
+records.
+
+### Note and Note NLP tables
+
+The fields of `note` and `note_nlp` records aren't mapping rules. They're stored
+as `ScanReportTableFieldMapping`s, one per OMOP field, each filled from a source
+column, with a constant, or (for concept fields) from the concepts mapped to a
+column's values (`map_values`). A `note_nlp` table's `note_nlp_concept_id` can
+instead name a vocabulary whose codes the column holds (`vocabulary_id`), for
+Carrot Transform to look up.
+
+A value-mapped field's Concepts give one rule each, for that field only, rather
+than the rules described below. Concepts with ID 0 ("No matching concept") give
+no rules.
+
+NLP-derived record settings are stored in `NlpLinkSettings` (the optional
+`fact_relationship` link concepts) and `NlpDerivedRecordExclusion` (source
+column values that stop derived records).
+
+These are exported only in the JSON V2 rules. See [V2 rules for notes and
+NLP](/transform/rules_v2_notes_nlp).
+
 ## Building Rules
 
 For each `ScanReportConcept` that is created, the procedure to build Mapping-Rules proceeds as follows:
@@ -87,11 +123,15 @@ The rule is built with the current `source_table` from the `content_object` (`so
 
 ### 5. Source Concept ID
 
-- A rule is created by finding the `<domain>_source_concept_id` (`OmopField`) for the current `destination_table`. As with previous rules, the rule links this with the `concept` and the `source_table` and `source_field`.
+- A rule is created by finding the `<domain>_source_concept_id` (`OmopField`) for the current `destination_table`. The rule links it with the `ScanReportConcept`'s source concept, and with the `source_table` and `source_field`.
 
-<Callout>
- In the current implementation and validation, we force all concept IDs to be Standard. This means that always `<domain>_source_concept_id == <domain>_concept_id`. We may need to review this for the future and allow a `source_concept` and aswell as a `concept` object to be saved to a `ScanReportConcept`. The logic could be that if a `source_concept` is not `null` then `<domain>_source_concept_id != <domain>_concept_id`, which would not affect exisiting `ScanReportConcept` objects that are in the current database.
-</Callout>
+`ScanReportConcept.source_concept` records the concept the value's code was found as in its source vocabulary, before following "Maps to" to the standard concept (`ScanReportConcept.concept`):
+
+- **Vocabulary (V) concepts** from a data dictionary store both: the source concept is `concept_id_1` of the "Maps to" relationship and the standard concept is `concept_id_2`. Source concepts may be non-standard. When the code is already a standard concept it maps to itself, so both are the same.
+- **Manually added (M) concepts** have no source vocabulary, so `source_concept` is empty and `<domain>_source_concept_id` is the mapped concept.
+- **Reused (R) concepts** carry over the source concept of the concept they were reused from, if it has one.
+
+All rules exports write the source concept to `<domain>_source_concept_id`, falling back to the mapped concept when it's empty. Re-running auto-mapping fills it in on existing V concepts.
 
 ### Schematic Diagram
 

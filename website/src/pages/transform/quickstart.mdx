@@ -1,3 +1,4 @@
+import { Callout } from "nextra/components";
 
 # Carrot-Transform Quick Start Guide
 
@@ -55,6 +56,13 @@ carrot-transform run v2 \
   --person Demographics \
   --output carrottransform_test_output
 ```
+
+<Callout type="info">
+  Rules for notes and NLP output use the OMOP CDM v5.4 `note` and `note_nlp`
+  tables, so add `--omop-ddl-file @carrot/config/OMOPCDM_postgresql_5.4_ddl.sql`
+  to the command. The default DDL is CDM v5.3. See [V2 Rules for Notes and
+  NLP](/transform/rules_v2_notes_nlp).
+</Callout>
 
 ### Arguments
 

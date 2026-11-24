@@ -10,5 +10,13 @@ Carrot supports the following tables in OMOP:
 - device_exposure
 - procedure_occurrence
 - specimen
+- death
+- note (CDM v5.4)
+- note_nlp (CDM v5.4)
+- fact_relationship (optional links between NLP-derived records and their note_nlp records)
+
+The note and note_nlp tables are set up differently from the others, and are
+only included in the Mapping JSON V2 download. See [Mapping notes and NLP
+output](/mapper/user_guide/notes_and_nlp).
 
 See the [Github issue](https://github.com/Health-Informatics-UoN/carrot-mapper/issues/812) for detail on further tables supported, and requests.

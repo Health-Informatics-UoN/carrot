@@ -235,5 +235,62 @@ The rules file defines how the fields from the input person.tsv map to OMOP conc
 }
 ```
 
+## `note.tsv`
+Written when the rules include note tables (OMOP CDM v5.4). Each row of a notes source table becomes one note.
+See [V2 rules for notes and NLP](/transform/rules_v2_notes_nlp).
+
+### Column description
+| Column Name                     | Description |
+|---------------------------------|-------------|
+| `note_id`                       | A new unique identifier for the note. NLP records refer to it. |
+| `person_id`                     | The person the note is about (links to the `person` table). |
+| `note_date` / `note_datetime`   | When the note was written. |
+| `note_type_concept_id`          | Where the note came from, e.g. 32817 (EHR). |
+| `note_class_concept_id`         | The kind of note, e.g. a discharge summary. |
+| `note_title`                    | The note's title. |
+| `note_text`                     | The note's text. |
+| `encoding_concept_id`           | The text's character encoding. |
+| `language_concept_id`           | The language the note is written in. |
+| `note_source_value`             | The note's identifier or type in the source data. |
+
+### Mapping
+Fields are filled from the columns, fixed values and mapped values chosen in Carrot Mapper.
+The rules' `record_key` registers each note's new `note_id` under its key in the source data, so NLP records can be linked to it.
+
+## `note_nlp.tsv`
+Written when the rules include NLP tables. Each term an NLP system found in a note, with a concept, becomes one record.
+
+### Column description
+| Column Name                     | Description |
+|---------------------------------|-------------|
+| `note_nlp_id`                   | A new unique identifier for the NLP record. |
+| `note_id`                       | The note the term was found in (links to the `note` table). |
+| `lexical_variant`               | The term as it appears in the note. |
+| `snippet` / `offset`            | The text around the term, and where it starts in the note. |
+| `note_nlp_concept_id`           | The standard concept for the term. |
+| `note_nlp_source_concept_id`    | The concept the term's code was found as in its source vocabulary. |
+| `nlp_system`                    | The NLP system and version that found the term. |
+| `nlp_date` / `nlp_datetime`     | When the NLP system processed the note. |
+| `term_exists`, `term_temporal`, `term_modifiers` | Modifiers the NLP system gave the term, if mapped. |
+
+### Mapping
+Each record's `note_id` is looked up from its note's key in the source data. Records whose note wasn't found aren't written, and are counted in the log.
+
+NLP terms can also give records in their concept's domain table, such as `condition_occurrence.tsv`, with the type concept 32858 (NLP).
+These derived records are only written when their `note_nlp` record is, and not for rows matching the rules' exclusions (e.g. negated terms).
+How many were skipped, and why, is reported per table at the end of the run.
+
+## `fact_relationship.tsv`
+Only written when the rules ask for links between NLP-derived records and their `note_nlp` records.
+Each link is two rows, one in each direction, as the CDM requires.
+
+| Column Name                 | Description |
+|-----------------------------|-------------|
+| `domain_concept_id_1`       | The domain of the first record. |
+| `fact_id_1`                 | The ID of the first record. |
+| `domain_concept_id_2`       | The domain of the second record. |
+| `fact_id_2`                 | The ID of the second record. |
+| `relationship_concept_id`   | How the first record relates to the second. |
+
 ## `summary.tsv`
 

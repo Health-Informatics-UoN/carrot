@@ -1,0 +1,185 @@
+import { Callout } from "nextra/components";
+
+# Mapping clinical notes and NLP output
+
+Carrot can map clinical notes to the OMOP CDM v5.4 `note` table, and the terms an
+NLP (natural language processing) system found in them to the `note_nlp` table.
+Each NLP term's concept can also become a record in its own domain's table, such
+as a condition in `condition_occurrence`, marked as NLP-derived.
+
+These tables work differently from the others. A standard table's records are
+built from the Concepts mapped to its values. A note or NLP table's records are
+built from the table itself: you say which column holds each field of the
+record, such as the note's text.
+
+<Callout type="info">
+  Note and NLP tables are only included in the **Mapping JSON V2** download, and
+  need a Carrot Transform version that supports them. See [V2 rules for notes
+  and NLP](/transform/rules_v2_notes_nlp) for what the rules contain.
+</Callout>
+
+## Preparing your data
+
+Before scanning your data with WhiteRabbit, prepare one file for notes and one
+for NLP terms.
+
+**Notes file**, one row per note, with:
+
+- a person ID and a date, as for any other table
+- a **note key**: a value that identifies each note, which the NLP file uses to
+  say which note each term was found in
+- the note's text, and any other fields you want to keep, such as a title or
+  the kind of note
+
+**NLP file**, one row per term found, with:
+
+- the **note key** of the note the term was found in
+- the person ID and the note's date, joined in from the note (each derived
+  record, such as a condition, needs both)
+- the term's code, such as a SNOMED CT code
+- the term as it appears in the note, and optionally the text around it, its
+  position (offset) and the NLP system's name
+- any modifiers the NLP system gives as separate columns, such as `negated` or
+  `subject`, so they can be used as [exclusions](#exclusions)
+
+<Callout type="warning">
+  WhiteRabbit reads each line of a CSV file as one row, and skips rows that
+  don't split into the expected number of columns. Note text usually contains
+  line breaks, tabs and quotes, which make WhiteRabbit miss notes (or all of
+  them), so replace them before exporting: line breaks and tabs with spaces,
+  double quotes with single quotes and backslashes with forward slashes. Each
+  is a one-for-one swap, so NLP offsets still point at the right place in the
+  text.
+</Callout>
+
+Upload the scan report as usual. See [Uploading a Scan Report
+file](/mapper/user_guide/upload_scan_report).
+
+## Setting up a notes table
+
+Open the table's **Edit Table** page.
+
+1. Set **Person ID** and **Date Event** as for any other table.
+1. Set **Table role** to **Note**.
+1. Optionally set a **Type concept**, which records where the notes came from in
+   `note_type_concept_id`, such as 32817 (EHR). The concept's name is shown
+   under the ID so you can check it.
+1. Press **Save**. The **Note fields** section appears below.
+
+For each field of the `note` record, choose how it's filled:
+
+| Option                | What it does                                                                                        |
+| --------------------- | --------------------------------------------------------------------------------------------------- |
+| **From a column**     | Copies a column of your table into the field, e.g. `note_text` from your text column.               |
+| **Fixed value**       | Writes the same value on every record.                                                              |
+| **Fixed concept**     | Writes the same concept on every record, e.g. 4180186 (English) for `language_concept_id`.          |
+| **Map column values** | For concept fields that vary from row to row: map each value of a column to a concept (see below). |
+| **Not mapped**        | Leaves the field empty. Only offered for optional fields.                                           |
+
+`note_id` and `note_text` are required. Choose your note key column for
+`note_id`: Carrot Transform gives each note a new numeric ID, and uses your key
+to link NLP terms to it.
+
+### Mapping a column's values to a field
+
+Some concept fields depend on each row, such as `note_class_concept_id` (the kind
+of note: discharge summary, outpatient note and so on). For these, choose **Map
+column values** and the column holding that information, such as `note_type`,
+then press **Save fields**.
+
+The field then shows how many of the column's values have a concept, and a
+**Map values** button. Map each value to a concept on the column's values page,
+exactly as you would for any other field. A notice at the top of that page says
+which field the values fill. Each value can have one concept.
+
+Concepts mapped this way only fill that field: they don't create records in
+other tables.
+
+## Setting up an NLP table
+
+Open the NLP table's **Edit Table** page, set **Person ID** and **Date Event**,
+set **Table role** to **Note NLP** and press **Save**.
+
+Set **Type concept** to 32858 (NLP). This marks every record derived from the
+NLP output, such as a condition, as NLP-derived in its `*_type_concept_id`
+field. OHDSI's earlier per-domain "NLP derived" concepts (e.g. 32424) are
+non-standard; 32858 replaces all of them.
+
+Then fill in the **Note NLP fields** as for notes. Three are required:
+
+- `note_id`: the column holding the **note key** of the note each term was found
+  in. This is the key the notes table uses, not an ID for the NLP row.
+- `lexical_variant`: the term as it appears in the note.
+- `note_nlp_concept_id`: the column holding each term's code, and how its
+  concept is found:
+  - **Codes from a vocabulary**: the column holds codes of a vocabulary loaded
+    in Carrot, such as SNOMED CT codes (e.g. 22298006), not OMOP concept IDs.
+    Choose the vocabulary, and Carrot Transform finds each code's concept, so
+    you don't need to map the values in Carrot Mapper. Any value you do map to
+    a concept by hand is used instead.
+  - **Map column values**: map each value of the column to a concept, as for any
+    other field. Use this when the codes aren't from a vocabulary in OMOP.
+
+<Callout type="warning">
+  Carrot Transform support for **Codes from a vocabulary** is still in
+  development. Until it's released, use **Map column values** for
+  `note_nlp_concept_id`, and let auto-mapping map the codes by setting the
+  column's vocabulary in your data dictionary.
+</Callout>
+
+Either way, each term with a concept becomes a `note_nlp` record (with
+`note_nlp_concept_id` and `note_nlp_source_concept_id`), linked to its note.
+Values mapped to "No matching concept" (0) don't.
+
+Leave `term_exists` unmapped unless your data holds OMOP's own values for it
+("Y" when the term is asserted). A `negated` column has the opposite meaning, so
+use it as an exclusion instead.
+
+## NLP-derived records
+
+Each concept on an NLP table also becomes a record in its domain's table, such
+as `condition_occurrence` for a Condition concept, with the table's type concept.
+A derived record is only written when its `note_nlp` record is, so terms whose
+note wasn't found don't give records with no source.
+
+The **NLP-derived records** section of the NLP table's settings controls these.
+Saving it only affects the downloaded rules, so it doesn't re-run auto-mapping.
+
+### Exclusions
+
+Exclusions stop derived records for rows whose column holds one of the given
+values, such as negated or family-history terms. The `note_nlp` record is still
+written, so the term isn't lost.
+
+Press **Add exclusion**, choose the column (e.g. `negated`), then type each value
+that should stop derived records (e.g. `true`) and press Enter or **Add**. Each
+value is matched in full, ignoring case and surrounding spaces, and may contain
+commas.
+
+### Link to note_nlp
+
+Each derived record can optionally be linked to its `note_nlp` record in the
+`fact_relationship` table, using three concepts: the domain of `note_nlp` records
+and the relationships in each direction.
+
+<Callout type="info">
+  The standard OMOP vocabularies don't yet have a domain concept for `note_nlp`
+  or relationship concepts for NLP derivation, so most people should leave these
+  empty. Derived records are still identified as NLP-derived by their type
+  concept (32858).
+</Callout>
+
+## Checking and downloading
+
+The **Rules** page of your scan report has a **Note tables** section listing each
+note and NLP table, how each of its fields is filled, and whether it's in the
+downloaded rules. A table marked **Needs attention** lists what's missing and
+where to set it. The same list is shown at the top of the table's **Edit Table**
+page.
+
+The rules list below it shows the mapping rules from Concepts as usual,
+including those for NLP terms and the records derived from them.
+
+When every table is ready, download **Mapping JSON V2** from **Request Download**
+and run it with Carrot Transform. See [Expected
+Output](/transform/expected_output) for the files it writes.
