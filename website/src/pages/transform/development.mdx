@@ -51,57 +51,30 @@ uv run pytest
 You can run the CLI directly like this:
 
 ```sh
-uv run -m carrottransform.cli.subcommands.run mapstream \
+uv run carrot-transform run v1 \
     --inputs carrottransform/examples/test/inputs \
     --person Demographics \
     --rules-file carrottransform/examples/test/rules/rules_14June2021.json \
     --output build
 ```
 
-> ⚠️ On Windows, you would need to replace `/` with `^` for line continuation in the terminal.
+> ⚠️ On Windows, you would need to replace `\` with `^` for line continuation in the terminal.
 >
 > Or just paste it into a text editor and hit `END` `END` `BACKSPACE` `DELETE` until you've reformatted it into one line, then, paste that into the command prompt
 
 ---
 
-## Deploying to PyPI and CI / GitHub Actions
+## Releases
 
-[The CI file](.github/workflows/uv-workflow.yml) uses [GitHub actions](https://github.com/Health-Informatics-UoN/carrot-transform/actions) to test the project and (when appropriate) [deploy to PyPI.](https://pypi.org/project/carrot-transform/)
-When the CI job runs, it tests and assembles the project.
-If the commit being examined is against the `main` branch, then, the project will be deployed to PyPI Test.
-If the commit has been tagged with a tag starting with `v...` then the project will be deployed to PyPI Main.
+Releases are automated with [`semantic-release`](https://semantic-release.gitbook.io/), driven by [Conventional Commits](https://www.conventionalcommits.org/).
 
+- PR titles must follow Conventional Commits (e.g. `feat: ...`, `fix: ...`, `docs: ...`) - this is enforced by CI. PRs are squash-merged, so the PR title becomes the commit on `main`; individual commits within your branch don't need to follow the convention.
+- On every merge to `main`, [the release workflow](https://github.com/Health-Informatics-UoN/carrot-transform/blob/main/.github/workflows/release.yml) publishes an `edge` container image, and `semantic-release` decides whether a new release is needed:
+  - `fix:` triggers a patch release
+  - `feat:` triggers a minor release
+  - a breaking change (`!`, e.g. `feat!: ...`, or a `BREAKING CHANGE:` footer) triggers a major release
+- When a release is created, it is tagged in git and on GitHub, the container image is tagged with the version (e.g. `1.2.3`, `1.2`, `1` and `latest`), and the package is published to [PyPI](https://pypi.org/project/carrot-transform/).
 
-## Release
+There is no need to bump the version by hand - the package version is derived from the git tags (via `hatch-vcs`), so there is no version number in `pyproject.toml`.
 
-The Carrot Transform release procedure is;
-- update version in `pyproject.toml`
-- merge that into `main`
-- tag it with `v?.?.?` and await the CI job
-
-This can be done as follows ...
-
-- `λ git checkout main` to checkout the main branch
-- `λ git pull origin main` to ensure your local is up to date
-- `λ uvx poetry version minor` this will increment the minor version
-  - you can change **major** . **minor** . **patch** with this command
-  - you can also do the edits by hand if you like
-- `λ NEW_VERSION=$(uvx poetry version -s)` to read the version
-  - this will be different on Windows
-  - again, you can set the envar by hand
-  - ... or substitue the values below by hand ...
-- `λ git checkout -b release/v$NEW_VERSION`
-  - Windows `cmd` uses `%NAME%` for shell substitution; you'll need to do something different
-- `λ git add pyproject.toml`
-- `λ git commit -m "Bump version to $NEW_VERSION"`
-- `λ git push --set-upstream origin release/v$NEW_VERSION`
-- submit the PR and merge it with main
-- `λ git checkout main`
-- `λ git pull origin main`
-- `λ git tag v$NEW_VERSION`
-- `λ git push origin v$NEW_VERSION`
-
-
-
-
-
+See the [contributing guide](https://github.com/Health-Informatics-UoN/carrot-transform/blob/main/CONTRIBUTING.md) for more details.
